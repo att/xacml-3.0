@@ -1,0 +1,15 @@
+Tests run = 543
+Decisions match = 543
+Status Codes match = 543
+Attributes match = 543
+PolicyIds match = 543
+PolicySetIds match = 543
+Associated Advice match = 543
+Obligations match = 543
+Unknown functions = 6
+Elapsed time = 00:00:07.883
+First decide time in nano-seconds 4747598000
+Total Multiple decide time in nano-seconds 0
+
+Average First decide time in nano-seconds 8743274
+Average decide time after first call in nano-seconds 0

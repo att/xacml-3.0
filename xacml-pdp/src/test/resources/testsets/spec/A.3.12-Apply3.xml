@@ -1,0 +1,13 @@
+<Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:any-of-any">
+   <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+   <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Ringo</AttributeValue>
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Mary</AttributeValue>
+   </Apply>
+   <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">John</AttributeValue>
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Paul</AttributeValue>
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">George</AttributeValue>
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Ringo</AttributeValue>
+   </Apply>
+</Apply>

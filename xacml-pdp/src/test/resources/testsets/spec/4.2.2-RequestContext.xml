@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Request xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd"
+   ReturnPolicyIdList="false">
+  <Attributes
+    Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject">
+    <Attribute IncludeInResult="false"
+        AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id"
+      Issuer="med.example.com">
+      <AttributeValue
+        DataType="http://www.w3.org/2001/XMLSchema#string">CN=Julius Hibbert</AttributeValue>
+    </Attribute>
+    <Attribute IncludeInResult="false"
+      AttributeId="urn:oasis:names:tc:xacml:3.0:example:attribute:role"
+      Issuer="med.example.com">
+      <AttributeValue
+        DataType="http://www.w3.org/2001/XMLSchema#string"
+        >physician</AttributeValue>
+      </Attribute>
+    <Attribute IncludeInResult="false"
+      AttributeId="urn:oasis:names:tc:xacml:3.0:example:attribute:physician-id"
+      Issuer="med.example.com">
+      <AttributeValue
+      DataType="http://www.w3.org/2001/XMLSchema#string">jh1234</AttributeValue>
+    </Attribute>
+  </Attributes>
+  <Attributes
+    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource">
+    <Content>
+      <md:record xmlns:md="urn:example:med:schemas:record"
+        xsi:schemaLocation="urn:example:med:schemas:record
+        http://www.med.example.com/schemas/record.xsd">
+        <md:patient>
+          <md:patientDoB>1992-03-21</md:patientDoB>
+          <md:patient-number>555555</md:patient-number>
+          <md:patientContact>
+            <md:email>b.simpson@example.com</md:email>
+          </md:patientContact>
+        </md:patient>
+      </md:record>
+    </Content>
+    <Attribute IncludeInResult="false"
+        AttributeId="urn:oasis:names:tc:xacml:3.0:content-selector" >
+      <AttributeValue
+        XPathCategory="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+        DataType=" urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression"
+        >md:record/md:patient/md:patientDoB</AttributeValue>
+    </Attribute>
+    <Attribute IncludeInResult="false"
+        AttributeId="urn:oasis:names:tc:xacml:2.0:resource:target-namespace" >
+      <AttributeValue
+        DataType="http://www.w3.org/2001/XMLSchema#anyURI"
+        >urn:example:med:schemas:record</AttributeValue>
+    </Attribute>
+  </Attributes>
+  <Attributes
+    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action">
+    <Attribute IncludeInResult="false"
+         AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" >
+      <AttributeValue
+        DataType="http://www.w3.org/2001/XMLSchema#string">read</AttributeValue>
+    </Attribute>
+  </Attributes>
+  <Attributes
+    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment">
+    <Attribute IncludeInResult="false"
+         AttributeId="urn:oasis:names:tc:xacml:1.0:environment:current-date" >
+      <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#date"
+          >2010-01-11</AttributeValue>
+    </Attribute>
+  </Attributes>
+</Request>

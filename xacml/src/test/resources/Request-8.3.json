@@ -1,0 +1,95 @@
+{
+  "Request": {
+    "AccessSubject": [
+      {
+        "Id": "s1",
+        "Attribute": [
+          {
+            "AttributeId": "com.acme.user.employeeId",
+            "Value": "Alice"
+          }
+        ]
+      }
+    ],
+    "Resource": [
+      {
+        "Id": "r1",
+        "Attribute": [
+          {
+            "AttributeId": "com.acme.object.objectType",
+            "Value": "record"
+          },
+          {
+            "AttributeId": "com.acme.record.recordId",
+            "Value": "126",
+            "IncludeInResult": true
+          }
+        ]
+      },
+      {
+        "Id": "r2",
+        "Attribute": [
+          {
+            "AttributeId": "com.acme.object.objectType",
+            "Value": "record"
+          },
+          {
+            "AttributeId": "com.acme.record.recordId",
+            "Value": "125",
+            "IncludeInResult": true
+          }
+        ]
+      }
+    ],
+    "Action": [
+      {
+        "Id": "a1",
+        "Attribute": [
+          {
+            "AttributeId": "com.acme.action.actionId",
+            "Value": "view",
+            "IncludeInResult": true
+          }
+        ]
+      },
+      {
+        "Id": "a2",
+        "Attribute": [
+          {
+            "AttributeId": "com.acme.action.actionId",
+            "Value": "edit",
+            "IncludeInResult": true
+          }
+        ]
+      },
+      {
+        "Id": "a3",
+        "Attribute": [
+          {
+            "AttributeId": "com.acme.action.actionId",
+            "Value": "delete",
+            "IncludeInResult": true
+          }
+        ]
+      }
+    ],
+    "MultiRequests": {
+      "RequestReference": [
+        {
+          "ReferenceId": [
+            "s1",
+            "a1",
+            "r1"
+          ]
+        },
+        {
+          "ReferenceId": [
+            "s1",
+            "a2",
+            "r1"
+          ]
+        }
+      ]
+    }
+  }
+}

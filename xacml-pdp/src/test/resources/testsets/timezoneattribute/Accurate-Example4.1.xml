@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" PolicyId="urn:com:att:xacml:policy:id:test:example:accurate" Version="1" RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:deny-unless-permit">
+    <Description>A more accurate sample policy to test detection of a users time, when the process is in another time zone.</Description>
+    <Target>
+        <AnyOf>
+            <AllOf>
+                <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">accurate-example-4.1</AttributeValue>
+                    <AttributeDesignator Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="false"/>
+                </Match>
+            </AllOf>
+        </AnyOf>
+    </Target>
+    <Rule RuleId="id-rule-permit" Effect="Permit">
+        <Description>PERMIT - user can access in their time zone</Description>
+        <Target />
+        <Condition>
+            <Apply
+                xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                FunctionId="urn:oasis:names:tc:xacml:3.0:function:time-in-recurring-range">
+                <Apply
+                    FunctionId="urn:oasis:names:tc:xacml:1.0:function:time-one-and-only">
+                    <!-- NOTE that the attribute ID is changed to JUnits can run at any time of day and simulate the user time.
+                       In production you would want to use the urn:oasis:names:tc:xacml:1.0:environment:current-time id as the attribute id.
+                     -->
+                    <AttributeDesignator
+                        Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
+                        AttributeId="test:current:time"
+                        DataType="http://www.w3.org/2001/XMLSchema#time"
+                        MustBePresent="false" />
+                </Apply>
+                <Apply
+                    FunctionId="urn:com:att:research:function:time-with-offset">
+                    <AttributeValue
+                        DataType="http://www.w3.org/2001/XMLSchema#time">09:00:00</AttributeValue>
+                    <Apply
+                        FunctionId="urn:com:att:research:function:zone-offset-one-and-only">
+                        <AttributeDesignator
+                            Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                            AttributeId="test:user:time-zone"
+                            DataType="urn:com:att:research:datatype:zone-offset"
+                            MustBePresent="false" />
+                    </Apply>
+                </Apply>
+                <Apply FunctionId="urn:com:att:research:function:time-with-offset">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#time">17:00:00</AttributeValue>
+                    <Apply
+                        FunctionId="urn:com:att:research:function:zone-offset-one-and-only">
+                        <AttributeDesignator
+                            Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                            AttributeId="test:user:time-zone"
+                            DataType="urn:com:att:research:datatype:zone-offset"
+                            MustBePresent="false" />
+                    </Apply>
+                </Apply>
+            </Apply>
+        </Condition>
+    </Rule>
+
+</Policy>

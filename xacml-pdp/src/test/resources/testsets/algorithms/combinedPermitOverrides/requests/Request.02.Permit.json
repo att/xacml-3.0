@@ -1,0 +1,28 @@
+{
+   "Request" : {
+		"AccessSubject" : {
+			"Attribute" : [
+			   {
+                  "Value" : "Bart",
+                  "AttributeId" : "urn:oasis:names:tc:xacml:1.0:subject:subject-id"
+               }
+             ]
+        },
+        "Action" : {
+        	"Attribute" : [
+	           {
+	              "Value" : "read",
+	              "AttributeId" : "urn:oasis:names:tc:xacml:1.0:action:action-id"
+               }
+            ]
+   	    },
+        "Resource" : {
+        	"Attribute" : [
+               {
+	              "Value" : "HOF",
+	              "AttributeId" : "urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+               }
+	       ]
+	    }
+   }
+}

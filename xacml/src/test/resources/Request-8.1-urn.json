@@ -1,0 +1,33 @@
+{
+   "Request":{
+      "Category":[{
+         "CategoryId":"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject",
+         "Attribute":[{
+           "AttributeId":"subject-id",
+           "Value":"Andreas"
+         },{
+           "AttributeId":"location",
+           "Value":"Gamla Stan"
+         }]
+      },{
+         "CategoryId":"urn:oasis:names:tc:xacml:3.0:attribute-category:action",
+         "Attribute":[{
+           "AttributeId":"action-id",
+           "Value":"http://example.com/buy",
+           "DataType":"anyURI"
+         }]
+      },{
+         "CategoryId":"urn:oasis:names:tc:xacml:3.0:attribute-category:resource",
+         "Attribute":[{
+           "AttributeId":"book-title",
+           "Value":"Learn German in 90 days"
+         },{
+           "AttributeId":"currency",
+           "Value": "SEK"
+         },{
+           "AttributeId":"price",
+           "Value": 123.34
+         }]
+      }]
+   }
+}

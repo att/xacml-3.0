@@ -1,0 +1,7 @@
+<Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:map">
+   <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-normalize-to-lower-case"/>
+   <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Hello</AttributeValue>
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">World!</AttributeValue>
+   </Apply>
+</Apply>

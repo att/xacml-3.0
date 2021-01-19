@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy
+  xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:md="http:www.med.example.com/schemas/record.xsd"
+  PolicyId="urn:oasis:names:tc:xacml:3.0:example:policyid:4"
+  Version="1.0"
+  RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides">
+  <PolicyDefaults>
+    <XPathVersion>http://www.w3.org/TR/1999/REC-xpath-19991116</XPathVersion>
+  </PolicyDefaults>
+  <Target/>
+  <Rule
+    RuleId="urn:oasis:names:tc:xacml:3.0:example:ruleid:4"
+    Effect="Deny">
+    <Description>
+      An Administrator shall not be permitted to read or write
+      medical elements of a patient record in the
+      http://www.med.example.com/records.xsd namespace.
+    </Description>
+    <Target>
+      <AnyOf>
+        <AllOf>
+          <Match
+            MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+           <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string"
+            >administrator</AttributeValue>
+            <AttributeDesignator
+              MustBePresent="false"
+      Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+            AttributeId="urn:oasis:names:tc:xacml:3.0:example:attribute:role"
+              DataType="http://www.w3.org/2001/XMLSchema#string"/>
+          </Match>
+        </AllOf>
+      </AnyOf>
+      <AnyOf>
+        <AllOf>
+          <Match
+            MatchId="urn:oasis:names:tc:xacml:1.0:function:anyURI-equal">
+           <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI"
+            >urn:example:med:schemas:record</AttributeValue>
+            <AttributeDesignator
+              MustBePresent="false"
+          Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+         AttributeId="urn:oasis:names:tc:xacml:2.0:resource:target-namespace"
+              DataType="http://www.w3.org/2001/XMLSchema#anyURI"/>
+          </Match>
+          <Match
+            MatchId="urn:oasis:names:tc:xacml:3.0:function:xpath-node-match">
+            <AttributeValue
+           DataType="urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression"
+    XPathCategory="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+               >md:record/md:medical</AttributeValue>
+            <AttributeDesignator
+               MustBePresent="false"
+          Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+          AttributeId="urn:oasis:names:tc:xacml:3.0:content-selector"
+          DataType="urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression"/>
+          </Match>
+        </AllOf>
+      </AnyOf>
+      <AnyOf>
+        <AllOf>
+          <Match
+            MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string"
+             >read</AttributeValue>
+            <AttributeDesignator
+               MustBePresent="false"
+            Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action"
+              AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+              DataType="http://www.w3.org/2001/XMLSchema#string"/>
+          </Match>
+        </AllOf>
+        <AllOf>
+          <Match
+            MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+           <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string"
+            >write</AttributeValue>
+            <AttributeDesignator
+               MustBePresent="false"
+            Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action"
+              AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+              DataType="http://www.w3.org/2001/XMLSchema#string"/>
+          </Match>
+        </AllOf>
+      </AnyOf>
+    </Target>
+  </Rule>
+</Policy>

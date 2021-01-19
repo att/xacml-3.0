@@ -1,0 +1,11 @@
+<Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:any-of">
+    <Function
+FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-regexp-match"/>
+    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">
+        John.*
+    </AttributeValue>
+    <AttributeDesignator
+         Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+         AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id"
+         DataType="http://www.w3.org/2001/XMLSchema#string"/>
+</Apply>

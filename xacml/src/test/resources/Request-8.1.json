@@ -1,0 +1,32 @@
+{
+   "Request":{
+      "AccessSubject":[{
+         "Attribute":[{
+           "AttributeId":"subject-id",
+           "Value":"Andreas"
+         },{
+           "AttributeId":"location",
+           "Value":"Gamla Stan"
+         }]
+      }],
+      "Action":[{
+         "Attribute":[{
+           "AttributeId":"action-id",
+           "Value":"http://example.com/buy",
+           "DataType":"anyURI"
+         }]
+      }],
+      "Resource":[{
+         "Attribute":[{
+           "AttributeId":"book-title",
+           "Value":"Learn German in 90 days"
+         },{
+           "AttributeId":"currency",
+           "Value": "SEK"
+         },{
+           "AttributeId":"price",
+           "Value": 123.34
+         }]
+      }]
+   }
+}

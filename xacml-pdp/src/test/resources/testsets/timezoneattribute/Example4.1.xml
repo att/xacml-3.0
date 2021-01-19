@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" PolicyId="urn:com:att:xacml:policy:id:test:example:4.1" Version="1" RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:deny-unless-permit">
+    <Description>A sample policy to test example 4.1 in the Time Extensions v1.0.</Description>
+    <Target>
+        <AnyOf>
+            <AllOf>
+                <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">example-4.1</AttributeValue>
+                    <AttributeDesignator Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="false"/>
+                </Match>
+            </AllOf>
+        </AnyOf>
+    </Target>
+    <Rule RuleId="id-rule-permit" Effect="Permit">
+        <Description>PERMIT - user can access in their time zone</Description>
+        <Target />
+        <Condition>
+            <Apply
+                xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                FunctionId="urn:oasis:names:tc:xacml:3.0:function:time-in-recurring-range">
+                <Apply
+                    FunctionId="urn:oasis:names:tc:xacml:1.0:function:time-one-and-only">
+                    <!-- NOTE that the attribute ID is changed to JUnits can run at any time of day and simulate the user time.
+                       In production you would want to use the urn:oasis:names:tc:xacml:1.0:environment:current-time id as the attribute id.
+                     -->
+                    <AttributeDesignator
+                        Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
+                        AttributeId="test:current:time"
+                        DataType="http://www.w3.org/2001/XMLSchema#time"
+                        MustBePresent="false" />
+                </Apply>
+                <Apply
+                    FunctionId="urn:oasis:names:tc:xacml:3.0:function:time-add-dayTimeDuration">
+                    <AttributeValue
+                        DataType="http://www.w3.org/2001/XMLSchema#time">09:00:00Z</AttributeValue>
+                    <Apply
+                        FunctionId="urn:oasis:names:tc:xacml:1.0:function:dayTimeDuration-one-and-only">
+                        <AttributeDesignator
+                            Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                            AttributeId="urn:oasis:names:tc:xacml:3.0:entity:time-zone"
+                            DataType="http://www.w3.org/2001/XMLSchema#dayTimeDuration"
+                            MustBePresent="false" />
+                    </Apply>
+                </Apply>
+                <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:time-add-dayTimeDuration">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#time">17:00:00Z</AttributeValue>
+                    <Apply
+                        FunctionId="urn:oasis:names:tc:xacml:1.0:function:dayTimeDuration-one-and-only">
+                        <AttributeDesignator
+                            Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                            AttributeId="urn:oasis:names:tc:xacml:3.0:entity:time-zone"
+                            DataType="http://www.w3.org/2001/XMLSchema#dayTimeDuration"
+                            MustBePresent="false" />
+                    </Apply>
+                </Apply>
+            </Apply>
+        </Condition>
+    </Rule>
+
+</Policy>

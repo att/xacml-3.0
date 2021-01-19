@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PolicySet
+  xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  PolicySetId="urn:oasis:names:tc:xacml:3.0:example:policysetid:1"
+  Version="1.0"
+  PolicyCombiningAlgId=
+  "urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:deny-overrides">
+  <Description>
+    Example policy set.
+  </Description>
+  <Target>
+    <AnyOf>
+      <AllOf>
+        <Match
+          MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string"
+            >urn:example:med:schema:records</AttributeValue>
+          <AttributeDesignator
+            MustBePresent="false"
+            Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+            AttributeId="urn:oasis:names:tc:xacml:2.0:resource:target-namespace"
+            DataType="http://www.w3.org/2001/XMLSchema#string"/>
+        </Match>
+      </AllOf>
+    </AnyOf>
+  </Target>
+  <PolicyIdReference>
+    urn:oasis:names:tc:xacml:3.0:example:policyid:3
+  </PolicyIdReference>
+  <Policy
+    PolicyId="urn:oasis:names:tc:xacml:3.0:example:policyid:2"
+    RuleCombiningAlgId=
+      "urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides"
+    Version="1.0">
+    <Target/>
+    <Rule RuleId="urn:oasis:names:tc:xacml:3.0:example:ruleid:1"
+      Effect="Permit">
+    </Rule>
+    <Rule RuleId="urn:oasis:names:tc:xacml:3.0:example:ruleid:2"
+      Effect="Permit">
+    </Rule>
+    <Rule RuleId="urn:oasis:names:tc:xacml:3.0:example:ruleid:4"
+      Effect="Deny">
+    </Rule>
+  </Policy>
+</PolicySet>

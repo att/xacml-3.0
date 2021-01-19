@@ -1,0 +1,10 @@
+<Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:all-of">
+   <Function FunctionId="urn:oasis:names:tc:xacml:2.0:function:integer-greater-than"/>
+   <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">10</AttributeValue>
+   <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-bag">
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">9</AttributeValue>
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">3</AttributeValue>
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">4</AttributeValue>
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">2</AttributeValue>
+   </Apply>
+</Apply>

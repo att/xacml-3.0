@@ -1,0 +1,183 @@
+{
+	"Request": {
+		"ReturnPolicyIdList": true,
+		"AccessSubject": [
+			{
+				"Attribute": [
+					{
+						"AttributeId": "subject-id",
+						"Value": "Andreas"
+					},
+					{
+						"AttributeId": "subject-id-qualifier",
+						"DataType" : "string",
+						"Value": "Member"
+					},
+					{
+						"AttributeId": "key-info",
+						"Value": "key123"
+					},
+					{
+						"AttributeId": "authentication-time",
+						"DataType": "http://www.w3.org/2001/XMLSchema#time",
+						"Value": "08:19:52-05:00"
+					},
+					{
+						"AttributeId": "authentication-method",
+						"Value": "frontlock"
+					},
+					{
+						"AttributeId": "request-time",
+						"DataType": "http://www.w3.org/2001/XMLSchema#time",
+						"Value": "08:23:48-05:00"
+					},
+					{
+						"AttributeId": "session-start-time",
+						"DataType": "time",
+						"Value": "08:20:48-05:00"
+					},
+					{
+						"AttributeId": "ip-address",
+						"DataType": "ipAddress",
+						"Value": "127.0.0.1"
+					},
+					{
+						"AttributeId": "dns-name",
+						"DataType": "dnsName",
+						"Value": "yourhost:0-9"
+					}
+				]
+			}
+		],
+		"RecipientSubject": [
+			{
+				"Attribute": [
+					{
+						"AttributeId": "id:boolean",
+						"Value": false,
+						"IncludeInResult": true
+					},
+					{
+						"AttributeId": "id:integer",
+						"Value": 5
+					},
+					{
+						"AttributeId": "id:double",
+						"Value": 8.888
+					}
+				]
+			}
+		],
+		"IntermediarySubject": [
+			{
+				"Attribute": [
+					{
+						"AttributeId": "id:x500",
+						"DataType": "urn:oasis:names:tc:xacml:1.0:data-type:x500Name",
+						"Value": "cn=Julius Hibbert,o=Medico Corp,c=us"
+					},
+					{
+						"AttributeId": "id:rfc822",
+						"DataType": "urn:oasis:names:tc:xacml:1.0:data-type:rfc822Name",
+						"Value": "j_hibbert@MEDICO.COM"
+					},
+					{
+						"AttributeId": "id:xpath",
+						"DataType": "urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression",
+						"Value": "md:record/md:patient/md:patientDoB"
+					}
+				]
+			}
+		],
+		"Action": [
+			{
+				"Attribute": [
+					{
+						"AttributeId": "action-id",
+						"Value": "read"
+					},
+					{
+						"AttributeId": "implied-action",
+						"Value": "http://example.com/buy",
+						"DataType": "anyURI"
+					}
+				]
+			}
+		],
+		"Resource": [
+			{
+				"Attribute": [
+					{
+						"AttributeId": "resource-id",
+						"Value": "Learn German in 90 days"
+					},
+					{
+						"AttributeId": "target-namespace",
+						"Value": "SelfHelp"
+					}
+				]
+			}
+		],
+		"Environment": [
+			{
+				"Attribute": [
+					{
+						"AttributeId": "current-time",
+						"DataType": "time",
+						"Value": "08:23:47-05:00"
+					},
+					{
+						"AttributeId": "current-date",
+						"DataType": "date",
+						"Value": "2020-01-01"
+					},
+					{
+						"AttributeId": "current-dateTime",
+						"DataType": "dateTime",
+						"Value": "2020-01-01T08:23:47-05:00"
+					}
+				]
+			}
+		],
+		"Codebase": [
+			{
+				"Attribute": [
+					{
+						"AttributeId": "id:code",
+						"Value": ["image:build", 5],
+						"IncludeInResult": false
+					},
+					{
+						"AttributeId": "id:version",
+						"DataType": "http://www.w3.org/2001/XMLSchema#integer",
+						"Value": "999"
+					},
+					{
+						"AttributeId": "id:random",
+						"DataType": "http://www.w3.org/2001/XMLSchema#double",
+						"Value": "5.55"
+					},
+					{
+						"AttributeId": "id:isSnapshot",
+						"DataType": "http://www.w3.org/2001/XMLSchema#boolean",
+						"Value": "false"
+					}
+				]
+			}
+		],
+		"RequestingMachine": [
+			{
+				"Attribute": [
+					{
+						"AttributeId": "id:machine",
+						"Value": [
+							{"rack": "topleft"}, 
+							{"id" : 10}
+						],
+						"IncludeInResult": false
+					}
+				]
+			}
+		]
+	}
+}

@@ -1,0 +1,88 @@
+{
+  "Request": {
+    "AccessSubject": [
+      {
+        "Attribute": [
+          {
+            "AttributeId": "subject-id",
+            "Value": "Andreas"
+          },
+          {
+            "AttributeId": "location",
+            "Value": "Gamla Stan"
+          }
+        ]
+      }
+    ],
+    "Action": [
+      {
+        "Attribute": [
+          {
+            "AttributeId": "action-id",
+            "Value": "http://example.com/buy",
+            "DataType": "anyURI"
+          }
+        ]
+      }
+    ],
+    "Resource": [
+      {
+        "Attribute": [
+          {
+            "AttributeId": "book-title",
+            "Value": "Learn German in 90 days"
+          },
+          {
+            "AttributeId": "currency",
+            "Value": "SEK"
+          },
+          {
+            "AttributeId": "price",
+            "Value": 123.34
+          }
+        ]
+      }
+    ],
+    "Category": [
+      {
+        "CategoryId": "urn:oasis:names:tc:xacml:1.0:subject-category:access-subject",
+        "Attribute": [
+          {
+            "AttributeId": "subject-id",
+            "Value": "John"
+          },
+          {
+            "AttributeId": "location",
+            "Value": "Big Mountain"
+          }
+        ]
+      },
+      {
+        "CategoryId": "urn:oasis:names:tc:xacml:3.0:attribute-category:resource",
+        "Attribute": [
+          {
+            "AttributeId": "book-title",
+            "Value": "Learn French in 90 days"
+          },
+          {
+            "AttributeId": "currency",
+            "Value": "EUR"
+          },
+          {
+            "AttributeId": "price",
+            "Value": 123.34
+          }
+        ]
+      },
+      {
+        "CategoryId": "urn:custom:category",
+        "Attribute": [
+          {
+            "AttributeId": "some-attribute",
+            "Value": "some value"
+          }
+        ]
+      }
+    ]
+  }
+}

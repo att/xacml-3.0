@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+    PolicyId="urn:com:att:xacml:policy:id:test:time-inrecurring-range" Version="1"
+    RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:permit-unless-deny">
+    <Description>This policy will deny between the hours of midnight to 6am in the specific resource time zone, as well as on weekends.</Description>
+    <Target>
+        <AnyOf>
+            <AllOf>
+                <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                    <AttributeValue
+                        DataType="http://www.w3.org/2001/XMLSchema#string">is-resource-in-range</AttributeValue>
+                    <AttributeDesignator 
+                        Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action" 
+                        AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" 
+                        DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true" />
+                </Match>
+            </AllOf>
+        </AnyOf>
+    </Target>
+    <Rule RuleId="id-rule-deny-midnight-to-6am" Effect="Deny">
+        <Description>No action can be taken during maintenance hours of midnight - 6am in the
+            resources time zone.</Description>
+        <Target />
+        <Condition>
+            <Apply xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                FunctionId="urn:oasis:names:tc:xacml:3.0:function:time-in-recurring-range">
+                <Apply
+                    FunctionId="urn:oasis:names:tc:xacml:1.0:function:time-one-and-only">
+                <!-- NOTE that the attribute ID is changed to JUnits can run at any time of day and simulate the user time.
+                   In production you would want to use the urn:oasis:names:tc:xacml:1.0:environment:current-time id as the attribute id.
+                 -->
+                    <AttributeDesignator
+                        Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
+                        AttributeId="test:current:time"
+                        DataType="http://www.w3.org/2001/XMLSchema#time" MustBePresent="true" />
+                </Apply>
+                <Apply FunctionId="urn:com:att:research:function:time-with-offset">
+                    <AttributeValue
+                        DataType="http://www.w3.org/2001/XMLSchema#time">00:00:00</AttributeValue>
+                    <Apply
+                        FunctionId="urn:com:att:research:function:zone-offset-one-and-only">
+                        <AttributeDesignator
+                            Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                            AttributeId="test:user:time-zone"
+                            DataType="urn:com:att:research:datatype:zone-offset"
+                            MustBePresent="true" />
+                    </Apply>
+                </Apply>
+                <Apply FunctionId="urn:com:att:research:function:time-with-offset">
+                    <AttributeValue
+                        DataType="http://www.w3.org/2001/XMLSchema#time">06:00:00</AttributeValue>
+                    <Apply
+                        FunctionId="urn:com:att:research:function:zone-offset-one-and-only">
+                        <AttributeDesignator
+                            Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                            AttributeId="test:user:time-zone"
+                            DataType="urn:com:att:research:datatype:zone-offset"
+                            MustBePresent="true" />
+                    </Apply>
+                </Apply>
+            </Apply>
+        </Condition>
+    </Rule>
+    <Rule RuleId="id-rule-deny-weekends" Effect="Deny">
+        <Description>No action can be taken on the weekends.</Description>
+        <Target />
+        <Condition>
+            <Apply xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                FunctionId="urn:oasis:names:tc:xacml:3.0:function:dateTime-in-dayOfWeek-range">
+                <Apply
+                    FunctionId="urn:oasis:names:tc:xacml:1.0:function:dateTime-one-and-only">
+                <!-- NOTE that the attribute ID is changed to JUnits can run at any time of day and simulate the user date time.
+                   In production you would want to use the urn:oasis:names:tc:xacml:1.0:environment:current-dateTime id as the attribute id.
+                 -->
+                    <AttributeDesignator
+                        Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
+                        AttributeId="test:current:datetime"
+                        DataType="http://www.w3.org/2001/XMLSchema#dateTime" MustBePresent="true" />
+                </Apply>
+
+                <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:dayOfWeek-from-string">                
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:2.0:function:string-concatenate">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-from-dayOfWeek">                
+                            <AttributeValue DataType="urn:oasis:names:tc:xacml:3.0:data-type:dayOfWeek">6</AttributeValue>
+                        </Apply>
+                        <Apply FunctionId="urn:com:att:research:function:string-from-zone-offset">                
+                            <Apply
+                                FunctionId="urn:com:att:research:function:zone-offset-one-and-only">
+                                <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="test:user:time-zone"
+                                    DataType="urn:com:att:research:datatype:zone-offset"
+                                    MustBePresent="true" />
+                            </Apply>
+                        </Apply>
+                    </Apply>
+                </Apply>
+                <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:dayOfWeek-from-string">                
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:2.0:function:string-concatenate">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:string-from-dayOfWeek">                
+                            <AttributeValue DataType="urn:oasis:names:tc:xacml:3.0:data-type:dayOfWeek">7</AttributeValue>
+                        </Apply>
+                        <Apply FunctionId="urn:com:att:research:function:string-from-zone-offset">                
+                            <Apply
+                                FunctionId="urn:com:att:research:function:zone-offset-one-and-only">
+                                <AttributeDesignator
+                                    Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                    AttributeId="test:user:time-zone"
+                                    DataType="urn:com:att:research:datatype:zone-offset"
+                                    MustBePresent="true" />
+                            </Apply>
+                        </Apply>
+                    </Apply>
+                </Apply>
+            </Apply>
+        </Condition>
+    </Rule>
+</Policy>

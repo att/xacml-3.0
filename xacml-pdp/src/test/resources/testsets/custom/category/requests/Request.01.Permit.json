@@ -1,0 +1,21 @@
+{
+   "Request" : {
+        "Category" : [ {
+        	"CategoryId" : "urn:oasis:names:tc:xacml:3.0:attribute-category:action",
+        	"Attribute" : 
+	           {
+	              "Value" : "read",
+	              "AttributeId" : "urn:oasis:names:tc:xacml:1.0:action:action-id"
+               }
+	    	}, {
+        	"CategoryId" : "urn:oasis:names:tc:xacml:3.0:attribute-category:purpose",
+        	"Attribute" :
+               {
+	              "Value" : "mine",
+	              "AttributeId" : "urn:oasis:names:tc:xacml:1.0:action:action-id",
+	              "IncludeInResult" : true
+               }
+            }
+	       ]
+	  }
+}

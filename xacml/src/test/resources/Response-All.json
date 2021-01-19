@@ -1,0 +1,118 @@
+{
+	"Response": 
+	[
+		{
+			"Decision": "Permit",
+			"Obligations": 
+			[
+				{
+					"Id": "urn:oasis:names:tc:xacml:example:obligation:email",
+					"AttributeAssignment": 
+					[
+						{
+							"AttributeId": "urn:oasis:names:tc:xacml:3.0:example:attribute:mailto",
+							"Value": "j_hibbert@MEDICO.COM"
+						},
+						{
+							"AttributeId": "urn:oasis:names:tc:xacml:3.0:example:attribute:text",
+							"Value": "Your medical record has been accessed"
+						},
+						{
+							"AttributeId": "urn:oasis:names:tc:xacml:3.0:example:attribute:text",
+							"Value": "CN=Julius Hibbert"
+						}
+					]
+				},
+				{
+					"Id": "urn:oasis:names:tc:xacml:example:obligation:log"
+				}
+			],
+			"AssociatedAdvice": [
+				{
+					"Id": "advice:1",
+					"AttributeAssignment": 
+					[
+					]
+				},
+				{
+					"Id": "advice:2",
+					"AttributeAssignment": 
+					[
+						{
+							"AttributeId": "a1",
+							"DataType": "boolean",
+							"Value": "yes"
+						}
+					]
+				},
+				{
+					"Id": "advice:3",
+					"AttributeAssignment": 
+					[
+						{
+							"AttributeId": "id:advice:boolean",
+							"Value": true
+						},
+						{
+							"AttributeId": "id:advice:integer",
+							"DataType": "integer",
+							"Value": 1000
+						},
+						{
+							"AttributeId": "id:advice:double",
+							"Value": 1.234
+						}
+					]
+				}
+			],
+			"PolicyIdentifierList": 
+			{
+				"PolicyIdReference": 
+				[
+					{
+						"Id": "policy1",
+						"Version": "1.0"
+					},
+					{
+						"Id": "policy2",
+						"Version": "2.0"
+					}
+				],
+				"PolicySetIdReference": 
+				[
+					{
+						"Id": "policySet3",
+						"Version": "3.1"
+					},
+					{
+						"Id": "policySet4",
+						"Version": "4.9999"
+					}
+				]
+			}
+		},
+		{
+			"Decision": "Indeterminate",
+			"Status": {
+				"StatusMessage": "Missing a lot of stuff",
+				"StatusDetail": [
+					{
+						"AttributeId": "missing:attribute",
+						"Category": "custom:category",
+						"Value": ["notasecret"
+						]
+					}
+				],
+				"StatusCode": {
+					"Value": "urn:oasis:names:tc:xacml:1.0:status:processing-error",
+					"StatusCode": {
+						"Value": "urn:oasis:names:tc:xacml:1.0:status:syntax-error"
+					}
+				}
+			}
+		},
+		{
+      		"Decision":"NotApplicable"
+   		}
+	]
+}

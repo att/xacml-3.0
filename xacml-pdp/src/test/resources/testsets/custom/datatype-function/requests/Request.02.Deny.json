@@ -1,0 +1,26 @@
+{
+   "Request" : {
+		"AccessSubject" : {
+			"Attribute" : [
+			   {
+                  "Value" : "Person",
+                  "AttributeId" : "urn:oasis:names:tc:xacml:1.0:subject:subject-id"
+               }
+             ]
+        },
+        "Action" : {
+        	"Attribute" : 
+	           {
+	              "Value" : "access",
+	              "AttributeId" : "urn:oasis:names:tc:xacml:1.0:action:action-id"
+               }
+	    },
+        "Resource" : {
+        	"Attribute" : [
+               {
+	              "Value" : "Protected Resource",
+	              "AttributeId" : "urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+               }	       ]
+	    }
+   }
+}

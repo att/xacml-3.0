@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" PolicyId="urn:com:att:xacml:policy:id:eca9620b-0f58-4ede-8198-1168862a6133" Version="1" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+    <Description>This policy demonstrates the use of a custom datatype and function for that datatype.</Description>
+    <Target/>
+    <Rule RuleId="urn:com:att:xacml:rule:id:425288ba-fe86-40c2-bdf4-67f0cc9abb0c" Effect="Permit">
+        <Description>PERMIT - Decryption succeeded.</Description>
+        <Target/>
+        <Condition>
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">This is the SECRET value!</AttributeValue>
+                <Apply FunctionId="urn:com:att:research:xacml:custom:function:3.0:rsa:decrypt">
+                	<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:hexBinary-one-and-only">
+	                    <AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="com:att:research:xacml:test:custom:encrypted-data" DataType="http://www.w3.org/2001/XMLSchema#hexBinary" MustBePresent="true"/>
+                	</Apply>
+                	<Apply FunctionId="urn:com:att:research:xacml:custom:function:3.0:rsa:privatekey-one-and-only">
+	                    <AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="com:att:research:xacml:test:custom:privatekey" DataType="urn:com:att:research:xacml:custom:3.0:rsa:private" Issuer="com:att:research:xacml:test:custom" MustBePresent="false"/>
+	                 </Apply>
+                </Apply>
+            </Apply>
+        </Condition>
+    </Rule>
+    <Rule RuleId="urn:com:att:xacml:rule:id:85684198-7a0a-419f-87bc-a7a23be23002" Effect="Deny">
+        <Description>DENY - The decryption failed. Default.</Description>
+        <Target/>
+    </Rule>
+</Policy>

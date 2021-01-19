@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" PolicyId="urn:oasis:names:tc:xacml:2.0:conformance-test:IIC006:policy" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides" Version="1.0" xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:policy:schema:os         access_control-xacml-2.0-policy-schema-os.xsd">
+    <Description>
+        Policy for Conformance Test IIC500d. test deprecated uri-string-concatenate.
+    </Description>
+    <Target/>
+    <Rule Effect="Permit" RuleId="urn:oasis:names:tc:xacml:2.0:conformance-test:IIC500d:rule">
+        <Description>
+            URI made up from parts must match 
+            URI in request
+        </Description>
+        <Condition>
+<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-equal">
+            <Apply FunctionId="urn:oasis:names:tc:xacml:2.0:function:uri-string-concatenate">
+            	<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">http://medico.com/rec</AttributeValue>
+            	<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ord/doctor/</AttributeValue>
+             	<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">JuliusHibbert</AttributeValue>
+            </Apply>
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">http://medico.com/record/doctor/JuliusHibbert</AttributeValue>
+</Apply>
+        </Condition>
+    </Rule>
+</Policy>
