@@ -11,11 +11,12 @@ import java.util.Map;
 import com.att.research.xacml.api.DataType;
 import com.att.research.xacml.api.DataTypeFactory;
 import com.att.research.xacml.api.Identifier;
+import com.att.research.xacml.std.StdDataTypeFactory;
 import com.att.research.xacml.std.datatypes.DataTypes;
 
 public class CustomDataTypeFactory extends DataTypeFactory {
-	private static final Map<Identifier,DataType<?>> mapIdentifiersToDataTypes	= new HashMap<Identifier,DataType<?>>();
-	private static boolean mapNeedsInit												= true;
+	private static final Map<Identifier,DataType<?>> 	mapIdentifiersToDataTypes	= new HashMap<Identifier,DataType<?>>();
+	private static boolean			 					mapNeedsInit				= true;
 	
 	public static final DataTypePrivateKey				DT_PRIVATEKEY				= DataTypePrivateKey.newInstance();
 	public static final DataTypePublicKey				DT_PUBLICKEY				= DataTypePublicKey.newInstance();
@@ -30,23 +31,6 @@ public class CustomDataTypeFactory extends DataTypeFactory {
 		if (mapNeedsInit) {
 			synchronized(mapIdentifiersToDataTypes) {
 				if (mapNeedsInit) {
-					registerDataType(DataTypes.DT_ANYURI);
-					registerDataType(DataTypes.DT_BASE64BINARY);
-					registerDataType(DataTypes.DT_BOOLEAN);
-					registerDataType(DataTypes.DT_DATE);
-					registerDataType(DataTypes.DT_DATETIME);
-					registerDataType(DataTypes.DT_DAYTIMEDURATION);
-					registerDataType(DataTypes.DT_DNSNAME);
-					registerDataType(DataTypes.DT_DOUBLE);
-					registerDataType(DataTypes.DT_HEXBINARY);
-					registerDataType(DataTypes.DT_INTEGER);
-					registerDataType(DataTypes.DT_IPADDRESS);
-					registerDataType(DataTypes.DT_RFC822NAME);
-					registerDataType(DataTypes.DT_STRING);
-					registerDataType(DataTypes.DT_TIME);
-					registerDataType(DataTypes.DT_X500NAME);
-					registerDataType(DataTypes.DT_XPATHEXPRESSION);
-					registerDataType(DataTypes.DT_YEARMONTHDURATION);
 					//
 					// These are the custom data types!
 					//
@@ -61,13 +45,16 @@ public class CustomDataTypeFactory extends DataTypeFactory {
 		}
 	}
 
+	private DataTypeFactory stdDataTypeFactory = new StdDataTypeFactory();
+
 	public CustomDataTypeFactory() {
 		initMap();
 	}
 
 	@Override
 	public DataType<?> getDataType(Identifier dataTypeId) {
-		return mapIdentifiersToDataTypes.get(dataTypeId);
+		DataType<?> dataType = mapIdentifiersToDataTypes.get(dataTypeId);
+		return dataType != null ? dataType : stdDataTypeFactory.getDataType(dataTypeId);
 	}
 
 }
