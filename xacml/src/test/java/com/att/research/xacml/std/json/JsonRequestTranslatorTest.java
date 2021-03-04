@@ -651,17 +651,7 @@ public class JsonRequestTranslatorTest {
 		assertThat(Iterators.size(request.getRequestAttributes(new IdentifierImpl("urn:custom:category")))).isEqualTo(1);
 	}
 
-	@Test
-	public void testEntity41() throws Exception {
-		Request request = JsonRequestTranslator.load(new File("src/test/resources/entity/Request-4.1.json"));
-		validateEntity41(request);
-	}
-
-	private void validateEntity41(Request request) throws Exception {
-
-	}
-    
-    private <T> boolean hasAttribute(Request request, Identifier categoryId, Identifier attributeId,
+	private <T> boolean hasAttribute(Request request, Identifier categoryId, Identifier attributeId,
 		    String issuer, boolean includeInResults, Collection<AttributeValue<T>> expectedValues) {
 	    logger.info("Searching for attribute {} in category {}", attributeId, categoryId);
 
