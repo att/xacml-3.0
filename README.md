@@ -7,7 +7,9 @@ The AT&T framework also includes interfaces and implementations to standardize d
 
 # Release
 
-There is a branch v1.0 that is the official release. Master branch is WIP.
+3.0 - is the latest official release
+
+master branch is where all current development resides.
 
 # Requirements
 
