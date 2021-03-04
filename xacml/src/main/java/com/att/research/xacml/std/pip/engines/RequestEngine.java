@@ -13,17 +13,16 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * StdRequestEngine implements the {@link com.att.research.xacml.api.pip.PIPEngine} interface to retrieve
- * matching {@link com.att.research.xacml.api.Attribute}s from a {@link com.att.research.xacml.api.Request} object.
- * 
- * @author car
- * @version $Revision: 1.1 $
+ * RequestEngine extends {@link RequestAttributesEngine} to retrieve matching {@link com.att.research.xacml.api.Attribute}s
+ * from a {@link com.att.research.xacml.api.Request} object.
+ *
+ * @author ygrignon
  */
 public class RequestEngine extends RequestAttributesEngine {
 	private Request request;
 
 	/**
-	 * Creates a <code>StdRequestEngine</code> for retrieving <code>Attribute</code>s from a <code>Request</code>.
+	 * Creates a <code>RequestEngine</code> for retrieving <code>Attribute</code>s from a <code>Request</code>.
 	 * 
 	 * @param requestIn the <code>Request</code> to search
 	 */

@@ -9,6 +9,12 @@ import com.att.research.xacml.std.pip.StdPIPResponse;
 
 import java.util.*;
 
+/**
+ * RequestAttributesEngine implements the {@link com.att.research.xacml.api.pip.PIPEngine} interface to retrieve
+ * matching {@link com.att.research.xacml.api.Attribute}s from {@link com.att.research.xacml.api.RequestAttributes}.
+ *
+ * @author ygrignon
+ */
 public abstract class RequestAttributesEngine implements PIPEngine {
     private boolean shutdown = false;
 

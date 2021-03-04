@@ -9,6 +9,13 @@ import com.att.research.xacml.std.pip.StdPIPResponse;
 
 import java.util.*;
 
+/**
+ * EntityEngine extends {@link RequestAttributesEngine} to retrieve matching {@link com.att.research.xacml.api.Attribute}s
+ * from an entity as specified by the <a href="">
+ * XACML v3 Related and Nested Entity Profile Version 1.0</a> specification.
+ *
+ * @author ygrignon
+ */
 public class EntityEngine extends RequestAttributesEngine {
     private RequestAttributes entity;
     private boolean shutdown = false;
