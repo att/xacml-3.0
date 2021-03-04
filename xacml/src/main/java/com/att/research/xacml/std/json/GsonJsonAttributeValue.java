@@ -15,23 +15,7 @@ import com.att.research.xacml.api.AttributeValue;
 import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.api.XACML3;
-import com.att.research.xacml.std.datatypes.DataTypeAnyURI;
-import com.att.research.xacml.std.datatypes.DataTypeBase64Binary;
-import com.att.research.xacml.std.datatypes.DataTypeBoolean;
-import com.att.research.xacml.std.datatypes.DataTypeDNSName;
-import com.att.research.xacml.std.datatypes.DataTypeDate;
-import com.att.research.xacml.std.datatypes.DataTypeDateTime;
-import com.att.research.xacml.std.datatypes.DataTypeDayTimeDuration;
-import com.att.research.xacml.std.datatypes.DataTypeDouble;
-import com.att.research.xacml.std.datatypes.DataTypeHexBinary;
-import com.att.research.xacml.std.datatypes.DataTypeInteger;
-import com.att.research.xacml.std.datatypes.DataTypeIpAddress;
-import com.att.research.xacml.std.datatypes.DataTypeRFC822Name;
-import com.att.research.xacml.std.datatypes.DataTypeString;
-import com.att.research.xacml.std.datatypes.DataTypeTime;
-import com.att.research.xacml.std.datatypes.DataTypeX500Name;
-import com.att.research.xacml.std.datatypes.DataTypeXPathExpression;
-import com.att.research.xacml.std.datatypes.DataTypeYearMonthDuration;
+import com.att.research.xacml.std.datatypes.*;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -42,7 +26,7 @@ public class GsonJsonAttributeValue implements Serializable {
     
     private Object value; // NOSONAR
 	private Identifier dataType = null; // NOSONAR
-	
+
 	@EqualsAndHashCode.Exclude private boolean isPostProcessed = false;
 
     public GsonJsonAttributeValue() {
@@ -201,9 +185,12 @@ public class GsonJsonAttributeValue implements Serializable {
 		} else if (XACML3.ID_DATATYPE_HEXBINARY.equals(this.dataType) || "hexBinary".equals(this.dataType.stringValue())) {
 			this.dataType = XACML3.ID_DATATYPE_HEXBINARY;
 			return DataTypeHexBinary.newInstance().convert(value);
-		} else if (XACML3.ID_DATATYPE_XPATHEXPRESSION.equals(this.dataType) || "hexBinary".equals(this.dataType.stringValue())) {
+		} else if (XACML3.ID_DATATYPE_XPATHEXPRESSION.equals(this.dataType) || "xpathExpression".equals(this.dataType.stringValue())) {
 			this.dataType = XACML3.ID_DATATYPE_XPATHEXPRESSION;
 			return DataTypeXPathExpression.newInstance().convert(value);
+		} else if (XACML3.ID_DATATYPE_ENTITY.equals(this.dataType) || "entity".equals(this.dataType.stringValue())) {
+			this.dataType = XACML3.ID_DATATYPE_ENTITY;
+			return DataTypeEntity.newInstance().convert(value);
 		}
 		return value;
 	}

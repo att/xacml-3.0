@@ -41,11 +41,23 @@ public class DOMRequestAttributes {
 	 * @throws DOMStructureException if the conversion cannot be made
 	 */
 	public static RequestAttributes newInstance(Node nodeRequestAttributes) throws DOMStructureException {
+		return newInstance(nodeRequestAttributes, false);
+	}
+
+	/**
+	 * Creates a new <code>DOMRequestAttributes</code> from the given root <code>Node</code> of a XACML Attributes element.
+	 *
+	 * @param nodeRequestAttributes the <code>Node</code> representing the Attributes element
+	 * @param isEntity true if this is an entity as defined by the XACML v3.0 Related and Nested Entities Profile.
+	 * @return a new <code>DOMRequestAttributes</code> from the given <code>Node</code>
+	 * @throws DOMStructureException if the conversion cannot be made
+	 */
+	public static RequestAttributes newInstance(Node nodeRequestAttributes, boolean isEntity) throws DOMStructureException {
 		Element	elementRequestAttributes			= DOMUtil.getElement(nodeRequestAttributes);
 		boolean bLenient							= DOMProperties.isLenient();
 		
-		Identifier identifierCategory	= DOMUtil.getIdentifierAttribute(elementRequestAttributes, XACML3.ATTRIBUTE_CATEGORY, !bLenient);
-		String xmlId					= DOMUtil.getXmlId(elementRequestAttributes);
+		Identifier identifierCategory	= isEntity ? null : DOMUtil.getIdentifierAttribute(elementRequestAttributes, XACML3.ATTRIBUTE_CATEGORY, !bLenient);
+		String xmlId					= isEntity ? null : DOMUtil.getXmlId(elementRequestAttributes);
 		Node nodeContentRoot			= null;
 		List<Attribute> listAttributes	= new ArrayList<>();
 		boolean sawContent				= false;

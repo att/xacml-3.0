@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+        PolicyId="urn:com:att:xacml:policy:id:test:entity-matching-values-in-bag" Version="1"
+        RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:deny-unless-permit">
+    <Description>[ENTITY 7.1] This policy will permit product codes between 50 and 200</Description>
+    <Target>
+        <AnyOf>
+            <AllOf>
+                <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                    <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#string">matching-values-in-bag</AttributeValue>
+                    <AttributeDesignator
+                            Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action"
+                            AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                            DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true" />
+                </Match>
+            </AllOf>
+        </AnyOf>
+    </Target>
+    <Rule RuleId="id-rule-permit-between-50-and-200" Effect="Permit">
+        <Condition>
+            <ForAny VariableId="product-code">
+                <AttributeDesignator
+                        Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                        AttributeId="urn:example:xacml:product‑code"
+                        DataType="http://www.w3.org/2001/XMLSchema#integer"
+                        MustBePresent="false"/>
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than-or-equal">
+                        <VariableReference VariableId="product-code"/>
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">100</AttributeValue>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-less-than-or-equal">
+                        <VariableReference VariableId="product-code"/>
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">200</AttributeValue>
+                    </Apply>
+                </Apply>
+            </ForAny>
+        </Condition>
+    </Rule>
+</Policy>

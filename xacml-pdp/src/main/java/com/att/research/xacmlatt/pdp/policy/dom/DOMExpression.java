@@ -33,7 +33,7 @@ import com.att.research.xacmlatt.pdp.policy.expressions.VariableReference;
  */
 public abstract class DOMExpression extends Expression {
 	private static final Logger logger	= LoggerFactory.getLogger(DOMExpression.class);
-	
+
 	protected DOMExpression() {
 	}
 	
@@ -44,7 +44,8 @@ public abstract class DOMExpression extends Expression {
 				XACML3.ELEMENT_ATTRIBUTESELECTOR.equals(nodeName) ||
 				XACML3.ELEMENT_ATTRIBUTEVALUE.equals(nodeName) ||
 				XACML3.ELEMENT_FUNCTION.equals(nodeName) ||
-				XACML3.ELEMENT_VARIABLEREFERENCE.equals(nodeName)
+				XACML3.ELEMENT_VARIABLEREFERENCE.equals(nodeName) ||
+				DOMQuantifiedExpression.isQuantifiedExpression(nodeExpression)
 				);
 	}
 	
@@ -79,6 +80,8 @@ public abstract class DOMExpression extends Expression {
 				return new Function(DOMUtil.getIdentifierAttribute(elementExpression, XACML3.ATTRIBUTE_FUNCTIONID));
 			} else if (elementExpression.getLocalName().equals(XACML3.ELEMENT_VARIABLEREFERENCE)) {
 				return new VariableReference(policy, DOMUtil.getStringAttribute(elementExpression, XACML3.ATTRIBUTE_VARIABLEID));
+			} else if (DOMQuantifiedExpression.isQuantifiedExpression(nodeExpression)) {
+				return DOMQuantifiedExpression.newInstance(elementExpression, policy);
 			} else if (!bLenient) {
 				throw DOMUtil.newUnexpectedElementException(nodeExpression);
 			} else {
@@ -106,6 +109,8 @@ public abstract class DOMExpression extends Expression {
 				return DOMUtil.repairIdentifierAttribute(elementExpression, XACML3.ATTRIBUTE_FUNCTIONID, XACML3.ID_FUNCTION_STRING_EQUAL, logger);
 			} else if (elementExpression.getLocalName().equals(XACML3.ELEMENT_VARIABLEREFERENCE)) {
 				return DOMUtil.repairStringAttribute(elementExpression, XACML3.ATTRIBUTE_VARIABLEID, "variableId", logger);
+			} else if (DOMQuantifiedExpression.isQuantifiedExpression(nodeExpression)) {
+				return DOMQuantifiedExpression.repair(elementExpression);
 			} else {
 				throw DOMUtil.newUnexpectedElementException(nodeExpression);
 			}

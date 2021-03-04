@@ -6,34 +6,35 @@
 
 package com.att.research.xacml.std.json;
 
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.security.auth.x500.X500Principal;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.att.research.xacml.api.AttributeValue;
-import com.att.research.xacml.api.DataTypeException;
-import com.att.research.xacml.api.Identifier;
-import com.att.research.xacml.api.XACML3;
+import com.att.research.xacml.api.*;
 import com.att.research.xacml.std.StdAttributeValue;
+import com.att.research.xacml.std.StdMutableAttribute;
+import com.att.research.xacml.std.StdMutableRequestAttributes;
 import com.att.research.xacml.std.datatypes.DataTypeInteger;
 import com.att.research.xacml.std.datatypes.RFC2396DomainName;
 import com.att.research.xacml.std.datatypes.RFC822Name;
 import com.att.research.xacml.std.datatypes.XPathExpressionWrapper;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
+import javax.security.auth.x500.X500Principal;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class JsonAttributeValueSerialization  implements JsonDeserializer<GsonJsonAttributeValue>, JsonSerializer<GsonJsonAttributeValue> {
 	private static final Logger logger	= LoggerFactory.getLogger(JsonAttributeValueSerialization.class);
@@ -42,27 +43,32 @@ public class JsonAttributeValueSerialization  implements JsonDeserializer<GsonJs
 	public JsonElement serialize(GsonJsonAttributeValue src, Type typeOfSrc, JsonSerializationContext context) {
 		logger.info("serialize {} type {}", src, typeOfSrc);
 		if (src.getValue() instanceof Collection) {
-			Collection<?> arrayValues = ((Collection<?>)src.getValue());
+			Collection<?> arrayValues = ((Collection<?>) src.getValue());
 			if (arrayValues.size() == 1) {
-				AttributeValue<?> value = (AttributeValue<?>) arrayValues.iterator().next();
-				if (value.getValue() instanceof Collection) {
-					JsonArray array = new JsonArray();
-					((Collection<?>)value.getValue()).forEach(val -> array.add(getStringValue(val)));
-					return array;
-				}
-				return new JsonPrimitive(getStringValue(value.getValue()));
+				return serialize(arrayValues.iterator().next(), context);
+			} else {
+				JsonArray array = new JsonArray();
+				arrayValues.forEach(val -> array.add(serialize(val, context)));
+				return array;
 			}
-			JsonArray array = new JsonArray();
-			arrayValues.forEach(value -> {
-				if (value instanceof AttributeValue) {
-					array.add(new JsonPrimitive(getStringValue(((AttributeValue<?>)value).getValue())));
-				} else {
-					array.add(new JsonPrimitive(getStringValue(value)));				
-				}
-			});
-			return array;
+		} else {
+			return serialize(src.getValue(), context);
 		}
-		return new JsonPrimitive(getStringValue(src.getValue()));
+	}
+
+	private JsonElement serialize(Object object, JsonSerializationContext context) {
+		if (object instanceof Collection<?>) {
+			JsonArray array = new JsonArray();
+			((Collection<?>)object).forEach(val -> array.add(serialize(val, context)));
+			return array;
+		} else if (object instanceof AttributeValue<?>) {
+			return serialize(((AttributeValue<?>)object).getValue(), context);
+		} else if (object instanceof RequestAttributes) {
+			GsonJsonCategory entity = new GsonJsonCategory((RequestAttributes) object);
+			return context.serialize(entity);
+		} else {
+			return new JsonPrimitive(getStringValue(object));
+		}
 	}
 	
 	private String getStringValue(Object object) {
@@ -142,6 +148,43 @@ public class JsonAttributeValueSerialization  implements JsonDeserializer<GsonJs
 
 	private static StdAttributeValue<?> parseJsonObject(JsonObject jsonObject, GsonJsonAttributeValue attributeValue) {
 		logger.debug("Parsing jsonObject {}", jsonObject);
+
+		//
+		// Handle XACML v3.0 Related and Nested Entities Profile nested attributes provided as JSON
+		//
+		StdMutableRequestAttributes requestAttributes = new StdMutableRequestAttributes();
+		JsonPrimitive contentElement = jsonObject.getAsJsonPrimitive("Content");
+		if (contentElement != null && contentElement.isString()) {
+			// Directly invoke our Node deserializer
+			JsonNodeSerialization jsonNodeSerialization = new JsonNodeSerialization();
+			requestAttributes.setContentRoot(jsonNodeSerialization.deserialize(contentElement, Node.class, null));
+		}
+		JsonArray attributeArray = jsonObject.getAsJsonArray("Attribute");
+		if (attributeArray != null) {
+			// TODO reduce code duplication by providing a factory method for the GsonBuilder
+			GsonBuilder builder = new GsonBuilder()
+					.registerTypeAdapter(Node.class, new JsonNodeSerialization())
+					.registerTypeAdapter(Identifier.class, new JsonIdentifierSerialization())
+					.registerTypeAdapter(GsonJsonAttributeValue.class, new JsonAttributeValueSerialization())
+					.disableHtmlEscaping();
+			Gson gson = builder.create();
+			attributeArray.forEach(json -> {
+				// Deserialize the attribute
+				GsonJsonAttribute attribute = gson.fromJson(json, GsonJsonAttribute.class);
+				attribute.postProcess();
+
+				// Build the attribute
+				StdAttributeValue<?> value = new StdAttributeValue<>(attribute.getDataType(), attribute.getXacmlValue());
+				boolean includeInResult = attribute.getIncludeInResult() != null ? attribute.getIncludeInResult() : false;
+				StdMutableAttribute stdAttribute = new StdMutableAttribute(null, attribute.getAttributeId(),
+						value, attribute.getIssuer(), includeInResult);
+				requestAttributes.add(stdAttribute);
+			});
+		}
+		if (contentElement != null || attributeArray != null) {
+			return new StdAttributeValue<RequestAttributes>(XACML3.ID_DATATYPE_ENTITY, requestAttributes);
+		}
+
 		//
 		// Create a new object map
 		//

@@ -43,6 +43,7 @@ public class JsonIdentifierSerialization implements JsonDeserializer<Identifier>
 		datatypeMap.put("ipAddress", XACML3.ID_DATATYPE_IPADDRESS);
 		datatypeMap.put("dnsName", XACML3.ID_DATATYPE_DNSNAME);
 		datatypeMap.put("xpathExpression", XACML3.ID_DATATYPE_XPATHEXPRESSION);
+		datatypeMap.put("entity", XACML3.ID_DATATYPE_ENTITY);
 	}
 
 	

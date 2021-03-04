@@ -6,14 +6,9 @@
 package com.att.research.xacmlatt.pdp.policy.expressions;
 
 import java.util.Collection;
+import java.util.Iterator;
 
-import com.att.research.xacml.api.Attribute;
-import com.att.research.xacml.api.AttributeValue;
-import com.att.research.xacml.api.Identifier;
-import com.att.research.xacml.api.MissingAttributeDetail;
-import com.att.research.xacml.api.Status;
-import com.att.research.xacml.api.StatusCode;
-import com.att.research.xacml.api.StatusDetail;
+import com.att.research.xacml.api.*;
 import com.att.research.xacml.api.pip.PIPException;
 import com.att.research.xacml.api.pip.PIPRequest;
 import com.att.research.xacml.api.pip.PIPResponse;
@@ -21,7 +16,9 @@ import com.att.research.xacml.std.StdMutableMissingAttributeDetail;
 import com.att.research.xacml.std.StdStatus;
 import com.att.research.xacml.std.StdStatusCode;
 import com.att.research.xacml.std.StdStatusDetail;
+import com.att.research.xacml.std.pip.StdMutablePIPResponse;
 import com.att.research.xacml.std.pip.StdPIPRequest;
+import com.att.research.xacml.std.pip.engines.EntityEngine;
 import com.att.research.xacmlatt.pdp.eval.EvaluationContext;
 import com.att.research.xacmlatt.pdp.eval.EvaluationException;
 import com.att.research.xacmlatt.pdp.policy.Bag;
@@ -48,7 +45,7 @@ public class AttributeDesignator extends AttributeRetrievalBase {
 		}
 		return this.pipRequestCached;
 	}
-	
+
 	protected MissingAttributeDetail getMissingAttributeDetail() {
 		if (this.missingAttributeDetail == null) {
 			this.missingAttributeDetail	= new StdMutableMissingAttributeDetail(this.getCategory(), this.getAttributeId(), this.getDataTypeId(), this.getIssuer());
@@ -110,7 +107,7 @@ public class AttributeDesignator extends AttributeRetrievalBase {
 	 * @return true if the <code>Attribute</code> matches, else false
 	 */
 	protected boolean match(Attribute attribute) {
-		if (!this.getCategory().equals(attribute.getCategory())) {
+		if (this.getCategory() != null && !this.getCategory().equals(attribute.getCategory())) {
 			return false;
 		} else if (!this.getAttributeId().equals(attribute.getAttributeId())) {
 			return false;
@@ -136,6 +133,26 @@ public class AttributeDesignator extends AttributeRetrievalBase {
 		}
 	}
 
+	/**
+	 * Evaluates a {@link PIPRequest}. If an Entity was specified via {@link #setEntity(RequestAttributes)} then
+	 * evaluation of the request is delegated to the Entity. Otherwise, the evluation is delegated to the supplied
+	 * {@link EvaluationContext}.
+	 *
+	 * @param evaluationContext The evaluation context.
+	 * @param pipRequest The PIP request.
+	 * @return the PIP response.
+	 * @throws PIPException if the PIP request couldn't be evaluated.
+	 */
+	protected PIPResponse getAttributes(EvaluationContext evaluationContext, PIPRequest pipRequest) throws PIPException {
+		if (getCategory() != null) {
+			return evaluationContext.getAttributes(pipRequest);
+		} else {
+			assert (getEntity() != null);
+			EntityEngine entityEngine = new EntityEngine(getEntity());
+			return entityEngine.getAttributes(pipRequest, null);
+		}
+	}
+
 	@Override
 	public ExpressionResult evaluate(EvaluationContext evaluationContext, PolicyDefaults policyDefaults) throws EvaluationException {
 		if (!this.validate()) {
@@ -153,7 +170,7 @@ public class AttributeDesignator extends AttributeRetrievalBase {
 		 */
 		PIPResponse pipResponse	= null;
 		try {
-			pipResponse	= evaluationContext.getAttributes(pipRequest);
+			pipResponse	= getAttributes(evaluationContext, pipRequest);
 		} catch (PIPException ex) {
 			throw new EvaluationException("PIPException getting Attributes", ex);
 		}

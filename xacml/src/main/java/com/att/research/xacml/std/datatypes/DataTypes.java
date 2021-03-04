@@ -35,4 +35,5 @@ public class DataTypes {
 	public static final DataTypeXPathExpression		DT_XPATHEXPRESSION		= DataTypeXPathExpression.newInstance();
 	public static final DataTypeZoneOffset          DT_ZONEOFFSET           = DataTypeZoneOffset.newInstance();
     public static final DataTypeDayOfWeek           DT_DAYOFWEEK            = DataTypeDayOfWeek.newInstance();
+    public static final DataTypeEntity				DT_ENTITY				= DataTypeEntity.newInstance();
 }

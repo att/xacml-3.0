@@ -10,6 +10,7 @@ import java.net.URI;
 
 import javax.security.auth.x500.X500Principal;
 
+import com.att.research.xacml.api.RequestAttributes;
 import com.att.research.xacml.api.XACML1;
 import com.att.research.xacml.api.XACML2;
 import com.att.research.xacml.api.XACML3;
@@ -27,33 +28,7 @@ import com.att.research.xacml.std.datatypes.RFC822Name;
 import com.att.research.xacml.std.datatypes.XPathDayTimeDuration;
 import com.att.research.xacml.std.datatypes.XPathYearMonthDuration;
 import com.att.research.xacmlatt.pdp.policy.FunctionDefinition;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionAccessPermitted;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionArithmetic;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionBag;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionBagIsIn;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionBagOneAndOnly;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionBagSize;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionComparison;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionDateTimeArithmetic;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionDateTimeInDayOfWeekRange;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionEquality;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionHigherOrderBag;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionLogical;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionNumberTypeConversion;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionRFC822NameMatch;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionRecurringTimeEqual;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionRegexpMatch;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionSet;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionStringConversion;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionStringEqualIgnoreCase;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionStringFunctions;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionStringNormalize;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionTimeInRange;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionTimeInRecurringRange;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionTimeWithOffset;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionURIStringConcatenate;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionX500NameMatch;
-import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionXPath;
+import com.att.research.xacmlatt.pdp.std.functions.*;
 
 /**
  * StdFunctions contains the {@link com.att.research.xacml.api.Identifier} values for the standard XACML functions.
@@ -475,7 +450,7 @@ public class StdFunctions {
 	public static final FunctionDefinition	FD_URI_STRING_CONCATENATE = new FunctionDefinitionURIStringConcatenate(XACML2.ID_FUNCTION_URI_STRING_CONCATENATE);
 
     /*
-     * Time Extension Functions (See XACML v3.0 Time Extensions Version 1.0
+     * Time Extension Functions (See XACML v3.0 Time Extensions Version 1.0)
      */
     public static final FunctionDefinition  FD_TIME_IN_RECURRING_RANGE        = new FunctionDefinitionTimeInRecurringRange(XACML3.ID_FUNCTION_TIME_IN_RECURRING_RANGE, DataTypes.DT_TIME);
     public static final FunctionDefinition  FD_RECURRING_TIME_EQUAL        = new FunctionDefinitionRecurringTimeEqual(XACML3.ID_FUNCTION_RECURRING_TIME_EQUAL, DataTypes.DT_TIME);
@@ -489,6 +464,15 @@ public class StdFunctions {
     public static final FunctionDefinition  FD_DAYOFWEEK_BAG      = new FunctionDefinitionBag<ISODayOfWeek>(XACML3.ID_FUNCTION_DAYOFWEEK_BAG, DataTypes.DT_DAYOFWEEK);
     
     public static final FunctionDefinition  FD_DATETIME_IN_DAYOFWEEK_RANGE = new FunctionDefinitionDateTimeInDayOfWeekRange();
+
+    /*
+     * Entities functions (See XACML v3.0 Related and Nested Entities Profile Version 1.0)
+     */
+    public static final FunctionDefinition FD_ATTRIBUTE_DESIGNATOR = new FunctionDefinitionAttributeDesignator();
+    public static final FunctionDefinition FD_ATTRIBUTE_SELECTOR = new FunctionDefinitionAttributeSelector();
+    public static final FunctionDefinition FD_ENTITY_ONE_AND_ONLY = new FunctionDefinitionBagOneAndOnly<RequestAttributes>(XACML3.ID_FUNCTION_ENTITY_ONE_AND_ONLY, DataTypes.DT_ENTITY);
+    public static final FunctionDefinition FD_ENTITY_BAG_SIZE = new FunctionDefinitionBagOneAndOnly<RequestAttributes>(XACML3.ID_FUNCTION_ENTITY_BAG_SIZE, DataTypes.DT_ENTITY);
+    public static final FunctionDefinition FD_ENTITY_BAG = new FunctionDefinitionBagOneAndOnly<RequestAttributes>(XACML3.ID_FUNCTION_ENTITY_BAG, DataTypes.DT_ENTITY);
 
     /*
      * Functions that support the AT&T Zone Offset DataType

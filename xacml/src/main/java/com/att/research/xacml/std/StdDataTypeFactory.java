@@ -53,6 +53,7 @@ public class StdDataTypeFactory extends DataTypeFactory {
 					registerDataType(DataTypes.DT_YEARMONTHDURATION);
 					registerDataType(DataTypes.DT_ZONEOFFSET);
                     registerDataType(DataTypes.DT_DAYOFWEEK);
+                    registerDataType(DataTypes.DT_ENTITY);
 					mapNeedsInit	= false;
 				}
 			}

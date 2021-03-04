@@ -170,6 +170,24 @@ public class Policy extends PolicyDef {
 	public void addVariableDefinitions(Collection<VariableDefinition> variableDefinitions) {
 		this.variableMap.addVariableDefinitions(variableDefinitions);
 	}
+
+	/**
+	 * Pushes a new context for <code>VariableDefinition</code>s for this <code>Policy</code>. All pre-existing
+	 * <code>VariableDefinition</code>s are still active unless they are overriden by one in a newer context.
+	 * @see #popVariableDefinitions()
+	 */
+	public void pushVariableDefinitions() {
+		this.variableMap = new VariableMap(this.variableMap);
+	}
+
+	/**
+	 * Restores the previous <code>VariableDefinition</code> context for this <code>Policy</code>. All
+	 * <code>VariableDefinition</code>s that were defined in the top level context are lost.
+	 * @see #pushVariableDefinitions()
+	 */
+	public void popVariableDefinitions() {
+		this.variableMap = this.variableMap.getParent();
+	}
 	
 	/**
 	 * Gets an <code>Iterator</code> over the <code>Rule</code>s in this <code>Policy</code> or null if there are none.

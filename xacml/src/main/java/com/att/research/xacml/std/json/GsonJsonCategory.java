@@ -7,10 +7,8 @@
 package com.att.research.xacml.std.json;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.StringWriter;
+import java.util.*;
 
 import com.att.research.xacml.api.AttributeCategory;
 import com.att.research.xacml.api.DataType;
@@ -23,6 +21,17 @@ import com.google.gson.annotations.SerializedName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 @Data
 public class GsonJsonCategory implements Serializable {
@@ -59,6 +68,7 @@ public class GsonJsonCategory implements Serializable {
 		datatypeMap.put("ipAddress", DataTypes.DT_IPADDRESS);
 		datatypeMap.put("dnsName", DataTypes.DT_DNSNAME);
 		datatypeMap.put("xpathExpression", DataTypes.DT_XPATHEXPRESSION);
+		datatypeMap.put("entity", DataTypes.DT_ENTITY);
 	}
 
 	
@@ -66,8 +76,8 @@ public class GsonJsonCategory implements Serializable {
 	private Identifier categoryId; //NOSONAR
 	@SerializedName("Id")
 	private String id;
-	@SerializedName("content")
-	private Object content; //NOSONAR
+	@SerializedName("Content")
+	private Node content; //NOSONAR
 	@SerializedName("Attribute")
 	private List<GsonJsonAttribute> attributes;
 	
@@ -75,6 +85,7 @@ public class GsonJsonCategory implements Serializable {
 	
 	public GsonJsonCategory(RequestAttributes attributes) {
 		this.categoryId = attributes.getCategory();
+		this.content = attributes.getContentRoot();
 		this.id = attributes.getXmlId();
 		if (! attributes.getAttributes().isEmpty()) {
 			this.attributes = new ArrayList<>(attributes.getAttributes().size());
@@ -94,7 +105,11 @@ public class GsonJsonCategory implements Serializable {
 		if (isPostProcessed) {
 			return;
 		}
-		attributes.forEach(GsonJsonAttribute::postProcess);		
+		if (attributes != null) {
+			attributes.forEach(GsonJsonAttribute::postProcess);
+		} else {
+			attributes = Collections.emptyList();
+		}
 		isPostProcessed = true;
 	}
 
