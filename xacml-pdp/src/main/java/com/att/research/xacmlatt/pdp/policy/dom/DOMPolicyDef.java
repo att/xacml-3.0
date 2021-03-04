@@ -10,6 +10,7 @@ import java.io.InputStream;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -76,10 +77,15 @@ public abstract class DOMPolicyDef {
 		 * Get the DocumentBuilderFactory
 		 */
 		DocumentBuilderFactory documentBuilderFactory	= DocumentBuilderFactory.newInstance();
-		documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-		documentBuilderFactory.setNamespaceAware(true);
-		
+		try {
+			documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+			documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+			documentBuilderFactory.setNamespaceAware(true);
+		} catch (ParserConfigurationException ex) {
+			throw new DOMStructureException("Exception configuring DocumentBuilderFactory: " + ex.getMessage(), ex);
+		}
+
 		/*
 		 * Get the DocumentBuilder
 		 */

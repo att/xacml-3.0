@@ -5,10 +5,7 @@
  */
 package com.att.research.xacmlatt.pdp.policy.expressions;
 
-import com.att.research.xacml.api.Identifier;
-import com.att.research.xacml.api.StatusCode;
-import com.att.research.xacml.api.StatusDetail;
-import com.att.research.xacml.api.XACML;
+import com.att.research.xacml.api.*;
 import com.att.research.xacml.std.StdStatus;
 import com.att.research.xacml.std.StdStatusCode;
 import com.att.research.xacml.std.datatypes.DataTypes;
@@ -25,9 +22,10 @@ import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
  * @version $Revision: 1.1 $
  */
 public abstract class AttributeRetrievalBase extends Expression {
-	private Identifier	category;
-	private Identifier	dataTypeId;
-	private Boolean		mustBePresent;
+	private RequestAttributes	entity;
+	private Identifier			category;
+	private Identifier			dataTypeId;
+	private Boolean				mustBePresent;
 	
 	protected AttributeRetrievalBase(StatusCode statusCodeIn,
 			String statusMessageIn) {
@@ -63,9 +61,29 @@ public abstract class AttributeRetrievalBase extends Expression {
 	 * @param categoryIn the <code>Identifier</code> for the category associated with this <code>AttributeRetrievalBase</code>
 	 */
 	public void setCategory(Identifier categoryIn) {
+		assert this.entity == null : "Can't set both category and entity";
 		this.category	= categoryIn;
 	}
-	
+
+	/**
+	 * Gets the entity associated with this <code>AttributeRetrievalBase</code>.
+	 *
+	 * @return the entity of this <code>AttributeRetrievalBase</code>.
+	 */
+	public RequestAttributes getEntity() {
+		return this.entity;
+	}
+
+	/**
+	 * Sets the entity associated with this <code>AttributeRetrievalBase</code>.
+	 *
+	 * @param entityIn the entity associated with this <code>AttributeRetrievalBase</code>
+	 */
+	public void setEntity(RequestAttributes entityIn) {
+		assert this.category == null : "Can't set both category and entity";
+		this.entity	= entityIn;
+	}
+
 	/**
 	 * Gets the <code>Identifier</code> for the data type associated with this <code>AttributeRetrievalBase</code>.
 	 * 
@@ -111,7 +129,7 @@ public abstract class AttributeRetrievalBase extends Expression {
 
 	@Override
 	protected boolean validateComponent() {
-		if (this.getCategory() == null) {
+		if (this.getCategory() == null && this.getEntity() == null) {
 			this.setStatus(StdStatusCode.STATUS_CODE_SYNTAX_ERROR, "Missing Category");
 			return false;
 		} else if (this.getDataTypeId() == null) {
@@ -134,6 +152,10 @@ public abstract class AttributeRetrievalBase extends Expression {
 		Object objectToDump;
 		if ((objectToDump = this.getCategory()) != null) {
 			stringBuilder.append(",category=");
+			stringBuilder.append(objectToDump.toString());
+		}
+		if ((objectToDump = this.getEntity()) != null) {
+			stringBuilder.append(",entity=");
 			stringBuilder.append(objectToDump.toString());
 		}
 		if ((objectToDump = this.getDataTypeId()) != null) {

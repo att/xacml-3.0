@@ -13,43 +13,18 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.security.auth.x500.X500Principal;
 
+import com.att.research.xacml.api.*;
+import com.att.research.xacml.std.*;
+import com.att.research.xacml.std.datatypes.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.xpath.XPathExpression;
 
-import com.att.research.xacml.api.AttributeValue;
-import com.att.research.xacml.api.DataType;
-import com.att.research.xacml.api.DataTypeException;
-import com.att.research.xacml.api.DataTypeFactory;
-import com.att.research.xacml.api.Identifier;
-import com.att.research.xacml.api.Request;
-import com.att.research.xacml.api.RequestAttributesReference;
-import com.att.research.xacml.api.XACML3;
-import com.att.research.xacml.std.IdentifierImpl;
-import com.att.research.xacml.std.StdMutableAttribute;
-import com.att.research.xacml.std.StdMutableRequest;
-import com.att.research.xacml.std.StdMutableRequestAttributes;
-import com.att.research.xacml.std.StdRequestAttributesReference;
-import com.att.research.xacml.std.StdRequestDefaults;
-import com.att.research.xacml.std.StdRequestReference;
-import com.att.research.xacml.std.datatypes.Base64Binary;
-import com.att.research.xacml.std.datatypes.HexBinary;
-import com.att.research.xacml.std.datatypes.IPAddress;
-import com.att.research.xacml.std.datatypes.ISO8601Date;
-import com.att.research.xacml.std.datatypes.ISO8601DateTime;
-import com.att.research.xacml.std.datatypes.ISO8601Time;
-import com.att.research.xacml.std.datatypes.RFC2396DomainName;
-import com.att.research.xacml.std.datatypes.RFC822Name;
-import com.att.research.xacml.std.datatypes.XPathDayTimeDuration;
-import com.att.research.xacml.std.datatypes.XPathYearMonthDuration;
 import com.att.research.xacml.util.AttributeUtils;
 import com.att.research.xacml.util.FactoryException;
 
@@ -230,7 +205,7 @@ public class RequestParser {
 		//
 		boolean added = false;
 		for (StdMutableRequestAttributes a : attributes) {
-			if (a.getCategory().equals(mutableAttribute.getCategory()) &&
+			if ((mutableAttribute.getCategory() == null || a.getCategory().equals(mutableAttribute.getCategory())) &&
 				(id != null ? a.getXmlId().equals(id) : (a.getXmlId() == null))) {
 				//
 				// Category exists, add in the attribute values
@@ -305,7 +280,7 @@ public class RequestParser {
 			for (int i = 0; i < Array.getLength(fieldObject); i++) {
 				values.add(extractValue(datatype, Array.get(fieldObject, i)));
 			}
-		} else {
+	    } else {
 			values.add(extractValue(datatype, field.get(object)));
 		}
 		return values;
@@ -378,7 +353,51 @@ public class RequestParser {
 			logger.error("DataType factory does not know datatype: {}", datatype);
 			return null;
 		}
-		return dataTypeExtended.createAttributeValue(object);
+		if (dataTypeExtended.getId().equals(XACML3.ID_DATATYPE_ENTITY)) {
+			return extractEntity(object);
+		} else {
+			return dataTypeExtended.createAttributeValue(object);
+		}
+	}
+
+	protected static AttributeValue<?> extractEntity(Object obj)  throws DataTypeException {
+		//
+		// Make sure we are dealing with an entity definition
+		//
+		XACMLEntity entity = obj.getClass().getAnnotation(XACMLEntity.class);
+		if (entity == null) {
+			throw new DataTypeException(DataTypes.DT_ENTITY, obj.getClass().getSimpleName() + "is not an entity");
+		}
+
+		//
+		// Extract all entity attributes
+		//
+		List<StdMutableRequestAttributes> attributes = new ArrayList<>();
+		for (Field field : obj.getClass().getDeclaredFields()) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("Field: {}", field);
+			}
+			XACMLAttribute attribute = field.getAnnotation(XACMLAttribute.class);
+			if (attribute != null) {
+				try {
+					RequestParser.addAttribute(attributes,
+							null,
+							new IdentifierImpl(attribute.attributeId()),
+							attribute.includeInResults(),
+							(attribute.datatype().equals(XACMLRequest.NULL_STRING) ? null : attribute.datatype()),
+							(attribute.issuer().equals(XACMLRequest.NULL_STRING) ? null : attribute.issuer()),
+							(attribute.id().equals(XACMLRequest.NULL_STRING) ? null : attribute.id()),
+							field,
+							obj);
+				}
+				catch (IllegalAccessException e) {
+					throw new DataTypeException(DataTypes.DT_ENTITY, "Can't access field " + field.getName());
+				}
+			}
+		}
+
+		return new StdAttributeValue<RequestAttributes>(XACML3.ID_DATATYPE_ENTITY,
+				attributes.isEmpty() ? new StdMutableRequestAttributes() : attributes.get(0));
 	}
 
 }

@@ -6,6 +6,7 @@
 package com.att.research.xacmlatt.pdp.policy.expressions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import com.google.common.collect.Iterators;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -150,21 +152,27 @@ public class AttributeSelector extends AttributeRetrievalBase {
 		 * Get the DataType for this AttributeSelector for converting the resulting nodes into AttributeValues
 		 */
 		DataType<?> thisDataType	= this.getDataType();
-		
-		/*
-		 * Get the Request so we can find the XPathExpression to locate the root node and to find the Content element
-		 * of the requested category.
-		 */
-		Request request	= evaluationContext.getRequest();
-		assert(request != null);
-		
-		/*
-		 * Get the RequestAttributes objects for our Category.  If none are found, then we abort quickly with either
-		 * an empty or indeterminate result.
-		 */
-		Iterator<RequestAttributes> iterRequestAttributes	= request.getRequestAttributes(this.getCategory());
-		if (iterRequestAttributes == null || !iterRequestAttributes.hasNext()) {
-			return this.getEmptyResult("No Attributes with Category " + this.getCategory().toString(), null);
+
+		Iterator<RequestAttributes> iterRequestAttributes;
+		if (getCategory() != null) {
+			/*
+			 * Get the Request so we can find the XPathExpression to locate the root node and to find the Content element
+			 * of the requested category.
+			 */
+			Request request = evaluationContext.getRequest();
+			assert (request != null);
+
+			/*
+			 * Get the RequestAttributes objects for our Category.  If none are found, then we abort quickly with either
+			 * an empty or indeterminate result.
+			 */
+			iterRequestAttributes = request.getRequestAttributes(this.getCategory());
+			if (iterRequestAttributes == null || !iterRequestAttributes.hasNext()) {
+				return this.getEmptyResult("No Attributes with Category " + this.getCategory().toString(), null);
+			}
+		} else {
+			assert (getEntity() != null);
+			iterRequestAttributes = Collections.singleton(getEntity()).iterator();
 		}
 		
 		/*

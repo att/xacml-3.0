@@ -5,6 +5,10 @@
  */
 package com.att.research.xacml.api;
 
+import com.att.research.xacml.api.pip.PIPException;
+import com.att.research.xacml.api.pip.PIPRequest;
+import com.att.research.xacml.api.pip.PIPResponse;
+
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -21,7 +25,7 @@ public interface AttributeCategory {
 	 * 
 	 * @return the <code>Identifier</code> for the category of this <code>AttributeCategory</code>.
 	 */
-	public Identifier getCategory();
+	Identifier getCategory();
 	
 	/**
 	 * Gets the <code>Collection</code> of {@link com.att.research.xacml.api.Attribute}s in this <code>AttributeCategory</code>.
@@ -31,7 +35,7 @@ public interface AttributeCategory {
 	 * 
 	 * @return the <code>Collection</code> of {@link com.att.research.xacml.api.Attribute}s in this <code>AttributeCategory</code>.
 	 */
-	public Collection<Attribute> getAttributes();
+	Collection<Attribute> getAttributes();
 	
 	/**
 	 * Gets an <code>Iterator</code> over all of the {@link com.att.research.xacml.api.Attribute}s in this <code>AttributeCategory</code> with the
@@ -41,8 +45,8 @@ public interface AttributeCategory {
 	 * @return an <code>Iterator</code> over all of the <code>Attribute</code>s in this <code>AttributeCategory</code> with the given <code>Identifier</code>
 	 * matching their XACML AttributeId.
 	 */
-	public Iterator<Attribute> getAttributes(Identifier attributeId);
-	
+	Iterator<Attribute> getAttributes(Identifier attributeId);
+
 	/**
 	 * Determines if there is at least one {@link com.att.research.xacml.api.Attribute} in this <code>AttributeCategory</code> 
 	 * whose XACML AttributeId matches the given {@link com.att.research.xacml.api.Identifier}.
@@ -50,7 +54,7 @@ public interface AttributeCategory {
 	 * @param attributeId the <code>Identifier</code> of the AttributeId to look for
 	 * @return true if there is at least one <code>Attribute</code> whose XACML AttributeId matches the given <code>Identifier</code>, else false
 	 */
-	public boolean hasAttributes(Identifier attributeId);
+	boolean hasAttributes(Identifier attributeId);
 	
 	/**
 	 * {@inheritDoc}
@@ -62,5 +66,5 @@ public interface AttributeCategory {
 	 * 			The {@link com.att.research.xacml.api.Attribute}s in <code>a1</code> and <code>a2</code> are pairwise equal.
 	 */
 	@Override
-	public boolean equals(Object obj);
+	boolean equals(Object obj);
 }

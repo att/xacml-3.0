@@ -5,19 +5,17 @@
  */
 package com.att.research.xacmlatt.pdp.test.custom;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.std.IdentifierImpl;
 import com.att.research.xacmlatt.pdp.policy.FunctionDefinition;
 import com.att.research.xacmlatt.pdp.policy.FunctionDefinitionFactory;
-import com.att.research.xacmlatt.pdp.std.StdFunctions;
+import com.att.research.xacmlatt.pdp.std.StdFunctionDefinitionFactory;
 import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionBagOneAndOnly;
+
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CustomFunctionDefinitionFactory extends FunctionDefinitionFactory {
 	private static Map<Identifier,FunctionDefinition> 	mapFunctionDefinitions	= new HashMap<Identifier,FunctionDefinition>();
@@ -38,20 +36,6 @@ public class CustomFunctionDefinitionFactory extends FunctionDefinitionFactory {
 			synchronized(mapFunctionDefinitions) {
 				if (needMapInit) {
 					needMapInit	= false;
-					Field[] declaredFields	= StdFunctions.class.getDeclaredFields();
-					for (Field field : declaredFields) {
-						if (Modifier.isStatic(field.getModifiers()) && 
-							field.getName().startsWith(StdFunctions.FD_PREFIX) &&
-							FunctionDefinition.class.isAssignableFrom(field.getType()) &&
-							Modifier.isPublic(field.getModifiers())
-						) {
-							try {
-								register((FunctionDefinition)(field.get(null)));
-							} catch (IllegalAccessException ex) {
-								
-							}
-						}
-					}
 					//
 					// Our custom function
 					//
@@ -62,6 +46,8 @@ public class CustomFunctionDefinitionFactory extends FunctionDefinitionFactory {
 			}
 		}
 	}
+
+	private FunctionDefinitionFactory stdFunctionDefinitionFactory = new StdFunctionDefinitionFactory();
 	
 	public CustomFunctionDefinitionFactory() {
 		initMap();
@@ -69,7 +55,8 @@ public class CustomFunctionDefinitionFactory extends FunctionDefinitionFactory {
 
 	@Override
 	public FunctionDefinition getFunctionDefinition(Identifier functionId) {
-		return mapFunctionDefinitions.get(functionId);
+		FunctionDefinition functionDefinition = mapFunctionDefinitions.get(functionId);
+		return functionDefinition != null ? functionDefinition : stdFunctionDefinitionFactory.getFunctionDefinition(functionId);
 	}
 
 }

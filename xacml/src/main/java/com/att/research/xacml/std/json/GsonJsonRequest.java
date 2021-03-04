@@ -23,6 +23,7 @@ import com.google.gson.annotations.SerializedName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.w3c.dom.Node;
 
 @Data
 public class GsonJsonRequest implements Serializable {
@@ -99,6 +100,7 @@ public class GsonJsonRequest implements Serializable {
 			//
 			StdMutableRequestAttributes attributes = new StdMutableRequestAttributes();
 			attributes.setCategory(category.getCategoryId());
+			attributes.setContentRoot(category.getContent());
 			attributes.setXmlId(category.getId());
 			//
 			// Iterate the attributes

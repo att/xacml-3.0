@@ -85,5 +85,4 @@ public class Bag {
 	public Iterator<AttributeValue<?>> getAttributeValues() {
 		return this.getAttributeValueList().iterator();
 	}
-
 }
