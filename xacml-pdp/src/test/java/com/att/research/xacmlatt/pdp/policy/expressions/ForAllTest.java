@@ -3,6 +3,7 @@ package com.att.research.xacmlatt.pdp.policy.expressions;
 import com.att.research.xacmlatt.pdp.eval.EvaluationException;
 import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
 import com.att.research.xacmlatt.pdp.policy.ExpressionResultBoolean;
+import com.att.research.xacmlatt.pdp.policy.LexicalEnvironment;
 import com.att.research.xacmlatt.pdp.policy.Policy;
 import org.junit.Test;
 
@@ -17,8 +18,8 @@ import static org.junit.Assert.*;
  */
 public class ForAllTest extends QuantifiedExpressionTest {
     @Override
-    protected QuantifiedExpression newInstance(Policy policy) {
-        return new ForAll(policy);
+    protected QuantifiedExpression newInstance(LexicalEnvironment lexicalEnvironment) {
+        return new ForAll(lexicalEnvironment);
     }
 
     /**
@@ -73,7 +74,7 @@ public class ForAllTest extends QuantifiedExpressionTest {
         QuantifiedExpression quantifiedExpression = newInstance(policy);
         quantifiedExpression.setVariableId("quantifiedVariable");
         quantifiedExpression.setDomainExpression(EX_BAG_TRUE_FALSE);
-        quantifiedExpression.setIterantExpression(new VariableReference(policy, "quantifiedVariable"));
+        quantifiedExpression.setIterantExpression(new VariableReference(quantifiedExpression, "quantifiedVariable"));
 
         // Evaluate the quantified expression and make sure it returns false
         ExpressionResult result = evaluate(quantifiedExpression);
@@ -93,7 +94,7 @@ public class ForAllTest extends QuantifiedExpressionTest {
         QuantifiedExpression quantifiedExpression = newInstance(policy);
         quantifiedExpression.setVariableId("quantifiedVariable");
         quantifiedExpression.setDomainExpression(EX_BAG_TRUE_TRUE);
-        quantifiedExpression.setIterantExpression(new VariableReference(policy, "quantifiedVariable"));
+        quantifiedExpression.setIterantExpression(new VariableReference(quantifiedExpression, "quantifiedVariable"));
 
         // Evaluate the quantified expression and make sure it returns true
         ExpressionResult result = evaluate(quantifiedExpression);

@@ -23,7 +23,6 @@ import com.google.common.collect.Iterators;
  * @version $Revision: 1.1 $
  */
 public class VariableMap {
-	private VariableMap						parent;
 	private List<VariableDefinition>		variableDefinitions;
 	private Map<String, VariableDefinition> mapVariableDefinitions;
 	
@@ -42,14 +41,6 @@ public class VariableMap {
 	public VariableMap() {
 	}
 
-	public VariableMap(VariableMap parent) {
-		this.parent = parent;
-	}
-
-	public VariableMap getParent() {
-		return this.parent;
-	}
-
 	/**
 	 * Gets the <code>VariableDefinition</code> with the given <code>String</code> id.
 	 * 
@@ -57,11 +48,7 @@ public class VariableMap {
 	 * @return the <code>VariableDefinition</code> with the given <code>String</code> id or null if not found.
 	 */
 	public VariableDefinition getVariableDefinition(String variableId) {
-		VariableDefinition variableDefinition = this.mapVariableDefinitions == null ? null : this.mapVariableDefinitions.get(variableId);
-		if (variableDefinition == null) {
-			variableDefinition = this.parent == null ? null : this.parent.getVariableDefinition(variableId);
-		}
-		return variableDefinition;
+		return this.mapVariableDefinitions == null ? null : this.mapVariableDefinitions.get(variableId);
 	}
 	
 	/**
@@ -71,17 +58,7 @@ public class VariableMap {
 	 * @return an <code>Iterator</code> over the <code>VariableDefinition</code>s in this <code>VariableMap</code>
 	 */
 	public Iterator<VariableDefinition> getVariableDefinitions() {
-		Iterator<VariableDefinition> iterator = this.variableDefinitions == null ? null : this.variableDefinitions.iterator();
-		Iterator<VariableDefinition> parentIterator = this.parent == null ? null : this.parent.getVariableDefinitions();
-		if (iterator != null && parentIterator != null) {
-			return Iterators.concat(iterator, parentIterator);
-		} else if (iterator != null) {
-			return iterator;
-		} else if (parentIterator != null) {
-			return parentIterator;
-		} else {
-			return null;
-		}
+		return this.variableDefinitions == null ? null : this.variableDefinitions.iterator();
 	}
 	
 	/**

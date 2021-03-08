@@ -107,7 +107,7 @@ public abstract class QuantifiedExpressionTest {
         // Evaluate the quantified expression and make sure it fails
         ExpressionResult result = evaluate(quantifiedExpression);
         assertFalse(result.isOk());
-        assertEquals(StdStatusCode.STATUS_CODE_PROCESSING_ERROR, result.getStatus().getStatusCode());
+        assertEquals(StdStatusCode.STATUS_CODE_SYNTAX_ERROR, result.getStatus().getStatusCode());
     }
 
     /**
@@ -118,22 +118,24 @@ public abstract class QuantifiedExpressionTest {
     public void testShallNotUseOuterQuantifiedExpressionVariableId() throws EvaluationException {
         Policy policy = new Policy();
 
-        // Create the nested quantified expression
-        QuantifiedExpression nestedQuantifiedExpression = newInstance(policy);
-        nestedQuantifiedExpression.setVariableId("test");
-        nestedQuantifiedExpression.setDomainExpression(EX_BAG_TRUE);
-        nestedQuantifiedExpression.setIterantExpression(EX_TRUE);
-
         // Create the outer quantified expression with the same variableId
         QuantifiedExpression outerQuantifiedExpression = newInstance(policy);
         outerQuantifiedExpression.setVariableId("test");
         outerQuantifiedExpression.setDomainExpression(EX_BAG_TRUE);
+
+        // Create the nested quantified expression
+        QuantifiedExpression nestedQuantifiedExpression = newInstance(outerQuantifiedExpression);
+        nestedQuantifiedExpression.setVariableId("test");
+        nestedQuantifiedExpression.setDomainExpression(EX_BAG_TRUE);
+        nestedQuantifiedExpression.setIterantExpression(EX_TRUE);
+
+        // Add the nested quantified expression to the outer quantified expression
         outerQuantifiedExpression.setIterantExpression(nestedQuantifiedExpression);
 
         // Evaluate the quantified expression and make sure it fails
         ExpressionResult result = evaluate(outerQuantifiedExpression);
         assertFalse(result.isOk());
-        assertEquals(StdStatusCode.STATUS_CODE_PROCESSING_ERROR, result.getStatus().getStatusCode());
+        assertEquals(StdStatusCode.STATUS_CODE_SYNTAX_ERROR, result.getStatus().getStatusCode());
     }
 
     /**
@@ -185,10 +187,10 @@ public abstract class QuantifiedExpressionTest {
 
     /**
      * Delegates quantified expression instantiation to the subclass.
-     * @param policy The policy for this quantified expression.
+     * @param lexicalEnvironment The lexical environment for this quantified expression.
      * @return the quantified expression.
      */
-    protected abstract QuantifiedExpression newInstance(Policy policy);
+    protected abstract QuantifiedExpression newInstance(LexicalEnvironment lexicalEnvironment);
 
     /**
      * Evaluates a quantified expression.

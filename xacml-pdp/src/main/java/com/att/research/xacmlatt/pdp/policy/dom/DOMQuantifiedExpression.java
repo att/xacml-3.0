@@ -5,6 +5,7 @@ import com.att.research.xacml.std.StdStatusCode;
 import com.att.research.xacml.std.dom.DOMProperties;
 import com.att.research.xacml.std.dom.DOMStructureException;
 import com.att.research.xacml.std.dom.DOMUtil;
+import com.att.research.xacmlatt.pdp.policy.LexicalEnvironment;
 import com.att.research.xacmlatt.pdp.policy.Policy;
 import com.att.research.xacmlatt.pdp.policy.expressions.*;
 import org.slf4j.Logger;
@@ -39,11 +40,11 @@ public class DOMQuantifiedExpression {
     /**
      * Constructs a {@link QuantifiedExpression} of the appropriate subtype based on the {@link Node} name.
      * @param nodeQuantifiedExpression The node.
-     * @param policy The policy.
+     * @param lexicalEnvironment The parent lexical environment.
      * @return the quantified expression.
      * @throws DOMStructureException if the supplied node can't be parsed as a quantified expression.
      */
-    public static QuantifiedExpression newInstance(Node nodeQuantifiedExpression, Policy policy) throws DOMStructureException {
+    public static QuantifiedExpression newInstance(Node nodeQuantifiedExpression, LexicalEnvironment lexicalEnvironment) throws DOMStructureException {
         Element elementQuantifiedExpression	= DOMUtil.getElement(nodeQuantifiedExpression);
         String nodeName                     = nodeQuantifiedExpression.getLocalName();
         boolean bLenient		            = DOMProperties.isLenient();
@@ -53,13 +54,13 @@ public class DOMQuantifiedExpression {
         //
         QuantifiedExpression quantifiedExpression;
         if (XACML3.ELEMENT_FORALL.equals(nodeName)) {
-            quantifiedExpression = new ForAll(policy);
+            quantifiedExpression = new ForAll(lexicalEnvironment);
         } else if (XACML3.ELEMENT_FORANY.equals(nodeName)) {
-            quantifiedExpression = new ForAny(policy);
+            quantifiedExpression = new ForAny(lexicalEnvironment);
         } else if (XACML3.ELEMENT_MAP.equals(nodeName)) {
-            quantifiedExpression = new Map(policy);
+            quantifiedExpression = new Map(lexicalEnvironment);
         } else if (XACML3.ELEMENT_SELECT.equals(nodeName)) {
-            quantifiedExpression = new Select(policy);
+            quantifiedExpression = new Select(lexicalEnvironment);
         } else {
             throw DOMUtil.newUnexpectedElementException(nodeQuantifiedExpression);
         }
@@ -77,9 +78,9 @@ public class DOMQuantifiedExpression {
                         String childName	= child.getLocalName();
                         if (DOMExpression.isExpression(child)) {
                             if (quantifiedExpression.getDomainExpression() == null) {
-                                quantifiedExpression.setDomainExpression(DOMExpression.newInstance(child, policy));
+                                quantifiedExpression.setDomainExpression(DOMExpression.newInstance(child, quantifiedExpression));
                             } else if (quantifiedExpression.getIterantExpression() == null) {
-                                quantifiedExpression.setIterantExpression(DOMExpression.newInstance(child, policy));
+                                quantifiedExpression.setIterantExpression(DOMExpression.newInstance(child, quantifiedExpression));
                             } else if (!bLenient) {
                                 throw DOMUtil.newUnexpectedElementException(child, nodeQuantifiedExpression);
                             }

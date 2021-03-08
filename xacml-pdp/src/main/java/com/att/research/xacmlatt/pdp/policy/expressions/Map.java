@@ -14,11 +14,11 @@ import com.att.research.xacmlatt.pdp.policy.*;
  */
 public class Map extends QuantifiedExpression {
     /**
-     * Constructs a <code>Map</code> quantified expression for this {@link Policy}.
-     * @param policy The policy.
+     * Constructs a <code>Map</code> quantified expression for this {@link LexicalEnvironment}.
+     * @param lexicalEnvironment The parent lexical environment.
      */
-    public Map(Policy policy) {
-        super(policy);
+    public Map(LexicalEnvironment lexicalEnvironment) {
+        super(lexicalEnvironment);
     }
 
     @Override

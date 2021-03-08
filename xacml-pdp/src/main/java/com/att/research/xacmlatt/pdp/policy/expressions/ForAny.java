@@ -14,11 +14,11 @@ import com.att.research.xacmlatt.pdp.policy.*;
  */
 public class ForAny extends QuantifiedExpression {
     /**
-     * Constructs a <code>ForAny</code> quantified expression for this {@link Policy}.
-     * @param policy The policy.
+     * Constructs a <code>ForAny</code> quantified expression for this {@link LexicalEnvironment}.
+     * @param lexicalEnvironment The parent lexical environment.
      */
-    public ForAny(Policy policy) {
-        super(policy);
+    public ForAny(LexicalEnvironment lexicalEnvironment) {
+        super(lexicalEnvironment);
     }
 
     @Override

@@ -9,6 +9,9 @@ import com.att.research.xacml.std.trace.StdTraceEvent;
 import com.att.research.xacmlatt.pdp.eval.EvaluationContext;
 import com.att.research.xacmlatt.pdp.eval.EvaluationException;
 import com.att.research.xacmlatt.pdp.policy.*;
+import com.google.common.collect.Iterators;
+
+import java.util.Iterator;
 
 /**
  * QuantifiedExpression extends {@link Expression} to provide the base behavior specified in section 5 of the
@@ -17,20 +20,20 @@ import com.att.research.xacmlatt.pdp.policy.*;
  *
  * @author ygrignon
  */
-public abstract class QuantifiedExpression extends Expression implements Traceable {
+public abstract class QuantifiedExpression extends Expression implements LexicalEnvironment {
     protected static ExpressionResult ER_CONTINUE_PROCESSING = null;
 
-    private Policy policy;
+    private LexicalEnvironment lexicalEnvironment;
     private VariableDefinition quantifiedVariable;
     private Expression domainExpression;
     private Expression iterantExpression;
 
     /**
-     * Constructs a quantified expression for this {@link Policy}.
-     * @param policy The policy.
+     * Constructs a quantified expression within a {@link LexicalEnvironment}.
+     * @param lexicalEnvironment The parent lexical environment.
      */
-    protected QuantifiedExpression(Policy policy) {
-        this.policy = policy;
+    protected QuantifiedExpression(LexicalEnvironment lexicalEnvironment) {
+        this.lexicalEnvironment = lexicalEnvironment;
         this.quantifiedVariable = new VariableDefinition();
     }
 
@@ -58,6 +61,38 @@ public abstract class QuantifiedExpression extends Expression implements Traceab
         this.quantifiedVariable.setId(variableId);
     }
 
+    protected VariableDefinition getQuantifiedVariable() {
+        return this.quantifiedVariable;
+    }
+
+    protected LexicalEnvironment getOuterLexicalEnvironment() {
+        return this.lexicalEnvironment;
+    }
+
+    @Override
+    public Iterator<VariableDefinition> getVariableDefinitions() {
+        return Iterators.concat(
+                Iterators.singletonIterator(getQuantifiedVariable()),
+                getOuterLexicalEnvironment().getVariableDefinitions());
+    }
+
+    /**
+     * Gets the <code>VariableDefinition</code> for the given <code>String</code> variable identifier.
+     *
+     * @param variableId the <code>String</code> variable identifier
+     * @return the <code>VariableDefinition</code> with the given <code>String</code> identifier or null if not found
+     */
+    public VariableDefinition getVariableDefinition(String variableId) {
+        if (variableId != null) {
+            if (variableId.equals(this.getVariableId())) {
+                return getQuantifiedVariable();
+            } else {
+                return getOuterLexicalEnvironment().getVariableDefinition(variableId);
+            }
+        }
+        return null;
+    }
+
     /**
      * Evaluates this <code>QuantifiedExpression</code> in the given {@link EvaluationContext}.
      *
@@ -71,33 +106,19 @@ public abstract class QuantifiedExpression extends Expression implements Traceab
         if (!this.validate()) {
             return ExpressionResult.newError(new StdStatus(this.getStatusCode(), this.getStatusMessage()));
         }
-        if (this.policy.getVariableDefinition(getVariableId()) != null) {
-            return ExpressionResult.newError(new StdStatus(StdStatusCode.STATUS_CODE_PROCESSING_ERROR, "Duplicate VariableDefinition found for \"" + this.getVariableId() + "\""));
+
+        // Evaluate the domain expression
+        ExpressionResult domainResult = getDomainExpression().evaluate(evaluationContext, policyDefaults);
+        assert domainResult != null;
+        if (!domainResult.isOk()) {
+            return ExpressionResult.newError(domainResult.getStatus());
+        }
+        if (!domainResult.isBag()) {
+            return ExpressionResult.newError(new StdStatus(StdStatusCode.STATUS_CODE_PROCESSING_ERROR, "Domain didn't produce a bag"));
         }
 
-        // Establish a new variable definition context so the quantified variable is only valid for this execution
-        policy.pushVariableDefinitions();
-        try {
-            // Register the quantified variable
-            policy.addVariableDefinition(quantifiedVariable);
-
-            // Evaluate the domain expression
-            ExpressionResult domainResult = domainExpression.evaluate(evaluationContext, policyDefaults);
-            assert domainResult != null;
-            if (!domainResult.isOk()) {
-                return ExpressionResult.newError(domainResult.getStatus());
-            }
-            if (!domainResult.isBag()) {
-                return ExpressionResult.newError(new StdStatus(StdStatusCode.STATUS_CODE_PROCESSING_ERROR, "Domain didn't produce a bag"));
-            }
-
-            // Evaluate the iterant expression for each domain values
-            return processDomainResult(domainResult.getBag(), null, evaluationContext, policyDefaults);
-        }
-        finally {
-            // Restore the variable definition context
-            policy.popVariableDefinitions();
-        }
+        // Evaluate the iterant expression for each domain values
+        return processDomainResult(domainResult.getBag(), null, evaluationContext, policyDefaults);
     }
 
     /**
@@ -118,10 +139,10 @@ public abstract class QuantifiedExpression extends Expression implements Traceab
         if (domain != null) {
             for (AttributeValue<?> attributeValue : domain.getAttributeValueList()) {
                 // Set the quantified variable to the current domain value
-                quantifiedVariable.setExpression(new AttributeValueExpression(attributeValue));
+                getQuantifiedVariable().setExpression(new AttributeValueExpression(attributeValue));
 
                 // Execute the iterant expression for the current domain value
-                ExpressionResult iterantResult = iterantExpression.evaluate(evaluationContext, policyDefaults);
+                ExpressionResult iterantResult = getIterantExpression().evaluate(evaluationContext, policyDefaults);
                 assert iterantResult != null;
                 if (evaluationContext.isTracing()) {
                     evaluationContext.trace(new StdTraceEvent<>(attributeValue.getValue().toString(), this, iterantResult));
@@ -163,10 +184,13 @@ public abstract class QuantifiedExpression extends Expression implements Traceab
         if (this.getVariableId() == null) {
             this.setStatus(StdStatusCode.STATUS_CODE_SYNTAX_ERROR, "Missing VariableId");
             return false;
-        } else {
-            this.setStatus(StdStatusCode.STATUS_CODE_OK, null);
-            return true;
         }
+        if (this.getOuterLexicalEnvironment().getVariableDefinition(getVariableId()) != null) {
+            this.setStatus(StdStatusCode.STATUS_CODE_SYNTAX_ERROR, "Duplicate VariableId");
+            return false;
+        }
+        this.setStatus(StdStatusCode.STATUS_CODE_OK, null);
+        return true;
     }
 
     @Override
@@ -176,7 +200,7 @@ public abstract class QuantifiedExpression extends Expression implements Traceab
 
     @Override
     public Traceable getCause() {
-        return this.policy;
+        return getOuterLexicalEnvironment();
     }
 
 }

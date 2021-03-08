@@ -2,10 +2,7 @@ package com.att.research.xacmlatt.pdp.policy.expressions;
 
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacmlatt.pdp.eval.EvaluationException;
-import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
-import com.att.research.xacmlatt.pdp.policy.FunctionArgumentExpression;
-import com.att.research.xacmlatt.pdp.policy.Policy;
-import com.att.research.xacmlatt.pdp.policy.PolicyDefaults;
+import com.att.research.xacmlatt.pdp.policy.*;
 import com.att.research.xacmlatt.pdp.std.StdEvaluationContext;
 import org.junit.Test;
 
@@ -23,8 +20,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class MapTest extends QuantifiedExpressionTest {
     @Override
-    protected QuantifiedExpression newInstance(Policy policy) {
-        return new Map(policy);
+    protected QuantifiedExpression newInstance(LexicalEnvironment lexicalEnvironment) {
+        return new Map(lexicalEnvironment);
     }
 
     /**
@@ -54,7 +51,7 @@ public class MapTest extends QuantifiedExpressionTest {
         quantifiedExpression.setDomainExpression(EX_BAG_TRUE_FALSE);
         quantifiedExpression.setIterantExpression(
                 new Apply(XACML3.ID_FUNCTION_STRING_FROM_BOOLEAN, "converts boolean to string",
-                        Collections.singletonList(new VariableReference(policy, "test"))));
+                        Collections.singletonList(new VariableReference(quantifiedExpression, "test"))));
 
         // Evaluate the quantified expression and make sure it returns a bag with values {TRUE, FALSE}
         ExpressionResult result = evaluate(quantifiedExpression);

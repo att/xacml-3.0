@@ -12,11 +12,7 @@ import com.att.research.xacml.std.StdStatusCode;
 import com.att.research.xacml.std.trace.StdTraceEvent;
 import com.att.research.xacmlatt.pdp.eval.EvaluationContext;
 import com.att.research.xacmlatt.pdp.eval.EvaluationException;
-import com.att.research.xacmlatt.pdp.policy.Expression;
-import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
-import com.att.research.xacmlatt.pdp.policy.Policy;
-import com.att.research.xacmlatt.pdp.policy.PolicyDefaults;
-import com.att.research.xacmlatt.pdp.policy.VariableDefinition;
+import com.att.research.xacmlatt.pdp.policy.*;
 
 /**
  * VariableReference extends {@link com.att.research.xacmlatt.pdp.policy.Expression} to implement the XACML VariableReference
@@ -28,17 +24,17 @@ import com.att.research.xacmlatt.pdp.policy.VariableDefinition;
 public class VariableReference extends Expression implements Traceable {
 	private static final ExpressionResult ER_SE_NO_EXPRESSION	= ExpressionResult.newError(new StdStatus(StdStatusCode.STATUS_CODE_SYNTAX_ERROR, "Missing Expression for VariableDefinition"));
 	
-	private Policy policy;
 	private String variableId;
+	private LexicalEnvironment lexicalEnvironment;
 	private VariableDefinition variableDefinition;
 	
 	protected VariableDefinition getVariableDefinition() {
 		if (this.variableDefinition == null) {
-			Policy thisPolicy	= this.getPolicy();
-			if (thisPolicy != null) {
+			LexicalEnvironment thisLexicalEnvironment	= this.getLexicalEnvironment();
+			if (thisLexicalEnvironment != null) {
 				String thisVariableId	= this.getVariableId();
 				if (thisVariableId != null) {
-					this.variableDefinition	= thisPolicy.getVariableDefinition(thisVariableId);
+					this.variableDefinition	= thisLexicalEnvironment.getVariableDefinition(thisVariableId);
 				}
 			}
 		}
@@ -56,17 +52,17 @@ public class VariableReference extends Expression implements Traceable {
 	public VariableReference() {
 	}
 	
-	public VariableReference(Policy policyIn, String variableIdIn) {
-		this.policy		= policyIn;
+	public VariableReference(LexicalEnvironment lexicalEnvironmentIn, String variableIdIn) {
+		this.lexicalEnvironment	= lexicalEnvironmentIn;
 		this.variableId	= variableIdIn;
 	}
 	
-	public Policy getPolicy() {
-		return this.policy;
+	public LexicalEnvironment getLexicalEnvironment() {
+		return this.lexicalEnvironment;
 	}
 	
-	public void setPolicy(Policy policyIn) {
-		this.policy	= policyIn;
+	public void setLexicalEnvironment(LexicalEnvironment lexicalEnvironmentIn) {
+		this.lexicalEnvironment = lexicalEnvironmentIn;
 	}
 	
 	public String getVariableId() {
@@ -106,8 +102,8 @@ public class VariableReference extends Expression implements Traceable {
 		if (this.getVariableId() == null) {
 			this.setStatus(StdStatusCode.STATUS_CODE_SYNTAX_ERROR, "Missing VariableId");
 			return false;
-		} else if (this.getPolicy() == null) {
-			this.setStatus(StdStatusCode.STATUS_CODE_SYNTAX_ERROR, "VariableReference not in a Policy");
+		} else if (this.getLexicalEnvironment() == null) {
+			this.setStatus(StdStatusCode.STATUS_CODE_SYNTAX_ERROR, "VariableReference not in a LexicalEnvironment");
 			return false;
 		} else {
 			this.setStatus(StdStatusCode.STATUS_CODE_OK, null);
@@ -138,7 +134,7 @@ public class VariableReference extends Expression implements Traceable {
 
 	@Override
 	public Traceable getCause() {
-		return this.policy;
+		return this.lexicalEnvironment;
 	}
 
 }

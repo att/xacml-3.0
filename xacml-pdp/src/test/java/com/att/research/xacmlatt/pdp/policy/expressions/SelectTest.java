@@ -2,6 +2,7 @@ package com.att.research.xacmlatt.pdp.policy.expressions;
 
 import com.att.research.xacmlatt.pdp.eval.EvaluationException;
 import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
+import com.att.research.xacmlatt.pdp.policy.LexicalEnvironment;
 import com.att.research.xacmlatt.pdp.policy.Policy;
 import org.junit.Test;
 
@@ -17,8 +18,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class SelectTest extends QuantifiedExpressionTest {
     @Override
-    protected QuantifiedExpression newInstance(Policy policy) {
-        return new Select(policy);
+    protected QuantifiedExpression newInstance(LexicalEnvironment lexicalEnvironment) {
+        return new Select(lexicalEnvironment);
     }
 
     /**
@@ -46,7 +47,7 @@ public class SelectTest extends QuantifiedExpressionTest {
         quantifiedExpression.setVariableId("test");
         quantifiedExpression.setDomainExpression(EX_BAG_TRUE_FALSE);
         quantifiedExpression.setIterantExpression(
-                new VariableReference(policy, "test"));
+                new VariableReference(quantifiedExpression, "test"));
 
         // Evaluate the quantified expression and make sure it returns the first domain value
         ExpressionResult result = evaluate(quantifiedExpression);
