@@ -24,7 +24,7 @@ public class ForAny extends QuantifiedExpression {
     @Override
     protected ExpressionResult processDomainResult(Bag domain, Bag resultBag, EvaluationContext evaluationContext, PolicyDefaults policyDefaults) throws EvaluationException {
         // ForAny evaluates to false if the domain is empty
-        if (domain != null && domain.size() == 0) {
+        if (domain != null && domain.isEmpty()) {
             return ExpressionResultBoolean.ERB_FALSE;
         }
 

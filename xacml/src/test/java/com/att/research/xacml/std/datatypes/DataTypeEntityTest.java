@@ -19,21 +19,18 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class DataTypeEntityTest {
     @Test
     public void testNull() throws Exception {
         DataTypeEntity entityType = DataTypeEntity.newInstance();
-        assertEquals(null, entityType.convert(null));
+        assertNull(entityType.convert(null));
     }
 
     @Test

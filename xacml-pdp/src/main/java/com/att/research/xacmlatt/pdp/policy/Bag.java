@@ -76,7 +76,16 @@ public class Bag {
 	public int size() {
 		return this.getAttributeValueList().size();
 	}
-	
+
+	/**
+	 * Gets whether this <code>Bag</code> is empty.
+	 *
+	 * @return true if the bag is empty, false otherwise.
+	 */
+	public boolean isEmpty() {
+		return this.getAttributeValueList().isEmpty();
+	}
+
 	/**
 	 * Gets an <code>Iterator</code> over all of the <code>AttributeValue</code>s in this <code>Bag</code>.
 	 * 

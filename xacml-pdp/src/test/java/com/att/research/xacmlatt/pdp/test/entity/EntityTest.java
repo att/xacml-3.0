@@ -194,14 +194,14 @@ public class EntityTest {
      */
     @Test
     public void testTableDrivenPolicyUsingAttributesMultiple() throws Exception {
-        // right-handed discombobulator is authorized for export to US
+        // left-handed discombobulator and combobulator are authorized for export to US
         TableDrivenPolicyUsingAttributesRequest request = new TableDrivenPolicyUsingAttributesRequest();
         request.productTypes = new String[] {"left-handed discombobulator", "left-handed combobulator"};
         request.destinations = new String[] {"AU", "GB"};
         Response response = pdp.decide(RequestParser.parseRequest(request));
         assertResult(response, Decision.PERMIT);
 
-        // right-handed discombobulator is not authorized for export to CA
+        // left-handed discombobulator and combobulator are not authorized for export to CA
         request.destinations = new String[] {"AU", "GB", "CA"};
         response = pdp.decide(RequestParser.parseRequest(request));
         assertResult(response, Decision.DENY);

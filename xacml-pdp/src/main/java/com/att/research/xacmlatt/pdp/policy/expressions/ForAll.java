@@ -24,7 +24,7 @@ public class ForAll extends QuantifiedExpression {
     @Override
     protected ExpressionResult processDomainResult(Bag domain, Bag resultBag, EvaluationContext evaluationContext, PolicyDefaults policyDefaults) throws EvaluationException {
         // ForAll evaluates to true if the domain is empty
-        if (domain != null && domain.size() == 0) {
+        if (domain != null && domain.isEmpty()) {
             return ExpressionResultBoolean.ERB_TRUE;
         }
 

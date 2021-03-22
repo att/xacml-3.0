@@ -24,7 +24,7 @@ public class Select extends QuantifiedExpression {
     @Override
     protected ExpressionResult processDomainResult(Bag domain, Bag resultBag, EvaluationContext evaluationContext, PolicyDefaults policyDefaults) throws EvaluationException {
         // Select evaluates to an empty bag if the domain is empty
-        if (domain != null && domain.size() == 0) {
+        if (domain != null && domain.isEmpty()) {
             return ExpressionResult.newEmpty();
         }
 
