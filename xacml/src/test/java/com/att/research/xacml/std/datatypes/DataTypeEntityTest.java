@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: MIT
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
+ */
 package com.att.research.xacml.std.datatypes;
 
 import com.att.research.xacml.api.Attribute;
@@ -26,6 +32,11 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.*;
 
+/**
+ * Entity datatype (de)serialization tests.
+ *
+ * @author ygrignon
+ */
 public class DataTypeEntityTest {
     @Test
     public void testNull() throws Exception {

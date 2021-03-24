@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: MIT
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
+ */
 package com.att.research.xacml.std.json;
 
 import com.google.gson.*;
@@ -22,6 +28,11 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * JSON (de)serializer between XML string literal and {@link org.w3c.dom.Node}.
+ *
+ * @author ygrignon
+ */
 public class JsonNodeSerialization implements JsonDeserializer<Node>, JsonSerializer<Node> {
     private static final Logger logger	= LoggerFactory.getLogger(JsonNodeSerialization.class);
 

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: MIT
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
+ */
 package com.att.research.xacml.std.json;
 
 import com.att.research.xacml.api.Identifier;
@@ -16,6 +22,11 @@ import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Unit tests for {@link JsonAttributeValueSerialization}.
+ *
+ * @author ygrignon
+ */
 public class JsonAttributeValueSerializationTest {
     @Test
     public void testPrimitiveAttributeValue() throws Exception {

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: MIT
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
+ */
 package com.att.research.xacmlatt.pdp.policy.expressions;
 
 import com.att.research.xacmlatt.pdp.eval.EvaluationException;
