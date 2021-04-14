@@ -7,7 +7,6 @@
 package com.att.research.xacmlatt.pdp.policy.expressions;
 
 import com.att.research.xacml.api.AttributeValue;
-import com.att.research.xacml.api.Status;
 import com.att.research.xacml.api.trace.Traceable;
 import com.att.research.xacml.std.StdStatus;
 import com.att.research.xacml.std.StdStatusCode;
@@ -31,6 +30,7 @@ public abstract class QuantifiedExpression extends Expression implements Lexical
 
     private LexicalEnvironment lexicalEnvironment;
     private VariableDefinition quantifiedVariable;
+    private ThreadLocalExpression domainValue;
     private Expression domainExpression;
     private Expression iterantExpression;
 
@@ -40,7 +40,9 @@ public abstract class QuantifiedExpression extends Expression implements Lexical
      */
     protected QuantifiedExpression(LexicalEnvironment lexicalEnvironment) {
         this.lexicalEnvironment = lexicalEnvironment;
+        this.domainValue = new ThreadLocalExpression();
         this.quantifiedVariable = new VariableDefinition();
+        this.quantifiedVariable.setExpression(this.domainValue);
     }
 
     public Expression getDomainExpression() {
@@ -143,25 +145,30 @@ public abstract class QuantifiedExpression extends Expression implements Lexical
      */
     protected ExpressionResult processDomainResult(Bag domain, Bag resultBag, EvaluationContext evaluationContext, PolicyDefaults policyDefaults) throws EvaluationException {
         if (domain != null) {
-            for (AttributeValue<?> attributeValue : domain.getAttributeValueList()) {
-                // Set the quantified variable to the current domain value
-                getQuantifiedVariable().setExpression(new AttributeValueExpression(attributeValue));
+            try {
+                for (AttributeValue<?> attributeValue : domain.getAttributeValueList()) {
+                    // Set the quantified variable to the current domain value
+                    domainValue.set(ExpressionResult.newSingle(attributeValue));
 
-                // Execute the iterant expression for the current domain value
-                ExpressionResult iterantResult = getIterantExpression().evaluate(evaluationContext, policyDefaults);
-                assert iterantResult != null;
-                if (evaluationContext.isTracing()) {
-                    evaluationContext.trace(new StdTraceEvent<>(attributeValue.getValue().toString(), this, iterantResult));
-                }
-                if (!iterantResult.isOk()) {
-                    return iterantResult;
-                }
+                    // Execute the iterant expression for the current domain value
+                    ExpressionResult iterantResult = getIterantExpression().evaluate(evaluationContext, policyDefaults);
+                    assert iterantResult != null;
+                    if (evaluationContext.isTracing()) {
+                        evaluationContext.trace(new StdTraceEvent<>(attributeValue.getValue().toString(), this, iterantResult));
+                    }
+                    if (!iterantResult.isOk()) {
+                        return iterantResult;
+                    }
 
-                // Apply the quantified expression behavior to the iterant expression result
-                ExpressionResult result = processIterantResult(attributeValue, iterantResult, resultBag);
-                if (result != ER_CONTINUE_PROCESSING) {
-                    return result;
+                    // Apply the quantified expression behavior to the iterant expression result
+                    ExpressionResult result = processIterantResult(attributeValue, iterantResult, resultBag);
+                    if (result != ER_CONTINUE_PROCESSING) {
+                        return result;
+                    }
                 }
+            }
+            finally {
+                domainValue.clear();
             }
         }
         return ER_CONTINUE_PROCESSING;
@@ -207,6 +214,45 @@ public abstract class QuantifiedExpression extends Expression implements Lexical
     @Override
     public Traceable getCause() {
         return getOuterLexicalEnvironment();
+    }
+
+    /**
+     * An Expression that returns the set result for a given thread.
+     */
+    private static class ThreadLocalExpression extends Expression {
+        private ThreadLocal<ExpressionResult> tl = new ThreadLocal<>();
+
+        /**
+         * Sets the result for the current thread.
+         * @param result The result.
+         */
+        public void set(ExpressionResult result) {
+            tl.set(result);
+        }
+
+        /**
+         * Clears the result for the current thread.
+         */
+        public void clear() {
+            tl.remove();
+        }
+
+        /**
+         * Returns the result for the current thread.
+         * @param evaluationContext the <code>EvaluationContext</code> in which to evaluate this <code>Expression</code>
+         * @param policyDefaults the {@link com.att.research.xacmlatt.pdp.policy.PolicyDefaults} to use in evaluating this <code>Expression</code>
+         * @return the result for this thread.
+         */
+        @Override
+        public ExpressionResult evaluate(EvaluationContext evaluationContext, PolicyDefaults policyDefaults) {
+            ExpressionResult result = tl.get();
+            return result != null ? result : ExpressionResult.newError(new StdStatus(StdStatusCode.STATUS_CODE_PROCESSING_ERROR, "No result set for current thread"));
+        }
+
+        @Override
+        protected boolean validateComponent() {
+            return tl.get() != null;
+        }
     }
 
 }
