@@ -28,7 +28,7 @@ import com.att.research.xacmlatt.pdp.eval.MatchResult;
  * @author car
  * @version $Revision: 1.2 $
  */
-public class Policy extends PolicyDef {
+public class Policy extends PolicyDef implements LexicalEnvironment {
 	private TargetedCombinerParameterMap<String,Rule>		ruleCombinerParameters	= new TargetedCombinerParameterMap<>();
 	private VariableMap										variableMap				= new VariableMap();
 	private List<Rule>										rules					= new ArrayList<>();
@@ -130,6 +130,7 @@ public class Policy extends PolicyDef {
 	 * 
 	 * @return an <code>Iterator</code> over the <code>VariableDefinition</code>s in this <code>Policy</code>
 	 */
+	@Override
 	public Iterator<VariableDefinition> getVariableDefinitions() {
 		return this.variableMap.getVariableDefinitions();
 	}
@@ -140,6 +141,7 @@ public class Policy extends PolicyDef {
 	 * @param variableId the <code>String</code> variable identifier
 	 * @return the <code>VariableDefinition</code> with the given <code>String</code> identifier or null if not found
 	 */
+	@Override
 	public VariableDefinition getVariableDefinition(String variableId) {
 		return this.variableMap.getVariableDefinition(variableId);
 	}
@@ -170,7 +172,7 @@ public class Policy extends PolicyDef {
 	public void addVariableDefinitions(Collection<VariableDefinition> variableDefinitions) {
 		this.variableMap.addVariableDefinitions(variableDefinitions);
 	}
-	
+
 	/**
 	 * Gets an <code>Iterator</code> over the <code>Rule</code>s in this <code>Policy</code> or null if there are none.
 	 * 

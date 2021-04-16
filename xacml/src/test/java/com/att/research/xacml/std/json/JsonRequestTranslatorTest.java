@@ -8,6 +8,7 @@ package com.att.research.xacml.std.json;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
+import com.att.research.xacml.std.datatypes.*;
 import com.google.common.collect.Iterators;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,22 +36,80 @@ import com.att.research.xacml.api.XACML2;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.IdentifierImpl;
 import com.att.research.xacml.std.StdAttributeValue;
-import com.att.research.xacml.std.datatypes.DataTypeAnyURI;
-import com.att.research.xacml.std.datatypes.DataTypeBoolean;
-import com.att.research.xacml.std.datatypes.DataTypeDate;
-import com.att.research.xacml.std.datatypes.DataTypeDateTime;
-import com.att.research.xacml.std.datatypes.DataTypeDouble;
-import com.att.research.xacml.std.datatypes.DataTypeInteger;
-import com.att.research.xacml.std.datatypes.DataTypeRFC822Name;
-import com.att.research.xacml.std.datatypes.DataTypeTime;
-import com.att.research.xacml.std.datatypes.DataTypeX500Name;
-import com.att.research.xacml.std.datatypes.DataTypeXPathExpression;
+import org.w3c.dom.Node;
+
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 public class JsonRequestTranslatorTest {
 	private static final Logger logger	= LoggerFactory.getLogger(JsonRequestTranslatorTest.class);
 
 	@Rule
-	public TemporaryFolder folder = new TemporaryFolder();	
+	public TemporaryFolder folder = new TemporaryFolder();
+
+	@Test
+	public void test4231() throws Exception {
+		test423("src/test/resources/Request-4.2.3.1.json");
+	}
+
+	@Test
+	public void test4232() throws Exception {
+		test423("src/test/resources/Request-4.2.3.2.json");
+	}
+
+	private void test423(String filename) throws Exception {
+		//
+		// Read it from the file
+		//
+		Request request = JsonRequestTranslator.load(new File(filename));
+		validate423Request(request);
+
+		//
+		// Convert to string
+		//
+		String strJson = JsonRequestTranslator.toString(request, true);
+		validate423Json(strJson);
+
+		//
+		// Read it again
+		//
+		request = JsonRequestTranslator.load(strJson);
+		validate423Request(request);
+
+		//
+		// Convert to string again
+		//
+		strJson = JsonRequestTranslator.toString(request, true);
+		validate423Json(strJson);
+	}
+
+	private void validate423Request(Request request) throws XPathExpressionException {
+		assertThat(request).isNotNull();
+		assertThat(request.getRequestAttributes()).isNotNull().hasSize(1);
+
+		RequestAttributes requestAttributes = request.getRequestAttributes(XACML1.ID_SUBJECT_CATEGORY_ACCESS_SUBJECT).next();
+		assertThat(requestAttributes.getContentRoot()).isNotNull();
+
+		XPath xPath = XPathFactory.newInstance().newXPath();
+		xPath.setNamespaceContext(new NodeNamespaceContext(requestAttributes.getContentRoot().getOwnerDocument()));
+
+		assertThat(requestAttributes.getContentNodeByXpathExpression(xPath.compile("/catalog/book/author")).getTextContent())
+				.isEqualTo("Gambardella, Matthew");
+	}
+
+	private void validate423Json(String strJson) {
+		logger.info("{}", strJson);
+
+		// @formatter:off
+		assertThat(strJson)
+				.contains("id=\\\"bk101\\\"")
+				.contains("Gambardella, Matthew")
+				.contains("XML Developer's Guide")
+				.contains("Computer")
+				.contains("</catalog>");
+		// @formatter:on
+	}
 	
 	@Test
 	public void test81() throws Exception {
@@ -79,12 +139,12 @@ public class JsonRequestTranslatorTest {
 		//
 		request = JsonRequestTranslator.load(strJson);
 		validate81Request(request);
+
 		//
 		// Convert to string again
 		//
 		strJson = JsonRequestTranslator.toString(request, false);
 		validate81Json(strJson);
-		
 	}
 	
 	private void validate81Json(String strJson) {
@@ -590,8 +650,8 @@ public class JsonRequestTranslatorTest {
 		assertThat(Iterators.size(request.getRequestAttributes(XACML3.ID_ATTRIBUTE_CATEGORY_ACTION))).isEqualTo(1);
 		assertThat(Iterators.size(request.getRequestAttributes(new IdentifierImpl("urn:custom:category")))).isEqualTo(1);
 	}
-    
-    private <T> boolean hasAttribute(Request request, Identifier categoryId, Identifier attributeId,
+
+	private <T> boolean hasAttribute(Request request, Identifier categoryId, Identifier attributeId,
 		    String issuer, boolean includeInResults, Collection<AttributeValue<T>> expectedValues) {
 	    logger.info("Searching for attribute {} in category {}", attributeId, categoryId);
 

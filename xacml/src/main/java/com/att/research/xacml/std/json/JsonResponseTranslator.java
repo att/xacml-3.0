@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
+import org.w3c.dom.Node;
 
 public class JsonResponseTranslator {
 	private static Gson gson;
@@ -27,6 +28,7 @@ public class JsonResponseTranslator {
 	
 	static {
 		GsonBuilder builder = new GsonBuilder()
+				.registerTypeAdapter(Node.class, new JsonNodeSerialization())
 				.registerTypeAdapter(Identifier.class, new JsonIdentifierSerialization())
 				.registerTypeAdapter(GsonJsonAttributeValue.class, new JsonAttributeValueSerialization())
 				.disableHtmlEscaping();

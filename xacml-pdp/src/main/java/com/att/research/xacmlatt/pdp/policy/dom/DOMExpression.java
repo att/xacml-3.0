@@ -6,6 +6,7 @@
 
 package com.att.research.xacmlatt.pdp.policy.dom;
 
+import com.att.research.xacmlatt.pdp.policy.LexicalEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -33,7 +34,7 @@ import com.att.research.xacmlatt.pdp.policy.expressions.VariableReference;
  */
 public abstract class DOMExpression extends Expression {
 	private static final Logger logger	= LoggerFactory.getLogger(DOMExpression.class);
-	
+
 	protected DOMExpression() {
 	}
 	
@@ -44,7 +45,8 @@ public abstract class DOMExpression extends Expression {
 				XACML3.ELEMENT_ATTRIBUTESELECTOR.equals(nodeName) ||
 				XACML3.ELEMENT_ATTRIBUTEVALUE.equals(nodeName) ||
 				XACML3.ELEMENT_FUNCTION.equals(nodeName) ||
-				XACML3.ELEMENT_VARIABLEREFERENCE.equals(nodeName)
+				XACML3.ELEMENT_VARIABLEREFERENCE.equals(nodeName) ||
+				DOMQuantifiedExpression.isQuantifiedExpression(nodeExpression)
 				);
 	}
 	
@@ -56,13 +58,13 @@ public abstract class DOMExpression extends Expression {
 	 * @return a new <code>Expression</code> parsed from the given <code>Node</code>
 	 * @throws DOMStructureException if there is an error parsing the <code>Node</code>
 	 */
-	public static Expression newInstance(Node nodeExpression, Policy policy) throws DOMStructureException {
+	public static Expression newInstance(Node nodeExpression, LexicalEnvironment lexicalEnvironment) throws DOMStructureException {
 		Element elementExpression	= DOMUtil.getElement(nodeExpression);
 		boolean bLenient			= DOMProperties.isLenient();
 	
 		if (DOMUtil.isInNamespace(elementExpression, XACML3.XMLNS)) {
 			if (elementExpression.getLocalName().equals(XACML3.ELEMENT_APPLY)) {
-				return DOMApply.newInstance(elementExpression, policy);
+				return DOMApply.newInstance(elementExpression, lexicalEnvironment);
 			} else if (elementExpression.getLocalName().equals(XACML3.ELEMENT_ATTRIBUTEDESIGNATOR)) {
 				return DOMAttributeDesignator.newInstance(elementExpression);
 			} else if (elementExpression.getLocalName().equals(XACML3.ELEMENT_ATTRIBUTESELECTOR)) {
@@ -78,7 +80,9 @@ public abstract class DOMExpression extends Expression {
 			} else if (elementExpression.getLocalName().equals(XACML3.ELEMENT_FUNCTION)) {
 				return new Function(DOMUtil.getIdentifierAttribute(elementExpression, XACML3.ATTRIBUTE_FUNCTIONID));
 			} else if (elementExpression.getLocalName().equals(XACML3.ELEMENT_VARIABLEREFERENCE)) {
-				return new VariableReference(policy, DOMUtil.getStringAttribute(elementExpression, XACML3.ATTRIBUTE_VARIABLEID));
+				return new VariableReference(lexicalEnvironment, DOMUtil.getStringAttribute(elementExpression, XACML3.ATTRIBUTE_VARIABLEID));
+			} else if (DOMQuantifiedExpression.isQuantifiedExpression(nodeExpression)) {
+				return DOMQuantifiedExpression.newInstance(elementExpression, lexicalEnvironment);
 			} else if (!bLenient) {
 				throw DOMUtil.newUnexpectedElementException(nodeExpression);
 			} else {
@@ -106,6 +110,8 @@ public abstract class DOMExpression extends Expression {
 				return DOMUtil.repairIdentifierAttribute(elementExpression, XACML3.ATTRIBUTE_FUNCTIONID, XACML3.ID_FUNCTION_STRING_EQUAL, logger);
 			} else if (elementExpression.getLocalName().equals(XACML3.ELEMENT_VARIABLEREFERENCE)) {
 				return DOMUtil.repairStringAttribute(elementExpression, XACML3.ATTRIBUTE_VARIABLEID, "variableId", logger);
+			} else if (DOMQuantifiedExpression.isQuantifiedExpression(nodeExpression)) {
+				return DOMQuantifiedExpression.repair(elementExpression);
 			} else {
 				throw DOMUtil.newUnexpectedElementException(nodeExpression);
 			}

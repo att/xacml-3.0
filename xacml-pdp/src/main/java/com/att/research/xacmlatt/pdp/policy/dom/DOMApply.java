@@ -6,6 +6,7 @@
 
 package com.att.research.xacmlatt.pdp.policy.dom;
 
+import com.att.research.xacmlatt.pdp.policy.LexicalEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -37,11 +38,11 @@ public class DOMApply extends Apply {
 	 * Creates a new <code>Apply</code> by parsing the given <code>Node</code> representing a XACML Apply element.
 	 * 
 	 * @param nodeApply the <code>Node</code> representing the XACML Apply element
-	 * @param policy the <code>Policy</code> encompassing the Apply element
+	 * @param lexicalEnvironment the <code>LexicalEnvironment</code> encompassing the Apply element
 	 * @return a new <code>Apply</code> parsed from the given <code>Node</code>
 	 * @throws DOMStructureException if there is an error parsing the <code>Node</code>
 	 */
-	public static Apply newInstance(Node nodeApply, Policy policy) throws DOMStructureException {
+	public static Apply newInstance(Node nodeApply, LexicalEnvironment lexicalEnvironment) throws DOMStructureException {
 		Element elementApply	= DOMUtil.getElement(nodeApply);
 		boolean bLenient		= DOMProperties.isLenient();
 		
@@ -58,7 +59,7 @@ public class DOMApply extends Apply {
 						if (XACML3.ELEMENT_DESCRIPTION.equals(childName)) {
 							domApply.setDescription(child.getTextContent());
 						} else if (DOMExpression.isExpression(child)) {
-							domApply.addArgument(DOMExpression.newInstance(child, policy));
+							domApply.addArgument(DOMExpression.newInstance(child, lexicalEnvironment));
 						} else if (!bLenient) {
 							throw DOMUtil.newUnexpectedElementException(child, nodeApply);
 						}

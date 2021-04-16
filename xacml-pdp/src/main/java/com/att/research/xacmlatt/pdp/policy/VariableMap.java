@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.att.research.xacml.util.StringUtils;
+import com.google.common.collect.Iterators;
 
 /**
  * VariableMap is a collection of {@link com.att.research.xacmlatt.pdp.policy.VariableDefinition}s that are accessible by
@@ -38,7 +39,6 @@ public class VariableMap {
 	}
 	
 	public VariableMap() {
-		super();
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class VariableMap {
 	 * @return the <code>VariableDefinition</code> with the given <code>String</code> id or null if not found.
 	 */
 	public VariableDefinition getVariableDefinition(String variableId) {
-		return (this.mapVariableDefinitions == null ? null : this.mapVariableDefinitions.get(variableId));
+		return this.mapVariableDefinitions == null ? null : this.mapVariableDefinitions.get(variableId);
 	}
 	
 	/**
@@ -58,7 +58,7 @@ public class VariableMap {
 	 * @return an <code>Iterator</code> over the <code>VariableDefinition</code>s in this <code>VariableMap</code>
 	 */
 	public Iterator<VariableDefinition> getVariableDefinitions() {
-		return (this.variableDefinitions == null ? null : this.variableDefinitions.iterator());
+		return this.variableDefinitions == null ? null : this.variableDefinitions.iterator();
 	}
 	
 	/**

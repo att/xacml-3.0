@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
+import org.w3c.dom.Node;
 
 /**
  * Translates JSON XACML Request that conforms to the following specification:
@@ -35,6 +36,7 @@ public final class JsonRequestTranslator {
 	
 	static {
 		GsonBuilder builder = new GsonBuilder()
+				.registerTypeAdapter(Node.class, new JsonNodeSerialization())
 				.registerTypeAdapter(Identifier.class, new JsonIdentifierSerialization())
 				.registerTypeAdapter(GsonJsonAttributeValue.class, new JsonAttributeValueSerialization())
 				.disableHtmlEscaping();
