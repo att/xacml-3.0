@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PolicySet PolicySetId="urn:com:xacml:policyset:id:2nd-when-first-permit" Version="1" PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:on-permit-apply-second" xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17">
+    <Target>
+        <AnyOf>
+            <AllOf>
+                <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Milhouse</AttributeValue>
+                    <AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="false"/>
+                </Match>
+            </AllOf>
+        </AnyOf>
+    </Target>
+    <Policy PolicyId="urn:com:xacml:policy:id:first" Version="1.0" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+        <Target/>
+        <Rule RuleId="urn:com:xacml:rule:id:first-permit" Effect="Permit">
+            <Target/>
+            <ObligationExpressions>
+                <ObligationExpression ObligationId="urn:obligation:permit:P1" FulfillOn="Permit"/>
+            </ObligationExpressions>
+        </Rule>
+        <ObligationExpressions>
+            <ObligationExpression ObligationId="urn:obligation:permit:P2" FulfillOn="Permit"/>
+        </ObligationExpressions>
+    </Policy>
+    <Policy PolicyId="urn:com:xacml:policy:id:second" Version="1.0" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+        <Target/>
+        <Rule RuleId="urn:com:xacml:rule:id:second-deny" Effect="Permit">
+            <Target/>
+            <ObligationExpressions>
+                <ObligationExpression ObligationId="urn:obligation:deny:D1" FulfillOn="Deny"/>
+                <ObligationExpression ObligationId="urn:obligation:permit:P3" FulfillOn="Permit"/>
+            </ObligationExpressions>
+        </Rule>
+        <ObligationExpressions>
+            <ObligationExpression ObligationId="urn:obligation:deny:D2" FulfillOn="Deny"/>
+            <ObligationExpression ObligationId="urn:obligation:permit:P4" FulfillOn="Permit"/>
+        </ObligationExpressions>
+    </Policy>
+    <ObligationExpressions>
+        <ObligationExpression ObligationId="urn:obligation:deny:D3" FulfillOn="Deny"/>
+        <ObligationExpression ObligationId="urn:obligation:permit:P5" FulfillOn="Permit"/>
+    </ObligationExpressions>
+</PolicySet>
