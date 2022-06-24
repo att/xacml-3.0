@@ -26,10 +26,16 @@
             <organizationUrl>http://www.research.att.com</organizationUrl>
         </developer>
         <developer>
-            <name>Chenfei Gao</name>
-            <email>cgao@research.att.com</email>
+            <name>Daniel Cruz</name>
+            <email>dc433y@att.com</email>
             <organization>ATT</organization>
-            <organizationUrl>http://www.research.att.com</organizationUrl>
+            <organizationUrl>http://www.att.com</organizationUrl>
+        </developer>
+        <developer>
+            <name>Jorge Hernandez-Herrero</name>
+            <email>jh1730@att.com</email>
+            <organization>ATT</organization>
+            <organizationUrl>http://www.att.com</organizationUrl>
         </developer>
     </developers>
 
