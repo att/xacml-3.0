@@ -5,6 +5,7 @@
  */
 package com.att.research.xacmlatt.pdp.test.annotations;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -17,20 +18,14 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 
+import com.att.research.xacml.std.annotations.*;
+import com.att.research.xacml.std.dom.DOMStructureException;
+import com.att.research.xacml.std.dom.DOMUtil;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.Response;
-import com.att.research.xacml.std.annotations.RequestParser;
-import com.att.research.xacml.std.annotations.XACMLAction;
-import com.att.research.xacml.std.annotations.XACMLAttribute;
-import com.att.research.xacml.std.annotations.XACMLEnvironment;
-import com.att.research.xacml.std.annotations.XACMLMultiRequest;
-import com.att.research.xacml.std.annotations.XACMLRequest;
-import com.att.research.xacml.std.annotations.XACMLRequestReference;
-import com.att.research.xacml.std.annotations.XACMLResource;
-import com.att.research.xacml.std.annotations.XACMLSubject;
 import com.att.research.xacml.std.datatypes.HexBinary;
 import com.att.research.xacml.std.datatypes.IPAddress;
 import com.att.research.xacml.std.datatypes.IPv4Address;
@@ -38,6 +33,7 @@ import com.att.research.xacml.std.datatypes.ISO8601DateTime;
 import com.att.research.xacml.std.datatypes.ISO8601Time;
 import com.att.research.xacml.util.FactoryException;
 import com.att.research.xacml.test.TestBase;
+import org.w3c.dom.Node;
 
 /**
  * This example application shows how to use annotations for Java classes to create requests to send to the
@@ -62,13 +58,14 @@ public class TestAnnotation extends TestBase {
 	@XACMLRequest(ReturnPolicyIdList=true)
 	public class MyRequestAttributes {
 		
-		public MyRequestAttributes(String user, String action, String resource) {
+		public MyRequestAttributes(String user, String action, String resource, Node content) {
 			this.userID = user;
 			this.action = action;
 			this.resource = resource;
 			this.today = new Date();
 			this.yesterday = Calendar.getInstance();
 			this.yesterday.add(Calendar.DAY_OF_MONTH, -1);
+			this.content = content;
 		}
 
 		@XACMLSubject(includeInResults=true)
@@ -139,28 +136,46 @@ public class TestAnnotation extends TestBase {
 		 */
 		@XACMLAttribute(category="foo:bar:category", attributeId="foo:bar:attribute:many")
 		URI[]		fooBarMany = new URI[] {URI.create("file://opt/app/test"), URI.create("https://localhost:8443/")};
+
+		/**
+		 * This field demonstrates the ability to add raw XML content to attributes
+		 */
+		@XACMLContent
+		Node content;
 		
 	};
 
 	@XACMLRequest(
 		Defaults="http://www.w3.org/TR/1999/Rec-xpath-19991116",
 		multiRequest=@XACMLMultiRequest(values={
-			@XACMLRequestReference(values={"subject1", "action", "resource"}),
-			@XACMLRequestReference(values={"subject2", "action", "resource"})})
+			@XACMLRequestReference(values={"subject1", "action", "resource1"}),
+			@XACMLRequestReference(values={"subject2", "action", "resource2"})})
 	)
 	public class MyMultiRequestAttributes {
-		
-		@XACMLSubject(id="subject1")
-		String	userID1 = "John";
-		
-		@XACMLSubject(id="subject2")
-		String	userID2 = "Ringo";
+
+		public MyMultiRequestAttributes(Node content) {
+			this.content = content;
+		}
 
 		@XACMLAction(id="action")
 		String	action = "access";
 
-		@XACMLResource(id="resource")
-		String	resource = "www.mywebsite.com";
+		@XACMLSubject(id="subject1")
+		String	userID1 = "John";
+
+		@XACMLResource(id="resource1")
+		String	resource1 = "www.mywebsite.com";
+
+		@XACMLContent(id="resource1")
+		Node content;
+		
+		@XACMLSubject(id="subject2")
+		String	userID2 = "Ringo";
+
+		@XACMLResource(id="resource2")
+		String	resource2 = "www.mywebsite.com";
+
+
 	}
 	
 	public TestAnnotation(String[] args) throws MalformedURLException, ParseException, HelpException {
@@ -178,14 +193,24 @@ public class TestAnnotation extends TestBase {
 		//
 		this.configure();
 		//
+		// Create raw XML content to test XACMLContent annotation
+		//
+		Node content = null;
+		try {
+			content = DOMUtil.loadDocument(new File("src/test/resources/testsets/annotation/content.xml"));
+		} catch (DOMStructureException e) {
+			throw new RuntimeException(e);
+		}
+		//
+		//
 		// Cycle through creating a few objects
 		//
 		this.num = 0;
-		this.doRequest(new MyRequestAttributes("John", "access", "www.mywebsite.com"));
+		this.doRequest(new MyRequestAttributes("John", "access", "www.mywebsite.com", content.getFirstChild()));
 		this.num++;
-		this.doRequest(new MyRequestAttributes("Ringo", "access", "www.mywebsite.com"));
+		this.doRequest(new MyRequestAttributes("Ringo", "access", "www.mywebsite.com", null));
 		this.num++;
-		this.doRequest(new MyMultiRequestAttributes());
+		this.doRequest(new MyMultiRequestAttributes(content.getFirstChild()));
 		this.num++;
 	}
 
@@ -222,4 +247,5 @@ public class TestAnnotation extends TestBase {
 			//
 		}		
 	}
+
 }
