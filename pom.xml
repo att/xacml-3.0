@@ -4,7 +4,7 @@
 
     <groupId>com.att.research.xacml</groupId>
     <artifactId>att-xacml</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1.0</version>
 
     <packaging>pom</packaging>
     <name>ATT XACML</name>
@@ -17,6 +17,10 @@
 	    <url>https://github.com/att/xacml-3.0/blob/master/LICENSE</url>
         </license>
     </licenses>
+
+    <scm>
+        <url>https://github.com/att/xacml-3.0</url>
+    </scm>
 
     <developers>
         <developer>
