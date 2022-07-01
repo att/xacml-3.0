@@ -17,7 +17,7 @@ import java.util.*;
 
 /**
  * EntityEngine extends {@link RequestAttributesEngine} to retrieve matching {@link com.att.research.xacml.api.Attribute}s
- * from an entity as specified by the <a href="">
+ * from an entity as specified by the <a href="https://docs.oasis-open.org/xacml/xacml-3.0-related-entities/v1.0/xacml-3.0-related-entities-v1.0.html">
  * XACML v3 Related and Nested Entity Profile Version 1.0</a> specification.
  *
  * @author ygrignon
