@@ -1,0 +1,6 @@
+<access>
+    <user>
+        <userId>John</userId>
+        <permissions>RWX</permissions>
+    </user>
+</access>

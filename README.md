@@ -7,7 +7,10 @@ The AT&T framework also includes interfaces and implementations to standardize d
 
 # Release
 
-3.0 - is the latest official release
+3.1 - is the latest official release
+* Upgrading dependencies
+* Enhanced the annotations to support Content
+* Feature to support On Permit Apply Second combining algorithm
 
 master branch is where all current development resides.
 

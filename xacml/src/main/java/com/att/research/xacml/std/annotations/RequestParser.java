@@ -157,6 +157,14 @@ public class RequestParser {
 						field, 
 						obj);
 			}
+			XACMLContent content = field.getAnnotation(XACMLContent.class);
+			if (content != null) {
+				RequestParser.addContent(attributes,
+						new IdentifierImpl(content.category()),
+						(content.id().equals(XACMLRequest.NULL_STRING) ? null : content.id()),
+						field,
+						obj);
+			}
 		}
 		//
 		// Add in all the attributes
@@ -168,6 +176,61 @@ public class RequestParser {
 			logger.debug(AttributeUtils.prettyPrint(stdMutableRequest));
 		}
 		return stdMutableRequest;
+	}
+
+	public static void addContent(List<StdMutableRequestAttributes> attributes,
+								  Identifier category,
+								  String id,
+								  Field field,
+								  Object object) throws IllegalAccessException {
+		//
+		// Pull the values from the field
+		//
+		field.setAccessible(true);
+		var fieldObject = field.get(object);
+		//
+		// if it's null we can skip
+		//
+		if (fieldObject == null) {
+			return;
+		}
+		//
+		// Cast to Node object
+		//
+		Node node = null;
+		if (fieldObject instanceof Node) {
+			node = (Node) fieldObject;
+		} else {
+			throw new IllegalArgumentException("Object is not of type " + Node.class);
+		}
+		//
+		// Does the category exist?
+		//
+		var added = false;
+		for (StdMutableRequestAttributes a : attributes) {
+			if ((category == null || a.getCategory().equals(category)) &&
+					(id != null ? a.getXmlId().equals(id) : (a.getXmlId() == null))) {
+				//
+				// Category exists, add in the content
+				//
+				a.setContentRoot(node);
+				added = true;
+				break;
+			}
+		}
+		//
+		// Was it added?
+		//
+		if (! added) {
+			//
+			// No the category does not exist yet or this has a different xml:id
+			//
+			var newAttributes = new StdMutableRequestAttributes();
+			newAttributes.setCategory(category);
+			newAttributes.setXmlId(id);
+			newAttributes.setContentRoot(node);
+			attributes.add(newAttributes);
+		}
 	}
 	
 	public static void addAttribute(List<StdMutableRequestAttributes> attributes, 

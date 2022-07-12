@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Policy xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" PolicyId="urn:com:att:xacml:policy:id:5b82db34-1613-4108-8973-93074182dd94" Version="1" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
     <Description>A sample policy to demonstrate use of annotations in a Java class.</Description>
+    <PolicyDefaults>
+        <XPathVersion>http://www.w3.org/TR/1999/Rec-xpath-19991116</XPathVersion>
+    </PolicyDefaults>
     <Target>
         <AnyOf>
             <AllOf>
@@ -12,7 +15,7 @@
         </AnyOf>
     </Target>
     <Rule RuleId="urn:com:att:xacml:rule:id:8b257f30-4e06-4c8e-8fb7-691b9534d55c" Effect="Permit">
-        <Description>PERMIT - John can access it</Description>
+        <Description>PERMIT - John can access it with RWX permissions</Description>
         <Target>
             <AnyOf>
                 <AllOf>
@@ -27,6 +30,14 @@
                 </AllOf>
             </AnyOf>
         </Target>
+        <Condition>
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                    <AttributeSelector MustBePresent="false" Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" Path="/access/user[userId='John']/permissions" DataType="http://www.w3.org/2001/XMLSchema#string" />
+                </Apply>
+                <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">RWX</AttributeValue>
+            </Apply>
+        </Condition>
     </Rule>
     <Rule RuleId="urn:com:att:xacml:rule:id:4fe7c147-7811-4e30-a463-9135afb1cfc2" Effect="Deny">
         <Description>DENY - Ringo cannot</Description>

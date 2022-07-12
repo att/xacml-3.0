@@ -54,7 +54,7 @@ public abstract class DOMExpression extends Expression {
 	 * Creates a new <code>Expression</code> of the appropriate sub-type based on the name of the given <code>Node</code>.
 	 * 
 	 * @param nodeExpression the <code>Node</code> to parse
-	 * @param policy the {@link com.att.research.xacmlatt.pdp.policy.Policy} containing the Expression element
+	 * @param lexicalEnvironment the LexicalEnvironment containing the Expression element
 	 * @return a new <code>Expression</code> parsed from the given <code>Node</code>
 	 * @throws DOMStructureException if there is an error parsing the <code>Node</code>
 	 */
