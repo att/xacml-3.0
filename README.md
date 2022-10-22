@@ -29,5 +29,19 @@ From the directory you downloaded the source to, just type 'mvn clean install'.
 Simple start is just to create an engine from the factory with all default properties.
 
 ```
-            PDPEngineFactory factory = PDPEngineFactory.newInstance()
+            PDPEngineFactory factory = PDPEngineFactory.newInstance();
             PDPEngine engine = factory.newEngine();
+```
+
+To start with properties that override the default:
+
+```
+            File xacmlPropertiesFile = new File("path/to/xacml.properties");
+            System.setProperty(XACMLProperties.XACML_PROPERTIES_NAME, xacmlPropertiesFile.getPath());
+            Properties properties = new Properties();
+            try (InputStream inStream = new FileInputStream(xacmlPropertiesFile)) {
+                properties.load(inStream);
+            }
+            PDPEngineFactory factory = PDPEngineFactory.newInstance();
+            PDPEngine engine = factory.newEngine(properties);
+```
