@@ -705,11 +705,11 @@ public class XACML3 {
      */
 	public static final Identifier ID_PROFILE_ENTITY	= new IdentifierImpl(ID_PROFILE, "entity");
 	public static final Identifier ID_DATATYPE_ENTITY	= new IdentifierImpl(ID_DATATYPE, "entity");
-	public static final Identifier ID_FUNCTION_ATTRIBUTE_DESIGNATOR = new IdentifierImpl("urn:oasis:names:tc:xacml:3.0:function:attribute‑designator");
-	public static final Identifier ID_FUNCTION_ATTRIBUTE_SELECTOR = new IdentifierImpl("urn:oasis:names:tc:xacml:3.0:function:attribute‑selector");
-	public static final Identifier ID_FUNCTION_ENTITY_ONE_AND_ONLY = new IdentifierImpl("urn:oasis:names:tc:xacml:3.0:function:entity‑one‑and‑only");
-	public static final Identifier ID_FUNCTION_ENTITY_BAG_SIZE = new IdentifierImpl("urn:oasis:names:tc:xacml:3.0:function:entity‑bag‑size");
-	public static final Identifier ID_FUNCTION_ENTITY_BAG = new IdentifierImpl("urn:oasis:names:tc:xacml:3.0:function:entity‑bag");
+	public static final Identifier ID_FUNCTION_ATTRIBUTE_DESIGNATOR = new IdentifierImpl(ID_FUNCTION, "attribute-designator");
+	public static final Identifier ID_FUNCTION_ATTRIBUTE_SELECTOR = new IdentifierImpl(ID_FUNCTION, "attribute-selector");
+	public static final Identifier ID_FUNCTION_ENTITY_ONE_AND_ONLY = new IdentifierImpl(ID_FUNCTION, "entity-one-and-only");
+	public static final Identifier ID_FUNCTION_ENTITY_BAG_SIZE = new IdentifierImpl(ID_FUNCTION, "entity-bag-size");
+	public static final Identifier ID_FUNCTION_ENTITY_BAG = new IdentifierImpl(ID_FUNCTION, "entity-bag");
 	public static final String     ELEMENT_FORALL		= "ForAll";
 	public static final String     ELEMENT_FORANY		= "ForAny";
 	public static final String     ELEMENT_MAP			= "Map";

@@ -110,7 +110,66 @@ public class JsonRequestTranslatorTest {
 				.contains("</catalog>");
 		// @formatter:on
 	}
-	
+
+	@Test
+	public void test4241() throws Exception {
+		test4241("src/test/resources/Request-4.2.4.1.json");
+	}
+
+	private void test4241(String filename) throws Exception {
+		//
+		// Read it from the file
+		//
+		Request request = JsonRequestTranslator.load(new File(filename));
+		validate4241Request(request);
+
+		//
+		// Convert to string
+		//
+		String strJson = JsonRequestTranslator.toString(request, true);
+		validate4241Json(strJson);
+
+		//
+		// Read it again
+		//
+		request = JsonRequestTranslator.load(strJson);
+		validate4241Request(request);
+
+		//
+		// Convert to string again
+		//
+		strJson = JsonRequestTranslator.toString(request, true);
+		validate4241Json(strJson);
+	}
+
+	private void validate4241Request(Request request) throws XPathExpressionException {
+		// @formatter:off
+
+		assertThat(request).isNotNull();
+		assertThat(request.getRequestAttributes()).isNotNull().hasSize(1);
+
+		assertThat(hasAttribute(request,
+				XACML1.ID_SUBJECT_CATEGORY_ACCESS_SUBJECT,
+				XACML2.ID_SUBJECT_ROLE,
+				null,
+				false,
+				Arrays.asList(
+						new StdAttributeValue<>(XACML3.ID_DATATYPE_STRING, "manager"),
+						new StdAttributeValue<>(XACML3.ID_DATATYPE_STRING, "administrator"))
+		)).isTrue();
+		// @formatter:on
+	}
+
+	private void validate4241Json(String strJson) {
+		logger.info("{}", strJson);
+
+		// @formatter:off
+		assertThat(strJson)
+				.contains("\"manager\",")
+				.contains("\"administrator\"");
+		// @formatter:on
+	}
+
 	@Test
 	public void test81() throws Exception {
 		test81("src/test/resources/Request-8.1.json");
@@ -550,18 +609,9 @@ public class JsonRequestTranslatorTest {
         		new IdentifierImpl("id:code"), 
         		null, 
         		false, 
-        		Arrays.asList(new StdAttributeValue<>(XACML3.ID_DATATYPE_STRING, 
-        				Arrays.asList("image:build", BigInteger.valueOf(5))))
-        		) &&
-        		! hasAttribute(request, 
-                		XACML1.ID_SUBJECT_CATEGORY_CODEBASE, 
-                		new IdentifierImpl("id:code"), 
-                		null, 
-                		false, 
-                		Arrays.asList(new StdAttributeValue<>(XACML3.ID_DATATYPE_STRING, 
-                				Arrays.asList("image:build", "5")))
-                		)
-        		) {
+        		Arrays.asList(new StdAttributeValue<>(XACML3.ID_DATATYPE_INTEGER, "2"),
+						new StdAttributeValue<>(XACML3.ID_DATATYPE_INTEGER, BigInteger.valueOf(5)))
+        		)) {
         	fail("id:code is incorrect");
         }
 
