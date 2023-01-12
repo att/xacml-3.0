@@ -34,7 +34,6 @@ public class StdAttributeValue<T> implements AttributeValue<T> {
 	 * @param xpathCategoryIn the <code>Identifier</code> representing the XACML XPathCategory id for the new <code>StdAttributeValue</code>
 	 */
 	public StdAttributeValue(Identifier dataTypeIdIn, T valueIn, Identifier xpathCategoryIn) {
-		assert !(valueIn instanceof Collection || valueIn.getClass().isArray()) : "Attribute value must wrap a simple value. Got " + valueIn;
 		this.dataTypeId		= dataTypeIdIn;
 		this.value			= valueIn;
 		this.xpathCategory	= xpathCategoryIn;

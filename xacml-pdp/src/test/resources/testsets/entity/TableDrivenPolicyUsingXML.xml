@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Policy xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
-        PolicyId="urn:com:att:xacml:policy:id:test:entity-table-driven-policy-using-attributes" Version="1"
+        PolicyId="urn:com:att:xacml:policy:id:test:entity-table-driven-policy-using-xml" Version="1"
         RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:deny-unless-permit">
-    <Description>[ENTITY 7.3.1] This policy will permit if the product type is approved to export to the destination</Description>
+    <Description>[ENTITY 7.3.2] This policy will permit if the product type is approved to export to the destination</Description>
     <Target>
         <AnyOf>
             <AllOf>
                 <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
                     <AttributeValue
-                            DataType="http://www.w3.org/2001/XMLSchema#string">table-driven-policy-using-attributes</AttributeValue>
+                            DataType="http://www.w3.org/2001/XMLSchema#string">table-driven-policy-using-xml</AttributeValue>
                     <AttributeDesignator
                             Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action"
                             AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
@@ -20,11 +20,20 @@
     <Rule RuleId="id-rule-permit-if-product-type-approved-for-export-single" Effect="Permit">
         <Condition>
             <ForAny VariableId="approved-export">
-                <AttributeDesignator
-                        Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
-                        AttributeId="urn:example:xacml:attribute:approved-export"
-                        DataType="urn:oasis:names:tc:xacml:3.0:data-type:entity"
-                        MustBePresent="false"/>
+                <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:attribute-selector">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:entity-one-and-only">
+                        <AttributeDesignator
+                                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
+                                AttributeId="urn:example:xacml:attribute:approved-export"
+                                DataType="urn:oasis:names:tc:xacml:3.0:data-type:entity"
+                                MustBePresent="false"/>
+                    </Apply>
+                    <AttributeValue
+                            DataType="urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression"
+                            XPathCategory="urn:example:xacml:category:ignored"
+                            >./ae:ApprovedExport</AttributeValue>
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">urn:oasis:names:tc:xacml:3.0:data-type:entity</AttributeValue>
+                </Apply>
                 <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
                     <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
                         <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
@@ -34,9 +43,12 @@
                                     DataType="http://www.w3.org/2001/XMLSchema#string"
                                     MustBePresent="false"/>
                         </Apply>
-                        <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:attribute-designator">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:attribute-selector">
                             <VariableReference VariableId="approved-export"/>
-                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">urn:example:xacml:attribute:ae-product-type</AttributeValue>
+                            <AttributeValue
+                                    DataType="urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression"
+                                    XPathCategory="urn:example:xacml:category:ignored"
+                                    >./ae:ProductType</AttributeValue>
                             <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">http://www.w3.org/2001/XMLSchema#string</AttributeValue>
                         </Apply>
                     </Apply>
@@ -48,57 +60,17 @@
                                     DataType="http://www.w3.org/2001/XMLSchema#string"
                                     MustBePresent="false"/>
                         </Apply>
-                        <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:attribute-designator">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:attribute-selector">
                             <VariableReference VariableId="approved-export"/>
-                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">urn:example:xacml:attribute:ae-destination</AttributeValue>
+                            <AttributeValue
+                                    DataType="urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression"
+                                    XPathCategory="urn:example:xacml:category:ignored"
+                                    >./ae:Destination</AttributeValue>
                             <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">http://www.w3.org/2001/XMLSchema#string</AttributeValue>
                         </Apply>
                     </Apply>
                 </Apply>
             </ForAny>
-        </Condition>
-    </Rule>
-    <Rule RuleId="id-rule-permit-if-product-type-approved-for-export-multiple" Effect="Permit">
-        <Condition>
-            <ForAll VariableId="product-type">
-                <AttributeDesignator
-                        Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
-                        AttributeId="urn:example:xacml:attribute:product-type"
-                        DataType="http://www.w3.org/2001/XMLSchema#string"
-                        MustBePresent="false"/>
-                <ForAll VariableId="destination">
-                    <AttributeDesignator
-                            Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action"
-                            AttributeId="urn:example:xacml:attribute:destination"
-                            DataType="http://www.w3.org/2001/XMLSchema#string"
-                            MustBePresent="false"/>
-                    <ForAny VariableId="approved-export">
-                        <AttributeDesignator
-                                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
-                                AttributeId="urn:example:xacml:attribute:approved-export"
-                                DataType="urn:oasis:names:tc:xacml:3.0:data-type:entity"
-                                MustBePresent="false"/>
-                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
-                            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
-                                <VariableReference VariableId="product-type"/>
-                                <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:attribute-designator">
-                                    <VariableReference VariableId="approved-export"/>
-                                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">urn:example:xacml:attribute:ae-product-type</AttributeValue>
-                                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">http://www.w3.org/2001/XMLSchema#string</AttributeValue>
-                                </Apply>
-                            </Apply>
-                            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
-                                <VariableReference VariableId="destination"/>
-                                <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:attribute-designator">
-                                    <VariableReference VariableId="approved-export"/>
-                                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">urn:example:xacml:attribute:ae-destination</AttributeValue>
-                                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">http://www.w3.org/2001/XMLSchema#string</AttributeValue>
-                                </Apply>
-                            </Apply>
-                        </Apply>
-                    </ForAny>
-                </ForAll>
-            </ForAll>
         </Condition>
     </Rule>
 </Policy>

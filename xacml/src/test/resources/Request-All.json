@@ -144,7 +144,7 @@
 				"Attribute": [
 					{
 						"AttributeId": "id:code",
-						"Value": ["2", 5],
+						"Value": [3, "image:build", 5],
 						"IncludeInResult": false
 					},
 					{

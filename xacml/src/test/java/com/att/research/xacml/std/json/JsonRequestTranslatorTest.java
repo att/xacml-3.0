@@ -609,8 +609,8 @@ public class JsonRequestTranslatorTest {
         		new IdentifierImpl("id:code"), 
         		null, 
         		false, 
-        		Arrays.asList(new StdAttributeValue<>(XACML3.ID_DATATYPE_INTEGER, "2"),
-						new StdAttributeValue<>(XACML3.ID_DATATYPE_INTEGER, BigInteger.valueOf(5)))
+        		Arrays.asList(new StdAttributeValue<>(XACML3.ID_DATATYPE_STRING, "image:build"),
+						new StdAttributeValue<>(XACML3.ID_DATATYPE_STRING, "5"))
         		)) {
         	fail("id:code is incorrect");
         }

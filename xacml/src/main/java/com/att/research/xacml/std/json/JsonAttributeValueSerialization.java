@@ -10,10 +10,7 @@ import com.att.research.xacml.api.*;
 import com.att.research.xacml.std.StdAttributeValue;
 import com.att.research.xacml.std.StdMutableAttribute;
 import com.att.research.xacml.std.StdMutableRequestAttributes;
-import com.att.research.xacml.std.datatypes.DataTypeInteger;
-import com.att.research.xacml.std.datatypes.RFC2396DomainName;
-import com.att.research.xacml.std.datatypes.RFC822Name;
-import com.att.research.xacml.std.datatypes.XPathExpressionWrapper;
+import com.att.research.xacml.std.datatypes.*;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +38,7 @@ public class JsonAttributeValueSerialization  implements JsonDeserializer<GsonJs
 	
 	@Override
 	public JsonElement serialize(GsonJsonAttributeValue src, Type typeOfSrc, JsonSerializationContext context) {
-		logger.info("serialize {} type {}", src, typeOfSrc);
+		logger.debug("serialize {} type {}", src, typeOfSrc);
 		if (src.getValue() instanceof Collection) {
 			Collection<?> arrayValues = ((Collection<?>) src.getValue());
 			if (arrayValues.size() == 1) {
@@ -89,8 +86,8 @@ public class JsonAttributeValueSerialization  implements JsonDeserializer<GsonJs
 	}
 
 	@Override
-	public GsonJsonAttributeValue deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
-		logger.info("deserialize attribute {} type {}", json, typeOfT);
+	public GsonJsonAttributeValue deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+		logger.debug("deserialize attribute {} type {}", json, typeOfT);
 		//
 		// Create this object
 		//
@@ -98,24 +95,28 @@ public class JsonAttributeValueSerialization  implements JsonDeserializer<GsonJs
 		//
 		// Parse the Json Element into it
 		//
-		this.parseJsonElement(json, attributeValue);
+		if (json.isJsonArray()) {
+			json.getAsJsonArray().forEach(element -> this.parseJsonElement(element, attributeValue));
+		} else {
+			this.parseJsonElement(json, attributeValue);
+		}
 		return attributeValue;
 	}
 	
-	private void parseJsonElement(JsonElement jsonElement, GsonJsonAttributeValue attributeValue) {
-		logger.info("parsing jsonElement is array={} null={} object={}, primitive={}", 
+	private void parseJsonElement(JsonElement jsonElement, GsonJsonAttributeValue attributeValue) throws JsonParseException {
+		logger.debug("parsing jsonElement is array={} null={} object={}, primitive={}",
 				jsonElement.isJsonArray(), jsonElement.isJsonNull(), jsonElement.isJsonObject(),
 				jsonElement.isJsonPrimitive());
 		//
 		// Parse the given element
 		//
 		StdAttributeValue<?> newAttribute = null;
-		if (jsonElement.isJsonArray()) {
-			jsonElement.getAsJsonArray().forEach(json -> this.parseJsonElement(json, attributeValue));
-		} else if (jsonElement.isJsonObject()) {
+		if (jsonElement.isJsonObject()) {
 			newAttribute = parseJsonObject(jsonElement.getAsJsonObject(), attributeValue);
 		} else if (jsonElement.isJsonPrimitive()) {
 			newAttribute = parsePrimitiveAttribute(jsonElement.getAsJsonPrimitive());
+		} else {
+			throw new JsonParseException("Unexpected value: " + jsonElement.toString());
 		}
 		//
 		// If we have a value, add it
@@ -124,7 +125,7 @@ public class JsonAttributeValueSerialization  implements JsonDeserializer<GsonJs
 			attributeValue.add(newAttribute);
 		}
 	}
-	
+
 	private static StdAttributeValue<?> parsePrimitiveAttribute(JsonPrimitive jsonPrimitive) {
 		try {
 			if (jsonPrimitive.isString()) {
@@ -132,10 +133,11 @@ public class JsonAttributeValueSerialization  implements JsonDeserializer<GsonJs
 			} else if (jsonPrimitive.isBoolean()) {
 				return new StdAttributeValue<>(XACML3.ID_DATATYPE_BOOLEAN, jsonPrimitive.getAsBoolean());
 			} else if (jsonPrimitive.isNumber()) {
-				Number number = jsonPrimitive.getAsNumber();
-				logger.debug("Number is {} {} ceil {}", number.doubleValue(), number.longValue(), Math.ceil(number.doubleValue()));
-				if (Math.ceil(number.doubleValue()) == number.longValue()) {
-					return new StdAttributeValue<>(XACML3.ID_DATATYPE_INTEGER, DataTypeInteger.newInstance().convert(jsonPrimitive.getAsInt()));
+				// Gson retains the numeric string and uses lazy parsing to instantiate the various types of number
+				// types. We leverage this fact to simplify identification of integral values and prevent 1.0 from being
+				// inferred as an integer when in fact it should be inferred as a double.
+				if (!jsonPrimitive.getAsString().contains(".")) {
+					return new StdAttributeValue<>(XACML3.ID_DATATYPE_INTEGER, DataTypeInteger.newInstance().convert(jsonPrimitive.getAsBigInteger()));
 				} else {
 					return new StdAttributeValue<>(XACML3.ID_DATATYPE_DOUBLE, jsonPrimitive.getAsDouble());
 				}

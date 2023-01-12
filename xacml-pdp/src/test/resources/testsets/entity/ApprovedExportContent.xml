@@ -1,0 +1,14 @@
+<ae:ApprovedExports xmlns:ae="urn:example:approved-export">
+    <ae:ApprovedExport>
+        <ae:ProductType>right-handed discombobulator</ae:ProductType>
+        <ae:Destination>US</ae:Destination>
+        <ae:Destination>DE</ae:Destination>
+        <ae:Destination>FR</ae:Destination>
+    </ae:ApprovedExport>
+    <ae:ApprovedExport>
+        <ae:ProductType>left-handed discombobulator</ae:ProductType>
+        <ae:ProductType>left-handed combobulator</ae:ProductType>
+        <ae:Destination>AU</ae:Destination>
+        <ae:Destination>GB</ae:Destination>
+    </ae:ApprovedExport>
+</ae:ApprovedExports>
