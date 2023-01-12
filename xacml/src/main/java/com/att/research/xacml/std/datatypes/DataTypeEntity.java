@@ -38,11 +38,15 @@ public class DataTypeEntity extends DataTypeBase<RequestAttributes> {
         if (source == null || source instanceof RequestAttributes) {
             return (RequestAttributes) source;
         } else if (source instanceof Node) {
-//            StdMutableRequestAttributes requestAttributes = new StdMutableRequestAttributes();
-//            requestAttributes.setContentRoot((Node)source);
-//            return requestAttributes;
             try {
-                return DOMRequestAttributes.newInstance((Node)source, true);
+                Node node = (Node) source;
+                if (DOMUtil.isElement(node) && DOMUtil.isInNamespace(node, XACML3.XMLNS)) {
+                    return DOMRequestAttributes.newInstance((Node) source, true);
+                } else {
+                    StdMutableRequestAttributes requestAttributes = new StdMutableRequestAttributes();
+                    requestAttributes.setContentRoot(DOMUtil.getDirectDocumentChild(node));
+                    return requestAttributes;
+                }
             }
             catch (DOMStructureException e) {
                 throw new DataTypeException(this, e);

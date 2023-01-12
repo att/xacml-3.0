@@ -38,6 +38,7 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpression;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -300,8 +301,8 @@ public class EntityFunctionsTest {
         @XACMLResource(attributeId = "attribute")
         final boolean attribute = true;
 
-        @XACMLResource(attributeId = "urn:xpath:good")
-        final XPathExpressionWrapper goodXPath = new XPathExpressionWrapper("./ex:Root/ex:Nested");
+        @XACMLResource(attributeId = "urn:xpath:good", datatype = "urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression")
+        final String goodXPath = "./ex:Root/ex:Nested";
 
         @XACMLContent
         final Node content;

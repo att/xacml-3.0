@@ -270,7 +270,6 @@ public class EntityTest {
      *
      * @throws Exception
      */
-    @Ignore
     @Test
     public void testTableDrivenPolicyUsingXML() throws Exception {
         // right-handed discombobulator is authorized for export to US
