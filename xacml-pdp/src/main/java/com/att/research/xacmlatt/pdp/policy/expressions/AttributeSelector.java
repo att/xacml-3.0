@@ -135,7 +135,11 @@ public class AttributeSelector extends AttributeRetrievalBase {
 					if (listXPathExpressions == null) {
 						listXPathExpressions	= new ArrayList<>();
 					}
-					listXPathExpressions.add(iterXPathExpressions.next().getValue());
+					// Wrap the xpaths in new XPathExpressionWrappers using the content namespaces
+					listXPathExpressions.add(new XPathExpressionWrapper(
+							requestAttributes.getContentRoot().getOwnerDocument(),
+							iterXPathExpressions.next().getValue().getPath()));
+
 				}
 			}
 		}
@@ -204,6 +208,9 @@ public class AttributeSelector extends AttributeRetrievalBase {
 						if (nodeContent != null) {
 							listNodesToQuery.add(nodeContent);
 						}
+					}
+					if (listNodesToQuery.isEmpty()) {
+						return ExpressionResult.newError(new StdStatus(StdStatusCode.STATUS_CODE_SYNTAX_ERROR, "No context node selected"));
 					}
 				}
 				
