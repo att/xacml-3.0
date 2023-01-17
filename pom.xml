@@ -41,6 +41,12 @@
             <organization>ATT</organization>
             <organizationUrl>http://www.att.com</organizationUrl>
         </developer>
+        <developer>
+            <name>Yanik Grignon</name>
+            <email>ygrignon@saleforce.com</email>
+            <organization>Salesforce</organization>
+            <organizationUrl>http://www.salesforce.com</organizationUrl>
+        </developer>
     </developers>
 
     <distributionManagement>

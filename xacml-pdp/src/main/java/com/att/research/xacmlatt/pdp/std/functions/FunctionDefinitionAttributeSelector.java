@@ -23,6 +23,7 @@ import com.att.research.xacmlatt.pdp.policy.FunctionDefinition;
 import com.att.research.xacmlatt.pdp.policy.expressions.AttributeSelector;
 
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
@@ -88,8 +89,8 @@ public class FunctionDefinitionAttributeSelector implements FunctionDefinition {
             }
 
             // Second argument is the path
-            ConvertedArgument<String> path = new ConvertedArgument<>(iterator.next(), DataTypes.DT_STRING, false);
-            attributeSelector.setPath(path.getValue());
+            ConvertedArgument<XPathExpressionWrapper> path = new ConvertedArgument<>(iterator.next(), DataTypes.DT_XPATHEXPRESSION, false);
+            attributeSelector.setPath(path.getValue().getPath());
 
             // Third argument is the datatype
             attributeSelector.setDataTypeId(convertToIdentifier(iterator.next()));

@@ -457,6 +457,20 @@ public class RequestParser {
 					throw new DataTypeException(DataTypes.DT_ENTITY, "Can't access field " + field.getName());
 				}
 			}
+
+			XACMLContent content = field.getAnnotation(XACMLContent.class);
+			if (content != null) {
+				try {
+					RequestParser.addContent(attributes,
+							null,
+							content.id(),
+							field,
+							obj);
+				}
+				catch (IllegalAccessException e) {
+					throw new DataTypeException(DataTypes.DT_ENTITY, "Can't access field " + field.getName());
+				}
+			}
 		}
 
 		return new StdAttributeValue<RequestAttributes>(XACML3.ID_DATATYPE_ENTITY,

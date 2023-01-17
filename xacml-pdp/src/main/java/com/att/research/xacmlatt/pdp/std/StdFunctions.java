@@ -471,8 +471,8 @@ public class StdFunctions {
     public static final FunctionDefinition FD_ATTRIBUTE_DESIGNATOR = new FunctionDefinitionAttributeDesignator();
     public static final FunctionDefinition FD_ATTRIBUTE_SELECTOR = new FunctionDefinitionAttributeSelector();
     public static final FunctionDefinition FD_ENTITY_ONE_AND_ONLY = new FunctionDefinitionBagOneAndOnly<RequestAttributes>(XACML3.ID_FUNCTION_ENTITY_ONE_AND_ONLY, DataTypes.DT_ENTITY);
-    public static final FunctionDefinition FD_ENTITY_BAG_SIZE = new FunctionDefinitionBagOneAndOnly<RequestAttributes>(XACML3.ID_FUNCTION_ENTITY_BAG_SIZE, DataTypes.DT_ENTITY);
-    public static final FunctionDefinition FD_ENTITY_BAG = new FunctionDefinitionBagOneAndOnly<RequestAttributes>(XACML3.ID_FUNCTION_ENTITY_BAG, DataTypes.DT_ENTITY);
+    public static final FunctionDefinition FD_ENTITY_BAG_SIZE = new FunctionDefinitionBagSize<RequestAttributes>(XACML3.ID_FUNCTION_ENTITY_BAG_SIZE, DataTypes.DT_ENTITY);
+    public static final FunctionDefinition FD_ENTITY_BAG = new FunctionDefinitionBag<RequestAttributes>(XACML3.ID_FUNCTION_ENTITY_BAG, DataTypes.DT_ENTITY);
 
     /*
      * Functions that support the AT&T Zone Offset DataType

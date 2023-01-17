@@ -12,12 +12,20 @@ import com.att.research.xacml.api.Result;
 import com.att.research.xacml.api.pdp.PDPEngine;
 import com.att.research.xacml.api.pdp.PDPEngineFactory;
 import com.att.research.xacml.std.annotations.*;
+import com.att.research.xacml.std.dom.DOMUtil;
 import com.att.research.xacmlatt.pdp.policy.expressions.ForAny;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
 
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
@@ -249,6 +257,60 @@ public class EntityTest {
 
         @XACMLAction
         public String actionId = "table-driven-policy-using-attributes";
+
+        @XACMLAction(attributeId = "urn:example:xacml:attribute:destination")
+        public String[] destinations;
+
+        @XACMLResource(attributeId = "urn:example:xacml:attribute:product-type")
+        public String[] productTypes;
+    }
+
+    /**
+     * 7.3.2 Table-driven Policy Expression Using XML (Figure 12)
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testTableDrivenPolicyUsingXML() throws Exception {
+        // right-handed discombobulator is authorized for export to US
+        TableDrivenPolicyUsingXMLRequest request = new TableDrivenPolicyUsingXMLRequest();
+
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        documentBuilderFactory.setValidating(false);
+        documentBuilderFactory.setNamespaceAware(true);
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        request.approvedExport.content = documentBuilder.parse(new File("src/test/resources/testsets/entity/ApprovedExportContent.xml")).getDocumentElement();
+
+        request.productTypes = new String[] {"right-handed discombobulator"};
+        request.destinations = new String[] {"US"};
+        Response response = pdp.decide(RequestParser.parseRequest(request));
+        assertResult(response, Decision.PERMIT);
+
+        // right-handed discombobulator is not authorized for export to CA
+        request.destinations = new String[] {"CA"};
+        response = pdp.decide(RequestParser.parseRequest(request));
+        assertResult(response, Decision.DENY);
+    }
+
+    @XACMLEntity
+    private static class ApprovedExportUsingXML {
+        @XACMLContent
+        public Node content;
+    }
+
+    @XACMLRequest
+    private static class TableDrivenPolicyUsingXMLRequest {
+        @XACMLEnvironment(
+                attributeId = "urn:example:xacml:attribute:approved-export",
+                datatype = "urn:oasis:names:tc:xacml:3.0:data-type:entity"
+        )
+        public ApprovedExportUsingXML approvedExport = new ApprovedExportUsingXML();
+
+        @XACMLAction
+        public String actionId = "table-driven-policy-using-xml";
 
         @XACMLAction(attributeId = "urn:example:xacml:attribute:destination")
         public String[] destinations;
