@@ -135,11 +135,11 @@ public class AttributeSelector extends AttributeRetrievalBase {
 					if (listXPathExpressions == null) {
 						listXPathExpressions	= new ArrayList<>();
 					}
-					// Wrap the xpaths in new XPathExpressionWrappers using the content namespaces
+					// The content selector xpath expressions from the request context don't have any namespace context.
+					// To query the content we create new XPathExpressionWrappers with the content's namespace context.
 					listXPathExpressions.add(new XPathExpressionWrapper(
 							requestAttributes.getContentRoot().getOwnerDocument(),
 							iterXPathExpressions.next().getValue().getPath()));
-
 				}
 			}
 		}
