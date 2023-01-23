@@ -131,12 +131,11 @@ public class EntityFunctionsTest {
         assertTrue(result.getBag().isEmpty());
     }
 
-    @Ignore
     @Test
     public void testAttributeSelectorWithEntity() throws ParserConfigurationException, IOException, SAXException, DataTypeException, DOMStructureException {
         Identifier xpathCategoryId = new IdentifierImpl("urn:ignored");
-        AttributeValue<XPathExpressionWrapper> goodXPathExpression = DataTypes.DT_XPATHEXPRESSION.createAttributeValue("./ex:Root/ex:Nested", xpathCategoryId);
-        AttributeValue<XPathExpressionWrapper> badXPathExpression = DataTypes.DT_XPATHEXPRESSION.createAttributeValue("./ex:Root/ex:Missing", xpathCategoryId);
+        AttributeValue<XPathExpressionWrapper> goodXPathExpression = DataTypes.DT_XPATHEXPRESSION.createAttributeValue("/ex:Root/ex:Nested", xpathCategoryId);
+        AttributeValue<XPathExpressionWrapper> badXPathExpression = DataTypes.DT_XPATHEXPRESSION.createAttributeValue("/ex:Root/ex:Missing", xpathCategoryId);
 
         // Create an entity with a single attribute with a boolean value
         Node content = parseXML("<ex:Root xmlns:ex=\"urn:example:entity\"><ex:Nested>true</ex:Nested></ex:Root>");
@@ -152,7 +151,6 @@ public class EntityFunctionsTest {
         testAttributeSelector(null, entity);
     }
 
-    @Ignore
     @Test
     public void testAttributeSelectorWithCategory() throws ParserConfigurationException, IOException, SAXException, DataTypeException, IllegalAccessException {
         // Create the evaluation context
@@ -171,12 +169,14 @@ public class EntityFunctionsTest {
         assertTrue(fd instanceof FunctionDefinitionAttributeSelector);
 
         Identifier xpathCategoryId = new IdentifierImpl("urn:ignored");
-        AttributeValue<XPathExpressionWrapper> goodXPathExpression = DataTypes.DT_XPATHEXPRESSION.createAttributeValue("./ex:Root/ex:Nested", xpathCategoryId);
-        AttributeValue<XPathExpressionWrapper> badXPathExpression = DataTypes.DT_XPATHEXPRESSION.createAttributeValue("./ex:Root/ex:Missing", xpathCategoryId);
+        AttributeValue<XPathExpressionWrapper> goodXPathExpression = DataTypes.DT_XPATHEXPRESSION.createAttributeValue("/ex:Root/ex:Nested", xpathCategoryId);
+        AttributeValue<XPathExpressionWrapper> badXPathExpression = DataTypes.DT_XPATHEXPRESSION.createAttributeValue("/ex:Root/ex:Missing", xpathCategoryId);
+        AttributeValue<XPathExpressionWrapper> textXPatExpression = DataTypes.DT_XPATHEXPRESSION.createAttributeValue("./text()", xpathCategoryId);
 
         // Create the function arguments
         FunctionArgument goodXPath = new FunctionArgumentAttributeValue(goodXPathExpression);
         FunctionArgument badXPath = new FunctionArgumentAttributeValue(badXPathExpression);
+        FunctionArgument textXPath = new FunctionArgumentAttributeValue(textXPatExpression);
         FunctionArgument dataType = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_DATATYPE_BOOLEAN.getUri()));
         FunctionArgument mustBePresent = new FunctionArgumentAttributeValue(DataTypeBoolean.AV_TRUE);
         FunctionArgument goodXPathRef = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(URI.create("urn:xpath:good")));
@@ -202,11 +202,12 @@ public class EntityFunctionsTest {
         result = fd.evaluate(evaluationContext, List.of(entity, goodXPath, dataType, mustBePresent, badXPathRef));
         assertEquals(StdStatusCode.STATUS_CODE_SYNTAX_ERROR, result.getStatus().getStatusCode());
 
-        goodXPath = new FunctionArgumentAttributeValue(DataTypes.DT_XPATHEXPRESSION.createAttributeValue(".", xpathCategoryId));
-
-        // Five parameters signature: good content node selector, bad relative xpath, must be present
-        result = fd.evaluate(evaluationContext, List.of(entity, goodXPath, dataType, mustBePresent, goodXPathRef));
-        assertEquals(StdStatusCode.STATUS_CODE_MISSING_ATTRIBUTE, result.getStatus().getStatusCode());
+        // Five parameters signature: good content node selector, good relative xpath, must be present
+        result = fd.evaluate(evaluationContext, List.of(entity, textXPath, dataType, mustBePresent, goodXPathRef));
+        assertTrue(result.isOk());
+        assertTrue(result.isBag());
+        assertEquals(1, result.getBag().size());
+        assertEquals(DataTypeBoolean.AV_TRUE, result.getValue());
 
         // Five parameters signature: good content node selector, bad relative xpath, must be present
         result = fd.evaluate(evaluationContext, List.of(entity, badXPath, dataType, mustBePresent, goodXPathRef));
@@ -302,7 +303,10 @@ public class EntityFunctionsTest {
         final boolean attribute = true;
 
         @XACMLResource(attributeId = "urn:xpath:good", datatype = "urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression")
-        final String goodXPath = "./ex:Root/ex:Nested";
+        final String goodXPath = "/ex:Root/ex:Nested";
+
+        @XACMLResource(attributeId = "urn:xpath:bad", datatype = "urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression")
+        final String badXPath = "/ex:Root/ex:Missing";
 
         @XACMLContent
         final Node content;
