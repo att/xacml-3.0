@@ -89,7 +89,7 @@ public class JsonAttributeValueSerializationTest {
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
         assertEquals(XACML3.ID_DATATYPE_STRING, value.getDataType());
-        assertArrayEquals(new Object[]{"manager", "administrator"}, ((List<Object>)value.getValue()).toArray());
+        assertArrayEquals(new Object[]{"manager", "administrator"}, ((List<?>)value.getValue()).toArray());
     }
 
     @Test
@@ -115,7 +115,7 @@ public class JsonAttributeValueSerializationTest {
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
         assertEquals(XACML3.ID_DATATYPE_INTEGER, value.getDataType());
-        assertArrayEquals(new Object[] {BigInteger.valueOf(3), BigInteger.valueOf(-4)}, ((List)value.getValue()).toArray());
+        assertArrayEquals(new Object[] {BigInteger.valueOf(3), BigInteger.valueOf(-4)}, ((List<?>)value.getValue()).toArray());
     }
 
     @Test
@@ -128,7 +128,7 @@ public class JsonAttributeValueSerializationTest {
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
         assertEquals(XACML3.ID_DATATYPE_DOUBLE, value.getDataType());
-        assertArrayEquals(new Object[] {999.222, -53.77777}, ((List)value.getValue()).toArray());
+        assertArrayEquals(new Object[] {999.222, -53.77777}, ((List<?>)value.getValue()).toArray());
     }
 
     /**
@@ -146,7 +146,7 @@ public class JsonAttributeValueSerializationTest {
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
         assertEquals(XACML3.ID_DATATYPE_DOUBLE, value.getDataType());
-        assertEquals(new Object[] {6.0, -53.77777}, ((List)value.getValue()).toArray());
+        assertArrayEquals(new Object[] {6.0, -53.77777}, ((List<?>)value.getValue()).toArray());
     }
 
     /**
@@ -164,7 +164,7 @@ public class JsonAttributeValueSerializationTest {
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
         assertEquals(XACML3.ID_DATATYPE_STRING, value.getDataType());
-        assertEquals(new Object[] {"6", "-53.77777", "false", "abc"}, ((List)value.getValue()).toArray());
+        assertArrayEquals(new Object[] {"6", "-53.77777", "false", "abc"}, ((List<?>)value.getValue()).toArray());
     }
 
     @Test
@@ -222,6 +222,7 @@ public class JsonAttributeValueSerializationTest {
         assertEquals(1, ((RequestAttributes)value.getValue()).getAttributes().size());
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testEntityArrayAttributeValue() throws Exception {
         final String json =

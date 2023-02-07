@@ -27,7 +27,6 @@ import com.google.gson.annotations.SerializedName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.w3c.dom.Node;
 
 @Data
 public class GsonJsonRequest implements Serializable {
@@ -111,7 +110,7 @@ public class GsonJsonRequest implements Serializable {
 			//
 			for (GsonJsonAttribute attribute : category.getAttributes()) {
 				Collection<AttributeValue<?>> values = attribute.getXacmlValue() instanceof Collection
-						? ((Collection<Object>)attribute.getXacmlValue()).stream()
+						? ((Collection<?>)attribute.getXacmlValue()).stream()
 						.map(o -> new StdAttributeValue<>(attribute.getDataType(), o))
 						.collect(Collectors.toSet())
 						: Collections.singleton(new StdAttributeValue<>(attribute.getDataType(), attribute.getXacmlValue()));
