@@ -9,8 +9,6 @@ import com.att.research.xacml.api.AttributeValue;
 import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.util.ObjUtil;
 
-import java.util.Collection;
-
 /**
  * Immutable implementation of the {@link com.att.research.xacml.api.AttributeValue} interface.
  *  
