@@ -51,7 +51,7 @@ public class JsonNodeSerialization implements JsonDeserializer<Node>, JsonSerial
             DocumentBuilder documentBuilder = getDocumentBuilder();
             InputStream is = new ByteArrayInputStream(strXML.getBytes(StandardCharsets.UTF_8));
             Document document = documentBuilder.parse(is);
-            return document.getDocumentElement();
+            return document.getFirstChild();
         }
         catch (ParserConfigurationException | IOException | SAXException e) {
             logger.warn("Unable to deserialize Node:" + e.getMessage(), e);

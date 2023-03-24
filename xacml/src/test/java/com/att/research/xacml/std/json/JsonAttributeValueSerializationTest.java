@@ -9,18 +9,17 @@ package com.att.research.xacml.std.json;
 import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.api.RequestAttributes;
 import com.att.research.xacml.api.XACML3;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import org.junit.Test;
 import org.w3c.dom.Node;
 
 import java.io.StringReader;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link JsonAttributeValueSerialization}.
@@ -29,10 +28,10 @@ import static org.junit.Assert.assertEquals;
  */
 public class JsonAttributeValueSerializationTest {
     @Test
-    public void testPrimitiveAttributeValue() throws Exception {
+    public void testPrimitiveStringInference() throws Exception {
         final String json =
                 "{\n" +
-                "  \"AttributeId\": \"urn:oasis:names:tc:xacml:2.0:subject:role\",\n" +
+                "  \"AttributeId\": \"urn:test:datatype:inference\",\n" +
                 "  \"Value\": \"manager\"\n" +
                 "}";
         GsonJsonAttribute attribute = fromJSONString(json);
@@ -42,16 +41,146 @@ public class JsonAttributeValueSerializationTest {
     }
 
     @Test
-    public void testArrayAttributeValue() throws Exception {
+    public void testPrimitiveBooleanInference() throws Exception {
         final String json =
                 "{\n" +
-                "  \"AttributeId\": \"urn:oasis:names:tc:xacml:2.0:subject:role\",\n" +
+                        "  \"AttributeId\": \"urn:test:datatype:inference\",\n" +
+                        "  \"Value\": true\n" +
+                        "}";
+        GsonJsonAttribute attribute = fromJSONString(json);
+        GsonJsonAttributeValue value = attribute.getValue();
+        assertEquals(XACML3.ID_DATATYPE_BOOLEAN, value.getDataType());
+        assertEquals(true, value.getValue());
+    }
+
+    @Test
+    public void testPrimitiveIntegerInference() throws Exception {
+        final String json =
+                "{\n" +
+                "  \"AttributeId\": \"urn:test:datatype:inference\",\n" +
+                "  \"Value\": 5\n" +
+                "}";
+        GsonJsonAttribute attribute = fromJSONString(json);
+        GsonJsonAttributeValue value = attribute.getValue();
+        assertEquals(XACML3.ID_DATATYPE_INTEGER, value.getDataType());
+        assertEquals(5, ((Number)value.getValue()).intValue());
+    }
+
+    @Test
+    public void testPrimitiveDoubleInference() throws Exception {
+        final String json =
+                "{\n" +
+                "  \"AttributeId\": \"urn:test:datatype:inference\",\n" +
+                "  \"Value\": 2.3\n" +
+                "}";
+        GsonJsonAttribute attribute = fromJSONString(json);
+        GsonJsonAttributeValue value = attribute.getValue();
+        assertEquals(XACML3.ID_DATATYPE_DOUBLE, value.getDataType());
+        assertEquals(2.3, value.getValue());
+    }
+
+    @Test
+    public void testStringArrayInference() throws Exception {
+        final String json =
+                "{\n" +
+                "  \"AttributeId\": \"urn:test:datatype:inference\",\n" +
                 "  \"Value\": [\"manager\", \"administrator\"]\n" +
                 "}";
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
         assertEquals(XACML3.ID_DATATYPE_STRING, value.getDataType());
-        assertEquals(Arrays.asList("manager", "administrator"), value.getValue());
+        assertArrayEquals(new Object[]{"manager", "administrator"}, ((List<?>)value.getValue()).toArray());
+    }
+
+    @Test
+    public void testBooleanArrayInference() throws Exception {
+        final String json =
+                "{\n" +
+                "  \"AttributeId\": \"urn:test:datatype:inference\",\n" +
+                "  \"Value\": [true, false]\n" +
+                "}";
+        GsonJsonAttribute attribute = fromJSONString(json);
+        GsonJsonAttributeValue value = attribute.getValue();
+        assertEquals(XACML3.ID_DATATYPE_BOOLEAN, value.getDataType());
+        assertArrayEquals(new Object[] {true, false}, ((List)value.getValue()).toArray());
+    }
+
+    @Test
+    public void testIntegerArrayInference() throws Exception {
+        final String json =
+                "{\n" +
+                "  \"AttributeId\": \"urn:test:datatype:inference\",\n" +
+                "  \"Value\": [3, -4]\n" +
+                "}";
+        GsonJsonAttribute attribute = fromJSONString(json);
+        GsonJsonAttributeValue value = attribute.getValue();
+        assertEquals(XACML3.ID_DATATYPE_INTEGER, value.getDataType());
+        assertArrayEquals(new Object[] {BigInteger.valueOf(3), BigInteger.valueOf(-4)}, ((List<?>)value.getValue()).toArray());
+    }
+
+    @Test
+    public void testDoubleArrayInference() throws Exception {
+        final String json =
+                "{\n" +
+                "  \"AttributeId\": \"urn:test:datatype:inference\",\n" +
+                "  \"Value\": [999.222, -53.77777]\n" +
+                "}";
+        GsonJsonAttribute attribute = fromJSONString(json);
+        GsonJsonAttributeValue value = attribute.getValue();
+        assertEquals(XACML3.ID_DATATYPE_DOUBLE, value.getDataType());
+        assertArrayEquals(new Object[] {999.222, -53.77777}, ((List<?>)value.getValue()).toArray());
+    }
+
+    /**
+     * JSON Profile 1.1 section 3.3.2: If an array of values contains integers and doubles only (excluding non-numerical
+     * values), then the inference will make the array an array of double.
+     * @throws Exception
+     */
+    @Test
+    public void testNumberArrayInference() throws Exception {
+        final String json =
+                "{\n" +
+                "  \"AttributeId\": \"urn:test:datatype:inference\",\n" +
+                "  \"Value\": [6, -53.77777]\n" +
+                "}";
+        GsonJsonAttribute attribute = fromJSONString(json);
+        GsonJsonAttributeValue value = attribute.getValue();
+        assertEquals(XACML3.ID_DATATYPE_DOUBLE, value.getDataType());
+        assertArrayEquals(new Object[] {6.0, -53.77777}, ((List<?>)value.getValue()).toArray());
+    }
+
+    /**
+     * JSON Profile 1.1 section 3.3.2: Any other combination of values will make the inference fail and the array will
+     * be considered as an array of string.
+     * @throws Exception
+     */
+    @Test
+    public void testMixedArrayInference() throws Exception {
+        final String json =
+                "{\n" +
+                "  \"AttributeId\": \"urn:test:datatype:inference\",\n" +
+                "  \"Value\": [6, -53.77777, false, \"abc\"]\n" +
+                "}";
+        GsonJsonAttribute attribute = fromJSONString(json);
+        GsonJsonAttributeValue value = attribute.getValue();
+        assertEquals(XACML3.ID_DATATYPE_STRING, value.getDataType());
+        assertArrayEquals(new Object[] {"6", "-53.77777", "false", "abc"}, ((List<?>)value.getValue()).toArray());
+    }
+
+    @Test
+    public void testArrayArray() throws Exception {
+        final String json =
+                "{\n" +
+                "  \"AttributeId\": \"urn:test:datatype:inference\",\n" +
+                "  \"Value\": [[6, 2.666], [4, -53.77777, false], \"abc\"]\n" +
+                "}";
+        try {
+            GsonJsonAttribute attribute = fromJSONString(json);
+            fail("Should not allow arrays of arrays as value");
+        }
+        catch (JsonParseException e) {
+            assertEquals("Unexpected value: [6,2.666]", e.getMessage());
+        }
     }
 
     @Test
@@ -93,6 +222,7 @@ public class JsonAttributeValueSerializationTest {
         assertEquals(1, ((RequestAttributes)value.getValue()).getAttributes().size());
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testEntityArrayAttributeValue() throws Exception {
         final String json =
@@ -112,7 +242,7 @@ public class JsonAttributeValueSerializationTest {
                 "        \"AttributeId\": \"urn:example:xacml:attribute:role-kind\",\n" +
                 "        \"Value\": \"administrator\"\n" +
                 "      }]\n" +
-                "    },\n" +
+                "    }\n" +
                 "  ]\n" +
                 "}";
         GsonJsonAttribute attribute = fromJSONString(json);

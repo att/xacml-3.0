@@ -63,17 +63,33 @@ public class GsonJsonAttributeValue implements Serializable {
 			// Yes, then we can append it
 			//
 			((Collection<Object>) this.value).add(value.getValue());
+
+			//
+			// Apply multi value inference rules defined by section 3.3.2 of the JSON Profile of XACML 3.0 Version 1.1
+			//
+			if (!this.dataType.equals(value.getDataTypeId())) {
+				if (XACML3.ID_DATATYPE_INTEGER.equals(this.dataType) && XACML3.ID_DATATYPE_DOUBLE.equals(value.getDataTypeId())) {
+					this.dataType = value.getDataTypeId();
+				} else {
+					this.dataType = XACML3.ID_DATATYPE_STRING;
+				}
+			}
 		} else {
 			//
-			// No, we will have to create one
+			// No, we will have to create one with the existing value
 			//
-			Collection<Object> newList = new ArrayList<>(2);
+			Collection<Object> newList = new ArrayList<>();
 			newList.add(this.value);
-			newList.add(value.getValue());
+
 			//
-			// And now we keep that new list
+			// Keep that new list
 			//
 			this.value = newList;
+
+			//
+			// Try adding the 2nd value again
+			//
+			add(value);
 		}
 	}
 
@@ -85,14 +101,7 @@ public class GsonJsonAttributeValue implements Serializable {
 		//
 		// Did the user specify a datatype?
 		//
-		if (userSpecifiedDataType == null) {
-			//
-			// Nothing specified by user so we will
-			// return the assumption we made when object(s)
-			// were added.
-			//
-			return this.dataType;
-		} else {
+		if (userSpecifiedDataType != null) {
 			//
 			// Save our new datatype
 			//

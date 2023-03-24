@@ -10,6 +10,7 @@ import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.api.RequestAttributes;
 import com.att.research.xacml.api.XACML3;
+import com.att.research.xacml.std.StdMutableRequestAttributes;
 import com.att.research.xacml.std.dom.*;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -38,7 +39,14 @@ public class DataTypeEntity extends DataTypeBase<RequestAttributes> {
             return (RequestAttributes) source;
         } else if (source instanceof Node) {
             try {
-                return DOMRequestAttributes.newInstance((Node)source, true);
+                Node node = (Node) source;
+                if (DOMUtil.isElement(node) && DOMUtil.isInNamespace(node, XACML3.XMLNS)) {
+                    return DOMRequestAttributes.newInstance((Node) source, true);
+                } else {
+                    StdMutableRequestAttributes requestAttributes = new StdMutableRequestAttributes();
+                    requestAttributes.setContentRoot(DOMUtil.getDirectDocumentChild(node));
+                    return requestAttributes;
+                }
             }
             catch (DOMStructureException e) {
                 throw new DataTypeException(this, e);

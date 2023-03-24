@@ -8,8 +8,12 @@ package com.att.research.xacml.std.json;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.att.research.xacml.api.AttributeValue;
 import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.api.Request;
 import com.att.research.xacml.api.RequestAttributesReference;
@@ -23,7 +27,6 @@ import com.google.gson.annotations.SerializedName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.w3c.dom.Node;
 
 @Data
 public class GsonJsonRequest implements Serializable {
@@ -106,13 +109,17 @@ public class GsonJsonRequest implements Serializable {
 			// Iterate the attributes
 			//
 			for (GsonJsonAttribute attribute : category.getAttributes()) {
-				StdAttributeValue<?> value = new StdAttributeValue<>(attribute.getDataType(), attribute.getXacmlValue());
-				boolean includeInResult = false; 
+				Collection<AttributeValue<?>> values = attribute.getXacmlValue() instanceof Collection
+						? ((Collection<?>)attribute.getXacmlValue()).stream()
+						.map(o -> new StdAttributeValue<>(attribute.getDataType(), o))
+						.collect(Collectors.toSet())
+						: Collections.singleton(new StdAttributeValue<>(attribute.getDataType(), attribute.getXacmlValue()));
+				boolean includeInResult = false;
 				if (attribute.getIncludeInResult() != null) {
-				  includeInResult = attribute.getIncludeInResult();
+					includeInResult = attribute.getIncludeInResult();
 				}
 				StdMutableAttribute stdAttribute = new StdMutableAttribute(category.getCategoryId(), attribute.getAttributeId(),
-						value, attribute.getIssuer(), includeInResult);
+						values, attribute.getIssuer(), includeInResult);
 				attributes.add(stdAttribute);
 			}
 			//
