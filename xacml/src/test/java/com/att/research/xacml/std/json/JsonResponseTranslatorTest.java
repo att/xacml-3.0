@@ -353,6 +353,9 @@ public class JsonResponseTranslatorTest {
 
     @Test
     public void testExceptions() {
+    	//
+    	// It seems that Jupiter running in github actions returns a null pointer
+    	//
     	File nonExistentFile = folder.resolve("/idontexist.json").toFile();
     	if (nonExistentFile != null) {
     		assertThatExceptionOfType(JSONStructureException.class).isThrownBy(() -> {
