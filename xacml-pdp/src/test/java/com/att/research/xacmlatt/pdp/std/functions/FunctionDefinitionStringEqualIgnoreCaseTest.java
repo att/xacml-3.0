@@ -1,20 +1,18 @@
 /*
  *
- *          Copyright (c) 2013,2019  AT&T Knowledge Ventures
+ *          Copyright (c) 2013,2019,2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 package com.att.research.xacmlatt.pdp.std.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.datatypes.DataTypes;
 import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
@@ -50,16 +48,12 @@ public class FunctionDefinitionStringEqualIgnoreCaseTest {
 	
 	FunctionArgumentAttributeValue intAttr1 = null;
 
-	public FunctionDefinitionStringEqualIgnoreCaseTest() {
-		try {
-			stringAttr1 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("abc"));
-			stringAttr2 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("abc"));
-			stringAttr3 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("ABC"));
-			stringAttr4 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("def"));
-			intAttr1 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(1));
-		} catch (Exception e) {
-			fail("creating attribute e="+ e);
-		}
+	public FunctionDefinitionStringEqualIgnoreCaseTest() throws DataTypeException {
+		stringAttr1 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("abc"));
+		stringAttr2 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("abc"));
+		stringAttr3 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("ABC"));
+		stringAttr4 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("def"));
+		intAttr1 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(1));
 	}
 	
 	
@@ -72,13 +66,13 @@ public class FunctionDefinitionStringEqualIgnoreCaseTest {
 		FunctionDefinitionEquality<?> fd = (FunctionDefinitionEquality<?>) StdFunctions.FD_STRING_EQUAL_IGNORE_CASE;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_STRING_EQUAL_IGNORE_CASE, fd.getId());
-		assertEquals(DataTypes.DT_STRING.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_STRING_EQUAL_IGNORE_CASE);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_STRING.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 
 		
@@ -87,25 +81,25 @@ public class FunctionDefinitionStringEqualIgnoreCaseTest {
 		arguments.add(stringAttr1);
 		arguments.add(stringAttr2);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// check "abc" with "ABC" (should be same)
 		arguments.clear();
 		arguments.add(stringAttr1);
 		arguments.add(stringAttr3);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// test bad args data types?  Not needed?
 		arguments.clear();
 		arguments.add(stringAttr1);
 		arguments.add(intAttr1);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
+		assertThat(res.isOk()).isFalse();
 
 		
 //TODO - null in either first or 2nd arg => NullPointerException

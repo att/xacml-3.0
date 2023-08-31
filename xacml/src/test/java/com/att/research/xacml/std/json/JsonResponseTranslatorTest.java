@@ -1,22 +1,24 @@
 /*
  *
- *          Copyright (c) 2020  AT&T Knowledge Ventures
+ *          Copyright (c) 2020, 2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 
 package com.att.research.xacml.std.json;
 
-import static org.junit.Assert.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import java.nio.file.Path;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +36,8 @@ import com.att.research.xacml.std.datatypes.DataTypeInteger;
 public class JsonResponseTranslatorTest {
 	private static final Logger logger	= LoggerFactory.getLogger(JsonResponseTranslatorTest.class);
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();  
+	@TempDir
+	Path folder;
     
     @Test
     public void test82() throws Exception {
@@ -84,61 +86,60 @@ public class JsonResponseTranslatorTest {
         Identifier idRecord = new IdentifierImpl("com.acme.record.recordId");
         Identifier idAction = new IdentifierImpl("com.acme.action.actionId");
         
-        assertNotNull(response);
+        assertThat(response).isNotNull();
         
-        assertNotNull(response.getResults());
-        assertEquals(2, response.getResults().size());
+        assertThat(response.getResults()).isNotNull();
+        assertThat(response.getResults()).hasSize(2);
         
         response.getResults().forEach(result -> {
         	assertThat(result.getDecision()).isEqualTo(Decision.DENY);
 
         	
-        	assertEquals(XACML3.ID_STATUS_OK, result.getStatus().getStatusCode().getStatusCodeValue());
-        	assertNotNull(result.getStatus().getStatusCode().getChild());
-        	assertEquals(XACML3.ID_STATUS_OK, result.getStatus().getStatusCode().getChild().getStatusCodeValue());
-        	assertNull(result.getStatus().getStatusCode().getChild().getChild());
+        	assertThat(XACML3.ID_STATUS_OK).isEqualTo(result.getStatus().getStatusCode().getStatusCodeValue());
+        	assertThat(result.getStatus().getStatusCode().getChild()).isNotNull();
+        	assertThat(XACML3.ID_STATUS_OK).isEqualTo(result.getStatus().getStatusCode().getChild().getStatusCodeValue());
+        	assertThat(result.getStatus().getStatusCode().getChild().getChild()).isNull();
         	
-        	assertNull(result.getStatus().getStatusMessage());
-        	assertNull(result.getStatus().getStatusDetail());
+        	assertThat(result.getStatus().getStatusMessage()).isNull();
+        	assertThat(result.getStatus().getStatusDetail()).isNull();
         	
-        	assertEquals(0, result.getPolicyIdentifiers().size());
-        	assertEquals(0, result.getPolicySetIdentifiers().size());
-        	assertEquals(0, result.getAssociatedAdvice().size());
-        	assertEquals(0, result.getObligations().size());
+        	assertThat(result.getPolicyIdentifiers()).hasSize(0);
+        	assertThat(result.getPolicySetIdentifiers()).hasSize(0);
+        	assertThat(result.getAssociatedAdvice()).hasSize(0);
+        	assertThat(result.getObligations()).hasSize(0);
         	
-        	
-        	assertEquals(2, result.getAttributes().size());
+        	assertThat(result.getAttributes()).hasSize(2);
         	
         	result.getAttributes().forEach(attribute -> {
         		if (XACML3.ID_ATTRIBUTE_CATEGORY_RESOURCE.equals(attribute.getCategory())) {
-        			assertTrue(attribute.hasAttributes(idRecord));
-        			assertFalse(attribute.hasAttributes(idAction));
-        			assertEquals(1, attribute.getAttributes().size());
-        			assertTrue(attribute.getAttributes(idRecord).hasNext());
+        			assertThat(attribute.hasAttributes(idRecord)).isTrue();
+        			assertThat(attribute.hasAttributes(idAction)).isFalse();
+        			assertThat(attribute.getAttributes()).hasSize(1);
+        			assertThat(attribute.getAttributes(idRecord).hasNext()).isTrue();
         			
         			Attribute recordAttribute = attribute.getAttributes(idRecord).next();
-        			assertNotNull(recordAttribute);
-        			assertEquals(idRecord, recordAttribute.getAttributeId());
-        			assertEquals(XACML3.ID_ATTRIBUTE_CATEGORY_RESOURCE, recordAttribute.getCategory());
-        			assertFalse(recordAttribute.getIncludeInResults());
-        			assertNull(recordAttribute.getIssuer());
+        			assertThat(recordAttribute).isNotNull();
+        			assertThat(idRecord).isEqualTo(recordAttribute.getAttributeId());
+        			assertThat(XACML3.ID_ATTRIBUTE_CATEGORY_RESOURCE).isEqualTo(recordAttribute.getCategory());
+        			assertThat(recordAttribute.getIncludeInResults()).isFalse();
+        			assertThat(recordAttribute.getIssuer()).isNull();
         			recordAttribute.getValues().forEach(val -> {
         				assertThat(val.getDataTypeId()).isEqualTo(XACML3.ID_DATATYPE_STRING);
         				assertThat(val.getValue()).isEqualTo("126");
         			});
         			
         		} else if (XACML3.ID_ATTRIBUTE_CATEGORY_ACTION.equals(attribute.getCategory())) {
-        			assertTrue(attribute.hasAttributes(idAction));
-        			assertFalse(attribute.hasAttributes(idRecord));
-        			assertEquals(1, attribute.getAttributes().size());
-        			assertTrue(attribute.getAttributes(idAction).hasNext());
+        			assertThat(attribute.hasAttributes(idAction)).isTrue();
+        			assertThat(attribute.hasAttributes(idRecord)).isFalse();
+        			assertThat(attribute.getAttributes()).hasSize(1);
+        			assertThat(attribute.getAttributes(idAction).hasNext()).isTrue();
         			
         			Attribute actionAttribute = attribute.getAttributes(idAction).next();
-        			assertNotNull(actionAttribute);
-        			assertEquals(idAction, actionAttribute.getAttributeId());
-        			assertEquals(XACML3.ID_ATTRIBUTE_CATEGORY_ACTION, actionAttribute.getCategory());
-        			assertFalse(actionAttribute.getIncludeInResults());
-        			assertNull(actionAttribute.getIssuer());
+        			assertThat(actionAttribute).isNotNull();
+        			assertThat(idAction).isEqualTo(actionAttribute.getAttributeId());
+        			assertThat(XACML3.ID_ATTRIBUTE_CATEGORY_ACTION).isEqualTo(actionAttribute.getCategory());
+        			assertThat(actionAttribute.getIncludeInResults()).isFalse();
+        			assertThat(actionAttribute.getIssuer()).isNull();
         			actionAttribute.getValues().forEach(val -> {
         				assertThat(val.getDataTypeId()).isEqualTo(XACML3.ID_DATATYPE_STRING);
         				assertThat(val.getValue()).isIn("view", "edit");
@@ -353,7 +354,7 @@ public class JsonResponseTranslatorTest {
     @Test
     public void testExceptions() {
         assertThatExceptionOfType(JSONStructureException.class).isThrownBy(() -> {
-            JsonResponseTranslator.load(new File(folder.getRoot().getAbsolutePath() + "/idontexist.json"));
+            JsonResponseTranslator.load(folder.resolve("/idontexist.json").toFile());
         });
         assertThatExceptionOfType(JSONStructureException.class).isThrownBy(() -> {
             JsonResponseTranslator.load("iamnot a json string at all");

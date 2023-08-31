@@ -1,6 +1,6 @@
 /*
  *
- *          Copyright (c) 2020-2021  AT&T Knowledge Ventures
+ *          Copyright (c) 2020-2021, 2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 
@@ -13,8 +13,10 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import com.att.research.xacml.api.AttributeValue;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.StdAttributeValue;
@@ -33,7 +35,7 @@ public class FunctionDefinitionDateTimeInDayOfWeekRangeTest {
   private static final FunctionDefinition fd = StdFunctions.FD_DATETIME_IN_DAYOFWEEK_RANGE;
   private static List<FunctionArgument> arguments = new ArrayList<FunctionArgument>();
   
-  @Before
+  @BeforeEach
   public void beforeEachTest() {
     arguments.clear();
   }

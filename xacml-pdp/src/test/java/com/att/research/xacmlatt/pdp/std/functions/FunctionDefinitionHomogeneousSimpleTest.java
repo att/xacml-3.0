@@ -1,20 +1,19 @@
 /*
  *
- *          Copyright (c) 2013,2019  AT&T Knowledge Ventures
+ *          Copyright (c) 2013,2019,2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 package com.att.research.xacmlatt.pdp.std.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.Status;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.datatypes.DataTypes;
@@ -45,31 +44,23 @@ public class FunctionDefinitionHomogeneousSimpleTest {
 		
 		// test a simple instance using the Equality class
 		FunctionDefinitionEquality<String> fd   = new FunctionDefinitionEquality<String>(XACML3.ID_FUNCTION_STRING_EQUAL, DataTypes.DT_STRING);
-		assertEquals(DataTypes.DT_STRING.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_STRING.getId());
 	}
 
 	@Test
 	public void testGetNumArgs() {
 		// test a simple instance using the Equality class
 		FunctionDefinitionEquality<String> fd   = new FunctionDefinitionEquality<String>(XACML3.ID_FUNCTION_STRING_EQUAL, DataTypes.DT_STRING);
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 	}
 
 	@Test
-	public void testValidateArguments() {
+	public void testValidateArguments() throws DataTypeException {
 		// create some arguments to use later
-		FunctionArgumentAttributeValue stringAttr1 = null;
-		FunctionArgumentAttributeValue stringAttr2 = null;
-		FunctionArgumentAttributeValue stringAttr3 = null;
-		FunctionArgumentAttributeValue intAttr = null;
-		try {
-			stringAttr1 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("abc"));
-			stringAttr2 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("def"));
-			stringAttr3 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("ghi"));
-			intAttr = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(1));
-		} catch (Exception e) {
-			fail("creating attribute e="+ e);
-		}
+		FunctionArgumentAttributeValue stringAttr1 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("abc"));
+		FunctionArgumentAttributeValue stringAttr2 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("def"));
+		FunctionArgumentAttributeValue stringAttr3 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("ghi"));
+		FunctionArgumentAttributeValue intAttr = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(1));
 		
 		FunctionDefinitionEquality<String> fd   = new FunctionDefinitionEquality<String>(XACML3.ID_FUNCTION_STRING_EQUAL, DataTypes.DT_STRING);
 		List<String> convertedValues = new ArrayList<String>();
@@ -79,32 +70,32 @@ public class FunctionDefinitionHomogeneousSimpleTest {
 		listFunctionArguments.add(stringAttr1);
 		listFunctionArguments.add(stringAttr2);
 		Status status = fd.validateArguments(listFunctionArguments, convertedValues);
-		assertTrue(status.isOk());
-		assertEquals(2, convertedValues.size());
+		assertThat(status.isOk()).isTrue();
+		assertThat(convertedValues.size()).isEqualTo(2);
 		
 		// test too few args
 		listFunctionArguments.remove(1);
 		status = fd.validateArguments(listFunctionArguments, convertedValues);
-		assertFalse(status.isOk());
-		assertEquals("Expected 2 arguments, got 1", status.getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", status.getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(status.isOk()).isFalse();
+		assertThat(status.getStatusMessage()).isEqualTo("Expected 2 arguments, got 1");
+		assertThat(status.getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// test too many args
 		listFunctionArguments.add(stringAttr2);
 		listFunctionArguments.add(stringAttr3);
 		status = fd.validateArguments(listFunctionArguments, convertedValues);
-		assertFalse(status.isOk());
-		assertEquals("Expected 2 arguments, got 3", status.getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", status.getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(status.isOk()).isFalse();
+		assertThat(status.getStatusMessage()).isEqualTo("Expected 2 arguments, got 3");
+		assertThat(status.getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// test with null arg
 		listFunctionArguments.clear();
 		listFunctionArguments.add(null);
 		listFunctionArguments.add(stringAttr1);
 		status = fd.validateArguments(listFunctionArguments, convertedValues);
-		assertFalse(status.isOk());
-		assertEquals("Got null argument at arg index 0", status.getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", status.getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(status.isOk()).isFalse();
+		assertThat(status.getStatusMessage()).isEqualTo("Got null argument at arg index 0");
+		assertThat(status.getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 
 		// test function that takes 0 args
 //TODO test with func that specifies 0 args? ASSUME for now that there are no such functions since a function needs to operate on something
@@ -118,18 +109,18 @@ public class FunctionDefinitionHomogeneousSimpleTest {
 		FunctionArgument bagArg = new FunctionArgumentBag(bag);
 		listFunctionArguments.add(bagArg);
 		status = fd.validateArguments(listFunctionArguments, convertedValues);
-		assertFalse(status.isOk());
-		assertEquals("Expected a simple value, saw a bag at arg index 1", status.getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", status.getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(status.isOk()).isFalse();
+		assertThat(status.getStatusMessage()).isEqualTo("Expected a simple value, saw a bag at arg index 1");
+		assertThat(status.getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// test with string and int
 		listFunctionArguments.clear();
 		listFunctionArguments.add(stringAttr1);
 		listFunctionArguments.add(intAttr);
 		status = fd.validateArguments(listFunctionArguments, convertedValues);
-		assertFalse(status.isOk());
-		assertEquals("Expected data type 'string' saw 'integer' at arg index 1", status.getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", status.getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(status.isOk()).isFalse();
+		assertThat(status.getStatusMessage()).isEqualTo("Expected data type 'string' saw 'integer' at arg index 1");
+		assertThat(status.getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 	}
 
 }

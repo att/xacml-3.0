@@ -32,6 +32,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.att.research.xacml.api.AttributeValue;
 import com.att.research.xacml.api.DataType;
 import com.att.research.xacml.api.DataTypeException;
@@ -45,8 +46,8 @@ import com.att.research.xacml.std.StdMutableRequest;
 import com.att.research.xacml.std.StdMutableRequestAttributes;
 import com.att.research.xacml.std.dom.DOMStructureException;
 import com.att.research.xacml.std.json.JSONStructureException;
-import com.att.research.xacml.util.FactoryException;
 import com.att.research.xacml.test.TestBase;
+import com.att.research.xacml.util.FactoryException;
 
 /**
  * TestCustom is an application that tests the extensibility and configurability of the AT&T XACML API.

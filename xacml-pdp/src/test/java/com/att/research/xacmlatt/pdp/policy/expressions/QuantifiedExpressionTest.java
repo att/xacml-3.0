@@ -1,10 +1,15 @@
 /*
  * Copyright (c) 2021, salesforce.com, inc.
+ * Modifications Copyright (c) 2023 AT&T Inc.
  * All rights reserved.
  * SPDX-License-Identifier: MIT
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 package com.att.research.xacmlatt.pdp.policy.expressions;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.StdAttributeValue;
@@ -12,12 +17,15 @@ import com.att.research.xacml.std.StdStatus;
 import com.att.research.xacml.std.StdStatusCode;
 import com.att.research.xacmlatt.pdp.eval.EvaluationContext;
 import com.att.research.xacmlatt.pdp.eval.EvaluationException;
-import com.att.research.xacmlatt.pdp.policy.*;
+import com.att.research.xacmlatt.pdp.policy.Bag;
+import com.att.research.xacmlatt.pdp.policy.Expression;
+import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
+import com.att.research.xacmlatt.pdp.policy.ExpressionResultBoolean;
+import com.att.research.xacmlatt.pdp.policy.LexicalEnvironment;
+import com.att.research.xacmlatt.pdp.policy.Policy;
+import com.att.research.xacmlatt.pdp.policy.PolicyDefaults;
+import com.att.research.xacmlatt.pdp.policy.VariableDefinition;
 import com.att.research.xacmlatt.pdp.std.StdEvaluationContext;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 /**
  * Base code for quantified expression tests. See section 5 of the
@@ -85,8 +93,8 @@ public abstract class QuantifiedExpressionTest {
 
         // Evaluate the quantified expression and make sure it fails
         ExpressionResult result = evaluate(quantifiedExpression);
-        assertFalse(result.isOk());
-        assertEquals(StdStatusCode.STATUS_CODE_PROCESSING_ERROR, result.getStatus().getStatusCode());
+        assertThat(result.isOk()).isFalse();
+        assertThat(StdStatusCode.STATUS_CODE_PROCESSING_ERROR).isEqualTo(result.getStatus().getStatusCode());
     }
 
     /**
@@ -110,8 +118,8 @@ public abstract class QuantifiedExpressionTest {
 
         // Evaluate the quantified expression and make sure it fails
         ExpressionResult result = evaluate(quantifiedExpression);
-        assertFalse(result.isOk());
-        assertEquals(StdStatusCode.STATUS_CODE_SYNTAX_ERROR, result.getStatus().getStatusCode());
+        assertThat(result.isOk()).isFalse();
+        assertThat(StdStatusCode.STATUS_CODE_SYNTAX_ERROR).isEqualTo(result.getStatus().getStatusCode());
     }
 
     /**
@@ -138,8 +146,8 @@ public abstract class QuantifiedExpressionTest {
 
         // Evaluate the quantified expression and make sure it fails
         ExpressionResult result = evaluate(outerQuantifiedExpression);
-        assertFalse(result.isOk());
-        assertEquals(StdStatusCode.STATUS_CODE_SYNTAX_ERROR, result.getStatus().getStatusCode());
+        assertThat(result.isOk()).isFalse();
+        assertThat(StdStatusCode.STATUS_CODE_SYNTAX_ERROR).isEqualTo(result.getStatus().getStatusCode());
     }
 
     /**
@@ -185,8 +193,8 @@ public abstract class QuantifiedExpressionTest {
 
         // Evaluate the quantified expression and make sure it fails
         ExpressionResult result = evaluate(quantifiedExpression);
-        assertFalse(result.isOk());
-        assertEquals(StdStatusCode.STATUS_CODE_PROCESSING_ERROR, result.getStatus().getStatusCode());
+        assertThat(result.isOk()).isFalse();
+        assertThat(StdStatusCode.STATUS_CODE_PROCESSING_ERROR).isEqualTo(result.getStatus().getStatusCode());
     }
 
     /**

@@ -1,6 +1,6 @@
 /*
  *
- *          Copyright (c) 2020  AT&T Knowledge Ventures
+ *          Copyright (c) 2020, 2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 
@@ -13,7 +13,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
 import com.att.research.xacml.api.DataTypeException;
 
 public class DataTypeDayOfWeekTest {

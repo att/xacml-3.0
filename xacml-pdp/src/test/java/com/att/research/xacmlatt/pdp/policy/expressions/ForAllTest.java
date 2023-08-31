@@ -1,19 +1,21 @@
 /*
  * Copyright (c) 2021, salesforce.com, inc.
+ * Modifications Copyright (c) 2023, AT&T Inc.
  * All rights reserved.
  * SPDX-License-Identifier: MIT
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 package com.att.research.xacmlatt.pdp.policy.expressions;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
+
 import com.att.research.xacmlatt.pdp.eval.EvaluationException;
 import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
 import com.att.research.xacmlatt.pdp.policy.ExpressionResultBoolean;
 import com.att.research.xacmlatt.pdp.policy.LexicalEnvironment;
 import com.att.research.xacmlatt.pdp.policy.Policy;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Tests for ForAll quantified expression. See section 5.2 of the
@@ -34,8 +36,8 @@ public class ForAllTest extends QuantifiedExpressionTest {
      */
     @Override
     protected void assertEmptyDomainResult(ExpressionResult result) {
-        assertTrue(result.isOk());
-        assertEquals(Boolean.TRUE, result.getValue().getValue());
+        assertThat(result.isOk()).isTrue();
+        assertThat(Boolean.TRUE).isEqualTo(result.getValue().getValue());
     }
 
     /**
@@ -55,16 +57,16 @@ public class ForAllTest extends QuantifiedExpressionTest {
 
         // Evaluate the quantified expression and make sure it fails
         ExpressionResult result = evaluate(quantifiedExpression);
-        assertFalse(result.isOk());
-        assertEquals(ExpressionResultBoolean.STATUS_PE_RETURNED_BAG, result.getStatus());
+        assertThat(result.isOk()).isFalse();
+        assertThat(ExpressionResultBoolean.STATUS_PE_RETURNED_BAG).isEqualTo(result.getStatus());
 
         // Update the iterant expression so it produces a string
         quantifiedExpression.setIterantExpression(EX_STRING);
 
         // Evaluate the quantified expression and make sure it still fails
         result = evaluate(quantifiedExpression);
-        assertFalse(result.isOk());
-        assertEquals(ExpressionResultBoolean.STATUS_PE_RETURNED_NON_BOOLEAN, result.getStatus());
+        assertThat(result.isOk()).isFalse();
+        assertThat(ExpressionResultBoolean.STATUS_PE_RETURNED_NON_BOOLEAN).isEqualTo(result.getStatus());
     }
 
     /**
@@ -84,8 +86,9 @@ public class ForAllTest extends QuantifiedExpressionTest {
 
         // Evaluate the quantified expression and make sure it returns false
         ExpressionResult result = evaluate(quantifiedExpression);
-        assertTrue(result.getStatus().getStatusMessage(), result.isOk());
-        assertEquals(Boolean.FALSE, result.getValue().getValue());
+        assertThat(result.getStatus().getStatusMessage()).isNull();
+        assertThat(result.isOk()).isTrue();
+        assertThat(Boolean.FALSE).isEqualTo(result.getValue().getValue());
     }
 
     /**
@@ -104,7 +107,8 @@ public class ForAllTest extends QuantifiedExpressionTest {
 
         // Evaluate the quantified expression and make sure it returns true
         ExpressionResult result = evaluate(quantifiedExpression);
-        assertTrue(result.getStatus().getStatusMessage(), result.isOk());
-        assertEquals(Boolean.TRUE, result.getValue().getValue());
+        assertThat(result.getStatus().getStatusMessage()).isNull();
+        assertThat(result.isOk()).isTrue();
+        assertThat(Boolean.TRUE).isEqualTo(result.getValue().getValue());
     }
 }

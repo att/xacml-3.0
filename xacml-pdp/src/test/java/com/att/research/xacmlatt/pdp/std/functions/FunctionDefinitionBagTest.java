@@ -1,19 +1,16 @@
 package com.att.research.xacmlatt.pdp.std.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.att.research.xacml.api.AttributeValue;
+import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.datatypes.DataTypes;
 import com.att.research.xacmlatt.pdp.policy.Bag;
@@ -43,92 +40,82 @@ public class FunctionDefinitionBagTest {
 	FunctionArgumentAttributeValue attrInteger = null;
 	FunctionArgumentAttributeValue attrString = null;
 
-	public FunctionDefinitionBagTest() {
-		try {
-			attrInteger = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(1111111111));
-			attrString = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("a string value"));
-		} catch (Exception e) {
-			fail("creating attributes e="+e);
-		}
+	public FunctionDefinitionBagTest() throws DataTypeException {
+		attrInteger = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(1111111111));
+		attrString = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("a string value"));
 	}
 	
 	@Test
-	public void testString() {
+	public void testString() throws DataTypeException {
 
 		String s1 = "abc";
 		String s2 = "def";
-		FunctionArgumentAttributeValue attr1 = null;
-		FunctionArgumentAttributeValue attr2 = null;
-		try {
-			attr1 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(s1));
-			attr2 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(s2));
-		} catch (Exception e) {
-			fail("creating attributes e="+e);
-		}
+		FunctionArgumentAttributeValue attr1 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(s1));
+		FunctionArgumentAttributeValue attr2 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(s2));
 		
 		FunctionDefinitionBag<?> fd = (FunctionDefinitionBag<?>) StdFunctions.FD_STRING_BAG;
 
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_STRING_BAG, fd.getId());
-		assertEquals(DataTypes.DT_STRING.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_STRING_BAG);
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_STRING.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertTrue(fd.returnsBag());
+		assertThat(fd.returnsBag()).isTrue();
 
 		// bag with only one
 		arguments.clear();
 		arguments.add(attr1);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Bag bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		Iterator<AttributeValue<?>> it = bag.getAttributeValues();
-		assertEquals(1, bag.size());
+		assertThat(bag.size()).isEqualTo(1);
 		AttributeValue<?> attrValueObject = it.next();
-		assertEquals(DataTypes.DT_STRING.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_STRING.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		
 		// zero args => empty bag
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
-		assertEquals(0, bag.size());
+		assertThat(bag).isNotNull();
+		assertThat(bag.size()).isZero();
 
 		
 		// null argument
 		arguments.clear();
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:string-bag Got null argument", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:string-bag Got null argument");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// argument of other type
 		arguments.clear();
 		arguments.add(attrInteger);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:string-bag Expected data type 'string' saw 'integer'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:string-bag Expected data type 'string' saw 'integer'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// 2 args (check response is correct)
 		arguments.clear();
 		arguments.add(attr1);
 		arguments.add(attr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		it = bag.getAttributeValues();
-		assertEquals(2, bag.size());
+		assertThat(bag.size()).isEqualTo(2);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_STRING.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_STRING.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_STRING.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s2, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_STRING.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s2);
 		
 		// duplicate args (verify return)
 		arguments.clear();
@@ -136,20 +123,20 @@ public class FunctionDefinitionBagTest {
 		arguments.add(attr2);
 		arguments.add(attr1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		it = bag.getAttributeValues();
-		assertEquals(3, bag.size());
+		assertThat(bag.size()).isEqualTo(3);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_STRING.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_STRING.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_STRING.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s2, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_STRING.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s2);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_STRING.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_STRING.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		
 		// lots of args
 		arguments.clear();
@@ -157,92 +144,86 @@ public class FunctionDefinitionBagTest {
 			arguments.add(attr1);
 		}
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		it = bag.getAttributeValues();
-		assertEquals(1000, bag.size());
+		assertThat(bag.size()).isEqualTo(1000);
 		
 	}
 	
 
 	@Test
-	public void testBoolean() {
+	public void testBoolean() throws DataTypeException {
 
 		Boolean s1 = true;
 		Boolean s2 = false;
-		FunctionArgumentAttributeValue attr1 = null;
-		FunctionArgumentAttributeValue attr2 = null;
-		try {
-			attr1 = new FunctionArgumentAttributeValue(DataTypes.DT_BOOLEAN.createAttributeValue(s1));
-			attr2 = new FunctionArgumentAttributeValue(DataTypes.DT_BOOLEAN.createAttributeValue(s2));
-		} catch (Exception e) {
-			fail("creating attributes e="+e);
-		}
+		FunctionArgumentAttributeValue attr1 = new FunctionArgumentAttributeValue(DataTypes.DT_BOOLEAN.createAttributeValue(s1));
+		FunctionArgumentAttributeValue attr2 = new FunctionArgumentAttributeValue(DataTypes.DT_BOOLEAN.createAttributeValue(s2));
 		
 		FunctionDefinitionBag<?> fd = (FunctionDefinitionBag<?>) StdFunctions.FD_BOOLEAN_BAG;
 
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_BOOLEAN_BAG, fd.getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_BOOLEAN_BAG);
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertTrue(fd.returnsBag());
+		assertThat(fd.returnsBag()).isTrue();
 
 		// bag with only one
 		arguments.clear();
 		arguments.add(attr1);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Bag bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		Iterator<AttributeValue<?>> it = bag.getAttributeValues();
-		assertEquals(1, bag.size());
+		assertThat(bag.size()).isEqualTo(1);
 		AttributeValue<?> attrValueObject = it.next();
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		
 		// zero args => empty bag
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
-		assertEquals(0, bag.size());
+		assertThat(bag).isNotNull();
+		assertThat(bag.size()).isEqualTo(0);
 
 		
 		// null argument
 		arguments.clear();
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:boolean-bag Got null argument", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:boolean-bag Got null argument");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// argument of other type
 		arguments.clear();
 		arguments.add(attrInteger);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:boolean-bag Expected data type 'boolean' saw 'integer'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:boolean-bag Expected data type 'boolean' saw 'integer'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// 2 args (check response is correct)
 		arguments.clear();
 		arguments.add(attr1);
 		arguments.add(attr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		it = bag.getAttributeValues();
-		assertEquals(2, bag.size());
+		assertThat(bag.size()).isEqualTo(2);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s2, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s2);
 		
 		// duplicate args (verify return)
 		arguments.clear();
@@ -250,20 +231,20 @@ public class FunctionDefinitionBagTest {
 		arguments.add(attr2);
 		arguments.add(attr1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		it = bag.getAttributeValues();
-		assertEquals(3, bag.size());
+		assertThat(bag.size()).isEqualTo(3);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s2, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s2);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		
 		// lots of args
 		arguments.clear();
@@ -271,93 +252,87 @@ public class FunctionDefinitionBagTest {
 			arguments.add(attr1);
 		}
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		it = bag.getAttributeValues();
-		assertEquals(1000, bag.size());
+		assertThat(bag.size()).isEqualTo(1000);
 		
 	}
 	
 	
 
 	@Test
-	public void testInteger() {
+	public void testInteger() throws DataTypeException {
 
 		BigInteger s1 = new BigInteger("123");
 		BigInteger s2 = new BigInteger("456");
-		FunctionArgumentAttributeValue attr1 = null;
-		FunctionArgumentAttributeValue attr2 = null;
-		try {
-			attr1 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(s1));
-			attr2 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(s2));
-		} catch (Exception e) {
-			fail("creating attributes e="+e);
-		}
+		FunctionArgumentAttributeValue attr1 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(s1));
+		FunctionArgumentAttributeValue attr2 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(s2));
 		
 		FunctionDefinitionBag<?> fd = (FunctionDefinitionBag<?>) StdFunctions.FD_INTEGER_BAG;
 
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_INTEGER_BAG, fd.getId());
-		assertEquals(DataTypes.DT_INTEGER.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_INTEGER_BAG);
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_INTEGER.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertTrue(fd.returnsBag());
+		assertThat(fd.returnsBag()).isTrue();
 
 		// bag with only one
 		arguments.clear();
 		arguments.add(attr1);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Bag bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		Iterator<AttributeValue<?>> it = bag.getAttributeValues();
-		assertEquals(1, bag.size());
+		assertThat(bag.size()).isEqualTo(1);
 		AttributeValue<?> attrValueObject = it.next();
-		assertEquals(DataTypes.DT_INTEGER.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_INTEGER.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		
 		// zero args => empty bag
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
-		assertEquals(0, bag.size());
+		assertThat(bag).isNotNull();
+		assertThat(bag.size()).isEqualTo(0);
 
 		
 		// null argument
 		arguments.clear();
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:integer-bag Got null argument", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:integer-bag Got null argument");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// argument of other type
 		arguments.clear();
 		arguments.add(attrString);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:integer-bag Expected data type 'integer' saw 'string'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:integer-bag Expected data type 'integer' saw 'string'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// 2 args (check response is correct)
 		arguments.clear();
 		arguments.add(attr1);
 		arguments.add(attr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		it = bag.getAttributeValues();
-		assertEquals(2, bag.size());
+		assertThat(bag.size()).isEqualTo(2);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_INTEGER.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_INTEGER.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_INTEGER.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s2, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_INTEGER.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s2);
 		
 		// duplicate args (verify return)
 		arguments.clear();
@@ -365,20 +340,20 @@ public class FunctionDefinitionBagTest {
 		arguments.add(attr2);
 		arguments.add(attr1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		it = bag.getAttributeValues();
-		assertEquals(3, bag.size());
+		assertThat(bag.size()).isEqualTo(3);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_INTEGER.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_INTEGER.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_INTEGER.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s2, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_INTEGER.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s2);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_INTEGER.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_INTEGER.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		
 		// lots of args
 		arguments.clear();
@@ -386,11 +361,11 @@ public class FunctionDefinitionBagTest {
 			arguments.add(attr1);
 		}
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		it = bag.getAttributeValues();
-		assertEquals(1000, bag.size());
+		assertThat(bag.size()).isEqualTo(1000);
 		
 	}
 	
@@ -398,82 +373,76 @@ public class FunctionDefinitionBagTest {
 	
 
 	@Test
-	public void testDouble() {
+	public void testDouble() throws DataTypeException {
 
 		Double s1 = 123.45;
 		Double s2 = 678.901;
-		FunctionArgumentAttributeValue attr1 = null;
-		FunctionArgumentAttributeValue attr2 = null;
-		try {
-			attr1 = new FunctionArgumentAttributeValue(DataTypes.DT_DOUBLE.createAttributeValue(s1));
-			attr2 = new FunctionArgumentAttributeValue(DataTypes.DT_DOUBLE.createAttributeValue(s2));
-		} catch (Exception e) {
-			fail("creating attributes e="+e);
-		}
+		FunctionArgumentAttributeValue attr1 = new FunctionArgumentAttributeValue(DataTypes.DT_DOUBLE.createAttributeValue(s1));
+		FunctionArgumentAttributeValue attr2 = new FunctionArgumentAttributeValue(DataTypes.DT_DOUBLE.createAttributeValue(s2));
 		
 		FunctionDefinitionBag<?> fd = (FunctionDefinitionBag<?>) StdFunctions.FD_DOUBLE_BAG;
 
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_DOUBLE_BAG, fd.getId());
-		assertEquals(DataTypes.DT_DOUBLE.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_DOUBLE_BAG);
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_DOUBLE.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertTrue(fd.returnsBag());
+		assertThat(fd.returnsBag()).isTrue();
 
 		// bag with only one
 		arguments.clear();
 		arguments.add(attr1);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Bag bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		Iterator<AttributeValue<?>> it = bag.getAttributeValues();
-		assertEquals(1, bag.size());
+		assertThat(bag.size()).isEqualTo(1);
 		AttributeValue<?> attrValueObject = it.next();
-		assertEquals(DataTypes.DT_DOUBLE.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_DOUBLE.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		
 		// zero args => empty bag
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
-		assertEquals(0, bag.size());
+		assertThat(bag).isNotNull();
+		assertThat(bag.size()).isEqualTo(0);
 
 		
 		// null argument
 		arguments.clear();
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:double-bag Got null argument", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:double-bag Got null argument");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// argument of other type
 		arguments.clear();
 		arguments.add(attrInteger);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:double-bag Expected data type 'double' saw 'integer'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:double-bag Expected data type 'double' saw 'integer'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// 2 args (check response is correct)
 		arguments.clear();
 		arguments.add(attr1);
 		arguments.add(attr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		it = bag.getAttributeValues();
-		assertEquals(2, bag.size());
+		assertThat(bag.size()).isEqualTo(2);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_DOUBLE.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_DOUBLE.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_DOUBLE.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s2, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_DOUBLE.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s2);
 		
 		// duplicate args (verify return)
 		arguments.clear();
@@ -481,20 +450,20 @@ public class FunctionDefinitionBagTest {
 		arguments.add(attr2);
 		arguments.add(attr1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		it = bag.getAttributeValues();
-		assertEquals(3, bag.size());
+		assertThat(bag.size()).isEqualTo(3);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_DOUBLE.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_DOUBLE.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_DOUBLE.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s2, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_DOUBLE.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s2);
 		attrValueObject = it.next();
-		assertEquals(DataTypes.DT_DOUBLE.getId(), attrValueObject.getDataTypeId());
-		assertEquals(s1, attrValueObject.getValue());
+		assertThat(attrValueObject.getDataTypeId()).isEqualTo(DataTypes.DT_DOUBLE.getId());
+		assertThat(attrValueObject.getValue()).isEqualTo(s1);
 		
 		// lots of args
 		arguments.clear();
@@ -502,11 +471,11 @@ public class FunctionDefinitionBagTest {
 			arguments.add(attr1);
 		}
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		bag = res.getBag();
-		assertNotNull(bag);
+		assertThat(bag).isNotNull();
 		it = bag.getAttributeValues();
-		assertEquals(1000, bag.size());
+		assertThat(bag.size()).isEqualTo(1000);
 		
 	}
 	

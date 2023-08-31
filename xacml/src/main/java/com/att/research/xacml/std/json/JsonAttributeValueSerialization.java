@@ -1,37 +1,46 @@
 /*
  *
- *          Copyright (c) 2020 AT&T Knowledge Ventures
+ *          Copyright (c) 2020,2023 AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 
 package com.att.research.xacml.std.json;
 
-import com.att.research.xacml.api.*;
-import com.att.research.xacml.std.StdAttributeValue;
-import com.att.research.xacml.std.StdMutableAttribute;
-import com.att.research.xacml.std.StdMutableRequestAttributes;
-import com.att.research.xacml.std.datatypes.*;
-import com.google.gson.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-
-import javax.security.auth.x500.X500Principal;
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.security.auth.x500.X500Principal;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
+
+import com.att.research.xacml.api.AttributeValue;
+import com.att.research.xacml.api.DataTypeException;
+import com.att.research.xacml.api.Identifier;
+import com.att.research.xacml.api.RequestAttributes;
+import com.att.research.xacml.api.XACML3;
+import com.att.research.xacml.std.StdAttributeValue;
+import com.att.research.xacml.std.StdMutableAttribute;
+import com.att.research.xacml.std.StdMutableRequestAttributes;
+import com.att.research.xacml.std.datatypes.DataTypeInteger;
+import com.att.research.xacml.std.datatypes.RFC2396DomainName;
+import com.att.research.xacml.std.datatypes.RFC822Name;
+import com.att.research.xacml.std.datatypes.XPathExpressionWrapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 public class JsonAttributeValueSerialization  implements JsonDeserializer<GsonJsonAttributeValue>, JsonSerializer<GsonJsonAttributeValue> {
 	private static final Logger logger	= LoggerFactory.getLogger(JsonAttributeValueSerialization.class);

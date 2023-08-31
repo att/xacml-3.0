@@ -1,17 +1,14 @@
 /*
  *
- *          Copyright (c) 2013,2019  AT&T Knowledge Ventures
+ *          Copyright (c) 2013,2019, 2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 package com.att.research.xacmlatt.pdp.policy;
 
-import com.att.research.xacml.api.AttributeValue;
-import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.Status;
 import com.att.research.xacml.api.StatusCode;
 import com.att.research.xacml.std.StdStatus;
 import com.att.research.xacml.std.StdStatusCode;
-import com.att.research.xacml.std.datatypes.DataTypes;
 import com.att.research.xacmlatt.pdp.eval.EvaluationContext;
 import com.att.research.xacmlatt.pdp.eval.EvaluationException;
 

@@ -12,7 +12,6 @@ import com.att.research.xacml.api.DataType;
 import com.att.research.xacml.api.DataTypeFactory;
 import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.std.StdDataTypeFactory;
-import com.att.research.xacml.std.datatypes.DataTypes;
 
 public class CustomDataTypeFactory extends DataTypeFactory {
 	private static final Map<Identifier,DataType<?>> 	mapIdentifiersToDataTypes	= new HashMap<Identifier,DataType<?>>();

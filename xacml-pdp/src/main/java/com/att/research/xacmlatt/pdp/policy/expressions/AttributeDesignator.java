@@ -1,14 +1,20 @@
 /*
  *
- *          Copyright (c) 2013,2019  AT&T Knowledge Ventures
+ *          Copyright (c) 2013,2019, 2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 package com.att.research.xacmlatt.pdp.policy.expressions;
 
 import java.util.Collection;
-import java.util.Iterator;
 
-import com.att.research.xacml.api.*;
+import com.att.research.xacml.api.Attribute;
+import com.att.research.xacml.api.AttributeValue;
+import com.att.research.xacml.api.Identifier;
+import com.att.research.xacml.api.MissingAttributeDetail;
+import com.att.research.xacml.api.RequestAttributes;
+import com.att.research.xacml.api.Status;
+import com.att.research.xacml.api.StatusCode;
+import com.att.research.xacml.api.StatusDetail;
 import com.att.research.xacml.api.pip.PIPException;
 import com.att.research.xacml.api.pip.PIPRequest;
 import com.att.research.xacml.api.pip.PIPResponse;
@@ -16,7 +22,6 @@ import com.att.research.xacml.std.StdMutableMissingAttributeDetail;
 import com.att.research.xacml.std.StdStatus;
 import com.att.research.xacml.std.StdStatusCode;
 import com.att.research.xacml.std.StdStatusDetail;
-import com.att.research.xacml.std.pip.StdMutablePIPResponse;
 import com.att.research.xacml.std.pip.StdPIPRequest;
 import com.att.research.xacml.std.pip.engines.EntityEngine;
 import com.att.research.xacmlatt.pdp.eval.EvaluationContext;

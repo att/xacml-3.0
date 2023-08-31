@@ -6,9 +6,9 @@
 
 package com.att.research.xacml.std.datatypes;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.att.research.xacml.api.DataTypeException;
 
@@ -18,15 +18,15 @@ public class DataTypeBase64BinaryTest {
 	public void test() throws DataTypeException {
 		DataTypeBase64Binary datatype = DataTypeBase64Binary.newInstance();
 		
-		assertNull(datatype.convert(null));
+		assertThat(datatype.convert(null)).isNull();
 		
 		String test = "iamasecretxx";
 		Base64Binary base64 = Base64Binary.newInstance(test);
-		assertEquals(base64, datatype.convert(base64));
-		assertEquals(base64, datatype.convert(base64.getData()));
+		assertThat(base64).isEqualTo(datatype.convert(base64));
+		assertThat(base64).isEqualTo(datatype.convert(base64.getData()));
 		
-		assertNull(datatype.toStringValue(null));
-		assertEquals(base64.stringValue(), datatype.toStringValue(base64));
+		assertThat(datatype.toStringValue(null)).isNull();
+		assertThat(base64.stringValue()).isEqualTo(datatype.toStringValue(base64));
 	}
 	
 }

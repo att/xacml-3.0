@@ -1,12 +1,15 @@
 /*
  *
- *          Copyright (c) 2018-2019 AT&T Knowledge Ventures
+ *          Copyright (c) 2018-2019, 2023 AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 package com.att.research.xacml.std.datatypes;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+import org.junit.jupiter.api.Test;
+
 import com.att.research.xacml.api.DataTypeException;
 
 public class DataTypeBooleanTest {
@@ -14,37 +17,35 @@ public class DataTypeBooleanTest {
   @Test
   public void test() throws DataTypeException {
     DataTypeBoolean b = DataTypeBoolean.newInstance();
-    assertNotNull(b);
+    assertThat(b).isNotNull();
     Boolean bool = b.convert("true");
-    assertEquals(Boolean.TRUE, bool.booleanValue());
+    assertThat(Boolean.TRUE).isEqualTo(bool.booleanValue());
     bool = b.convert("false");
-    assertEquals(Boolean.FALSE, bool.booleanValue());
-    assertNull(b.convert(null));
+    assertThat(Boolean.FALSE).isEqualTo(bool.booleanValue());
+    assertThat(b.convert(null)).isNull();;
     bool = null;
-    assertNull(b.convert(bool));
+    assertThat(b.convert(bool)).isNull();;
     bool = b.convert(1);
-    assertEquals(Boolean.TRUE, bool.booleanValue());
+    assertThat(Boolean.TRUE).isEqualTo(bool.booleanValue());
     bool = b.convert(0);
-    assertEquals(Boolean.FALSE, bool.booleanValue());
+    assertThat(Boolean.FALSE).isEqualTo(bool.booleanValue());
     bool = b.convert("1");
-    assertEquals(Boolean.TRUE, bool.booleanValue());
+    assertThat(Boolean.TRUE).isEqualTo(bool.booleanValue());
     bool = b.convert("0");
-    assertEquals(Boolean.FALSE, bool.booleanValue());
+    assertThat(Boolean.FALSE).isEqualTo(bool.booleanValue());
     DataTypeTestObject obj = new DataTypeTestObject();
-    assertNull(b.convert(obj));
+    assertThat(b.convert(obj)).isNull();;
     bool = b.convert(Boolean.FALSE);
-    assertEquals(Boolean.FALSE, bool.booleanValue());
+    assertThat(Boolean.FALSE).isEqualTo(bool.booleanValue());
   }
   
-  @Test(expected = DataTypeException.class)
-  public void test2() throws DataTypeException {
+  public void test2() {
     DataTypeBoolean b = DataTypeBoolean.newInstance();
-    b.convert(10);
+    assertThatExceptionOfType(DataTypeException.class).isThrownBy(() -> b.convert(10));
   }
 
-  @Test(expected = DataTypeException.class)
-  public void test3() throws DataTypeException {
+  public void test3() {
     DataTypeBoolean b = DataTypeBoolean.newInstance();
-    b.convert("null");
+    assertThatExceptionOfType(DataTypeException.class).isThrownBy(() -> b.convert("null"));
   }
 }

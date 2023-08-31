@@ -1,6 +1,6 @@
 /*
  *
- *          Copyright (c) 2020-2021  AT&T Knowledge Ventures
+ *          Copyright (c) 2020-2021, 2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 
@@ -10,8 +10,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.datatypes.DataTypes;
@@ -25,7 +27,7 @@ public class FunctionDefinitionTimeInRecurringRangeTest {
   private static FunctionDefinitionTimeInRecurringRange fd = (FunctionDefinitionTimeInRecurringRange) StdFunctions.FD_TIME_IN_RECURRING_RANGE;
   private static List<FunctionArgument> arguments = new ArrayList<FunctionArgument>();
   
-  @Before
+  @BeforeEach
   public void beforeEachTest() {
     arguments.clear();
   }

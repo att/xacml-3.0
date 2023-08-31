@@ -1,19 +1,18 @@
 /*
  * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023 AT&T Inc.
  * All rights reserved.
  * SPDX-License-Identifier: MIT
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 package com.att.research.xacml.std.pip.engines;
 
-import com.att.research.xacml.api.*;
-import com.att.research.xacml.api.pip.*;
-import com.att.research.xacml.std.StdMutableAttribute;
-import com.att.research.xacml.std.pip.StdMutablePIPResponse;
-import com.att.research.xacml.std.pip.StdPIPRequest;
-import com.att.research.xacml.std.pip.StdPIPResponse;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 
-import java.util.*;
+import com.att.research.xacml.api.Identifier;
+import com.att.research.xacml.api.RequestAttributes;
 
 /**
  * EntityEngine extends {@link RequestAttributesEngine} to retrieve matching {@link com.att.research.xacml.api.Attribute}s
@@ -24,7 +23,6 @@ import java.util.*;
  */
 public class EntityEngine extends RequestAttributesEngine {
     private RequestAttributes entity;
-    private boolean shutdown = false;
 
     public EntityEngine(RequestAttributes entity) {
         this.entity = entity;

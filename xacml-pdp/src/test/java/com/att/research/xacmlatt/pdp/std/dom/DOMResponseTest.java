@@ -1,20 +1,19 @@
 /*
  *
- *          Copyright (c) 2013,2019  AT&T Knowledge Ventures
+ *          Copyright (c) 2013,2019, 2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 package com.att.research.xacmlatt.pdp.std.dom;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.att.research.xacml.api.Attribute;
 import com.att.research.xacml.api.AttributeValue;
@@ -75,40 +74,22 @@ public class DOMResponseTest {
 	
 	
 	@Test
-	public void testEmptyAndDecisions() {
+	public void testEmptyAndDecisions() throws Exception {
 		// null response
-		try {
-			xmlResponse = DOMResponse.toString(null, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(Exception.class).isThrownBy(() -> DOMResponse.toString(null, false));
 		
 		// empty response (no Result object)
 		response = new StdMutableResponse();
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
 		
+		assertThatExceptionOfType(Exception.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		// just decision, no status
 		response = new StdMutableResponse();
 		result = new StdMutableResult();
 		result.setDecision(Decision.PERMIT);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		xmlResponse = DOMResponse.toString(response, false);
+		assertThat(xmlResponse).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision></Result></Response>", xmlResponse);
 		
 		// just status (empty), no decision
 		response = new StdMutableResponse();
@@ -116,14 +97,7 @@ public class DOMResponseTest {
 		status = new StdMutableStatus();		
 		result.setStatus(status);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		// just status (non-empty), no decision
 		response = new StdMutableResponse();
@@ -132,15 +106,7 @@ public class DOMResponseTest {
 		status.setStatusCode(StdStatusCode.STATUS_CODE_OK);
 		result.setStatus(status);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
-		
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		// test other decisions without Status
 		
@@ -148,68 +114,43 @@ public class DOMResponseTest {
 		result = new StdMutableResult();
 		result.setDecision(Decision.DENY);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Deny</Decision></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		xmlResponse = DOMResponse.toString(response, false);
+		assertThat(xmlResponse).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Deny</Decision></Result></Response>");
 		
 		response = new StdMutableResponse();
 		result = new StdMutableResult();
 		result.setDecision(Decision.NOTAPPLICABLE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>NotApplicable</Decision></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		xmlResponse = DOMResponse.toString(response, false);
+		assertThat(xmlResponse).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>NotApplicable</Decision></Result></Response>");
 		
 		response = new StdMutableResponse();
 		result = new StdMutableResult();
 		result.setDecision(Decision.INDETERMINATE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		xmlResponse = DOMResponse.toString(response, false);
+		assertThat(xmlResponse).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision></Result></Response>");
 		
 		response = new StdMutableResponse();
 		result = new StdMutableResult();
 		result.setDecision(Decision.INDETERMINATE_DENY);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{D}</Decision></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		xmlResponse = DOMResponse.toString(response, false);
+		assertThat(xmlResponse).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{D}</Decision></Result></Response>");
 		
 		response = new StdMutableResponse();
 		result = new StdMutableResult();
 		result.setDecision(Decision.INDETERMINATE_DENYPERMIT);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{DP}</Decision></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		xmlResponse = DOMResponse.toString(response, false);
+		assertThat(xmlResponse).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{DP}</Decision></Result></Response>");
 		
 		response = new StdMutableResponse();
 		result = new StdMutableResult();
 		result.setDecision(Decision.INDETERMINATE_PERMIT);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{P}</Decision></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-
+		xmlResponse = DOMResponse.toString(response, false);
+		assertThat(xmlResponse).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{P}</Decision></Result></Response>");
 		
 		// test Multiple Decisions - success
 		response = new StdMutableResponse();
@@ -219,13 +160,8 @@ public class DOMResponseTest {
 		StdMutableResult result2 = new StdMutableResult();
 		result2.setDecision(Decision.DENY);
 		response.add(result2);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision></Result><Result><Decision>Deny</Decision></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		xmlResponse = DOMResponse.toString(response, false);
+		assertThat(xmlResponse).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision></Result><Result><Decision>Deny</Decision></Result></Response>");
 		
 		// test Multiple Decisions - one success and one error
 		response = new StdMutableResponse();
@@ -235,20 +171,14 @@ public class DOMResponseTest {
 		result2 = new StdMutableResult();
 		result2.setDecision(Decision.INDETERMINATE);
 		response.add(result2);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision></Result><Result><Decision>Indeterminate</Decision></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		xmlResponse = DOMResponse.toString(response, false);
+		assertThat(xmlResponse).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision></Result><Result><Decision>Indeterminate</Decision></Result></Response>");
 	}
 		
-
-	
 	
 	// Test with every field filled in with multiple values where appropriate
 	@Test
-	public void testAllFieldsResponse() {	
+	public void testAllFieldsResponse() throws Exception {	
 		
 		// fully-loaded multiple response
 		
@@ -361,18 +291,10 @@ public class DOMResponseTest {
 		
 		
 		// add PolicyIdentifierList to result
-		StdIdReference policyIdentifier1 = null;
-		StdIdReference policyIdentifier2 = null;
-		StdIdReference policySetIdentifier1 = null;
-		StdIdReference policySetIdentifier2 = null;
-		try {
-			policyIdentifier1 = new StdIdReference(new IdentifierImpl("idRef1"), StdVersion.newInstance("1.2.3"));
-			policyIdentifier2 = new StdIdReference(new IdentifierImpl("idRef2_NoVersion"));
-			policySetIdentifier1 = new StdIdReference(new IdentifierImpl("idSetRef1"), StdVersion.newInstance("4.5.6.7.8.9.0"));
-			policySetIdentifier2 = new StdIdReference(new IdentifierImpl("idSetRef2_NoVersion"));
-		} catch (ParseException e1) {
-			fail("creating policyIds, e="+e1);
-		}
+		StdIdReference policyIdentifier1 = new StdIdReference(new IdentifierImpl("idRef1"), StdVersion.newInstance("1.2.3"));
+		StdIdReference policyIdentifier2 = new StdIdReference(new IdentifierImpl("idRef2_NoVersion"));
+		StdIdReference policySetIdentifier1 = new StdIdReference(new IdentifierImpl("idSetRef1"), StdVersion.newInstance("4.5.6.7.8.9.0"));
+		StdIdReference policySetIdentifier2 = new StdIdReference(new IdentifierImpl("idSetRef2_NoVersion"));
 		
 		result.addPolicyIdentifier(policyIdentifier1);
 		result.addPolicyIdentifier(policyIdentifier2);
@@ -383,14 +305,8 @@ public class DOMResponseTest {
 		response.add(result);
 	
 		// convert Response to XML
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-//System.out.println(xmlResponse);
-//System.out.println(DOMResponse.toString(response, true));
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusMessage>some status message</StatusMessage><StatusDetail><MissingAttributeDetail Category=\"urn:oasis:names:tc:xacml:3.0:attribute-category:action\" AttributeId=\"urn:oasis:names:tc:xacml:2.0:action:purpose\" DataTypeId=\"http://www.w3.org/2001/XMLSchema#string\" Issuer=\"an Issuer\"><AttributeValue>doh</AttributeValue><AttributeValue>5432</AttributeValue><AttributeValue>meh</AttributeValue></MissingAttributeDetail></StatusDetail></Status></Result><Result><Decision>Deny</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"/></Status><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Ned</AttributeAssignment></Obligation><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Maggie</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Homer</AttributeAssignment></Obligation></Obligations><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Crusty</AttributeAssignment></Advice></AssociatedAdvice></Result><Result><Decision>Permit</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"><StatusCode Value=\"child1StatusCode\"><StatusCode Value=\"childChildStatusCode\"><StatusCode Value=\"childChildChildStatusCode\"/></StatusCode></StatusCode></StatusCode></Status><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent3\" Issuer=\"CIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent4\" Issuer=\"DIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#boolean\">true</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent5\" Issuer=\"EIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrNoIssuer\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes><Attributes Category=\"secondCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent12\" Issuer=\"AIssue2\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu2</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent32\" Issuer=\"CIssue2\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Der2</AttributeValue></Attribute></Attributes><PolicyIdentifierList><PolicyIdReference Version=\"1.2.3\">idRef1</PolicyIdReference><PolicyIdReference>idRef2_NoVersion</PolicyIdReference><PolicySetIdReference Version=\"4.5.6.7.8.9.0\">idSetRef1</PolicySetIdReference><PolicySetIdReference>idSetRef2_NoVersion</PolicySetIdReference></PolicyIdentifierList></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		xmlResponse = DOMResponse.toString(response, false);
+		assertThat(xmlResponse).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusMessage>some status message</StatusMessage><StatusDetail><MissingAttributeDetail Category=\"urn:oasis:names:tc:xacml:3.0:attribute-category:action\" AttributeId=\"urn:oasis:names:tc:xacml:2.0:action:purpose\" DataTypeId=\"http://www.w3.org/2001/XMLSchema#string\" Issuer=\"an Issuer\"><AttributeValue>doh</AttributeValue><AttributeValue>5432</AttributeValue><AttributeValue>meh</AttributeValue></MissingAttributeDetail></StatusDetail></Status></Result><Result><Decision>Deny</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"/></Status><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Ned</AttributeAssignment></Obligation><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Maggie</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Homer</AttributeAssignment></Obligation></Obligations><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Crusty</AttributeAssignment></Advice></AssociatedAdvice></Result><Result><Decision>Permit</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"><StatusCode Value=\"child1StatusCode\"><StatusCode Value=\"childChildStatusCode\"><StatusCode Value=\"childChildChildStatusCode\"/></StatusCode></StatusCode></StatusCode></Status><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent3\" Issuer=\"CIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent4\" Issuer=\"DIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#boolean\">true</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent5\" Issuer=\"EIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrNoIssuer\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes><Attributes Category=\"secondCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent12\" Issuer=\"AIssue2\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu2</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent32\" Issuer=\"CIssue2\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Der2</AttributeValue></Attribute></Attributes><PolicyIdentifierList><PolicyIdReference Version=\"1.2.3\">idRef1</PolicyIdReference><PolicyIdReference>idRef2_NoVersion</PolicyIdReference><PolicySetIdReference Version=\"4.5.6.7.8.9.0\">idSetRef1</PolicySetIdReference><PolicySetIdReference>idSetRef2_NoVersion</PolicySetIdReference></PolicyIdentifierList></Result></Response>");
 	}
 	
 	
@@ -398,7 +314,7 @@ public class DOMResponseTest {
 	
 	// combinations of Status values with Decision values
 	@Test
-	public void testDecisionStatusMatch() {
+	public void testDecisionStatusMatch() throws Exception {
 		// the tests in this method use different values and do not change structures, so we can re-use the objects
 		response = new StdMutableResponse();
 		result = new StdMutableResult();
@@ -409,252 +325,77 @@ public class DOMResponseTest {
 		// StatusCode = OK
 		status.setStatusCode(StdStatusCode.STATUS_CODE_OK);
 		result.setDecision(Decision.PERMIT);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"/></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"/></Status></Result></Response>");
 		result.setDecision(Decision.DENY);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Deny</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"/></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Deny</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"/></Status></Result></Response>");
 		result.setDecision(Decision.NOTAPPLICABLE);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>NotApplicable</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"/></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>NotApplicable</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"/></Status></Result></Response>");
+
 		result.setDecision(Decision.INDETERMINATE);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		result.setDecision(Decision.INDETERMINATE_DENY);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		result.setDecision(Decision.INDETERMINATE_DENYPERMIT);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		result.setDecision(Decision.INDETERMINATE_PERMIT);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
-		
-		
-		
-		
-		
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		// StatusCode = SyntaxError
 		status.setStatusCode(StdStatusCode.STATUS_CODE_SYNTAX_ERROR);
 		result.setDecision(Decision.PERMIT);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		result.setDecision(Decision.DENY);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		result.setDecision(Decision.NOTAPPLICABLE);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		result.setDecision(Decision.INDETERMINATE);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:syntax-error\"/></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:syntax-error\"/></Status></Result></Response>");
 		result.setDecision(Decision.INDETERMINATE_DENY);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{D}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:syntax-error\"/></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{D}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:syntax-error\"/></Status></Result></Response>");
 		result.setDecision(Decision.INDETERMINATE_DENYPERMIT);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{DP}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:syntax-error\"/></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{DP}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:syntax-error\"/></Status></Result></Response>");
 		result.setDecision(Decision.INDETERMINATE_PERMIT);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{P}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:syntax-error\"/></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{P}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:syntax-error\"/></Status></Result></Response>");
 		
 		// StatusCode = ProcessingError
 		status.setStatusCode(StdStatusCode.STATUS_CODE_PROCESSING_ERROR);
 		result.setDecision(Decision.PERMIT);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		result.setDecision(Decision.DENY);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		result.setDecision(Decision.NOTAPPLICABLE);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
-		result.setDecision(Decision.INDETERMINATE);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:processing-error\"/></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
+
+		result.setDecision(Decision.INDETERMINATE);		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:processing-error\"/></Status></Result></Response>");
 		result.setDecision(Decision.INDETERMINATE_DENY);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{D}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:processing-error\"/></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{D}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:processing-error\"/></Status></Result></Response>");
 		result.setDecision(Decision.INDETERMINATE_DENYPERMIT);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{DP}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:processing-error\"/></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{DP}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:processing-error\"/></Status></Result></Response>");
 		result.setDecision(Decision.INDETERMINATE_PERMIT);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{P}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:processing-error\"/></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{P}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:processing-error\"/></Status></Result></Response>");
 		
 		// StatusCode = MissingAttribute
 		status.setStatusCode(StdStatusCode.STATUS_CODE_MISSING_ATTRIBUTE);
 		result.setDecision(Decision.PERMIT);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		result.setDecision(Decision.DENY);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		result.setDecision(Decision.NOTAPPLICABLE);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		result.setDecision(Decision.INDETERMINATE);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/></Status></Result></Response>");
 		result.setDecision(Decision.INDETERMINATE_DENY);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{D}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{D}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/></Status></Result></Response>");
 		result.setDecision(Decision.INDETERMINATE_DENYPERMIT);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{DP}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{DP}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/></Status></Result></Response>");
 		result.setDecision(Decision.INDETERMINATE_PERMIT);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{P}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate{P}</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/></Status></Result></Response>");
 	}
-
-	
-	
 
 	// tests related to Status and its components
 	@Test
-	public void testStatus() {
+	public void testStatus() throws Exception{
 		// Status with no StatusCode - error
 		response = new StdMutableResponse();
 		result = new StdMutableResult();
@@ -662,14 +403,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.PERMIT);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		// Status with StatusMessage when OK
 		response = new StdMutableResponse();
@@ -680,12 +414,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.PERMIT);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"/><StatusMessage>I'm ok, you're ok</StatusMessage></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"/><StatusMessage>I'm ok, you're ok</StatusMessage></Status></Result></Response>");
 		
 		// Status with StatusDetail when OK
 		response = new StdMutableResponse();
@@ -697,14 +426,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.PERMIT);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		// Status with StatusMessage when SyntaxError
 		response = new StdMutableResponse();
@@ -715,12 +437,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.INDETERMINATE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:syntax-error\"/><StatusMessage>I'm ok, you're ok</StatusMessage></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:syntax-error\"/><StatusMessage>I'm ok, you're ok</StatusMessage></Status></Result></Response>");
 		
 		// Status with empty StatusDetail when SyntaxError
 		response = new StdMutableResponse();
@@ -732,14 +449,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.INDETERMINATE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		
 		// Status with StatusMessage when ProcessingError
@@ -751,12 +461,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.INDETERMINATE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:processing-error\"/><StatusMessage>I'm ok, you're ok</StatusMessage></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:processing-error\"/><StatusMessage>I'm ok, you're ok</StatusMessage></Status></Result></Response>");
 		
 		// Status with empty StatusDetail when ProcessingError
 		response = new StdMutableResponse();
@@ -768,14 +473,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.INDETERMINATE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 
 		
 		// Status with StatusMessage when MissingAttribute
@@ -787,12 +485,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.INDETERMINATE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusMessage>I'm ok, you're ok</StatusMessage></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusMessage>I'm ok, you're ok</StatusMessage></Status></Result></Response>");
 		
 		// Status with empty StatusDetail when MissingAttribute
 		response = new StdMutableResponse();
@@ -804,13 +497,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.INDETERMINATE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusDetail></StatusDetail></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusDetail></StatusDetail></Status></Result></Response>");
 		
 		
 		// Status with StatusDetail with empty detail when MissingAttribute
@@ -825,14 +512,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.INDETERMINATE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		// Status with StatusDetail with valid detail with no value when MissingAttribute
 		response = new StdMutableResponse();
@@ -849,12 +529,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.INDETERMINATE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusDetail><MissingAttributeDetail Category=\"urn:oasis:names:tc:xacml:1.0:action\" AttributeId=\"mad\" DataTypeId=\"http://www.w3.org/2001/XMLSchema#string\"></MissingAttributeDetail></StatusDetail></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusDetail><MissingAttributeDetail Category=\"urn:oasis:names:tc:xacml:1.0:action\" AttributeId=\"mad\" DataTypeId=\"http://www.w3.org/2001/XMLSchema#string\"></MissingAttributeDetail></StatusDetail></Status></Result></Response>");
 		
 		// Status with StatusDetail with valid detail with value when MissingAttribute
 		response = new StdMutableResponse();
@@ -872,12 +547,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.INDETERMINATE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusDetail><MissingAttributeDetail Category=\"urn:oasis:names:tc:xacml:1.0:action\" AttributeId=\"mad\" DataTypeId=\"http://www.w3.org/2001/XMLSchema#string\"><AttributeValue>meh</AttributeValue></MissingAttributeDetail></StatusDetail></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusDetail><MissingAttributeDetail Category=\"urn:oasis:names:tc:xacml:1.0:action\" AttributeId=\"mad\" DataTypeId=\"http://www.w3.org/2001/XMLSchema#string\"><AttributeValue>meh</AttributeValue></MissingAttributeDetail></StatusDetail></Status></Result></Response>");
 		
 		// Status with StatusDetail with array valid detail with value when MissingAttribute
 		response = new StdMutableResponse();
@@ -896,13 +566,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.INDETERMINATE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusDetail><MissingAttributeDetail Category=\"urn:oasis:names:tc:xacml:1.0:action\" AttributeId=\"mad\" DataTypeId=\"http://www.w3.org/2001/XMLSchema#string\"><AttributeValue>meh</AttributeValue><AttributeValue>nu?</AttributeValue></MissingAttributeDetail></StatusDetail></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusDetail><MissingAttributeDetail Category=\"urn:oasis:names:tc:xacml:1.0:action\" AttributeId=\"mad\" DataTypeId=\"http://www.w3.org/2001/XMLSchema#string\"><AttributeValue>meh</AttributeValue><AttributeValue>nu?</AttributeValue></MissingAttributeDetail></StatusDetail></Status></Result></Response>");
 		
 		// Status with StatusDetail with valid detail with Integer value when MissingAttribute
 		response = new StdMutableResponse();
@@ -920,12 +584,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.INDETERMINATE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusDetail><MissingAttributeDetail Category=\"urn:oasis:names:tc:xacml:1.0:action\" AttributeId=\"mad\" DataTypeId=\"http://www.w3.org/2001/XMLSchema#string\"><AttributeValue>1111</AttributeValue></MissingAttributeDetail></StatusDetail></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusDetail><MissingAttributeDetail Category=\"urn:oasis:names:tc:xacml:1.0:action\" AttributeId=\"mad\" DataTypeId=\"http://www.w3.org/2001/XMLSchema#string\"><AttributeValue>1111</AttributeValue></MissingAttributeDetail></StatusDetail></Status></Result></Response>");
 		
 		// Status with StatusDetail with array valid detail with Integer value when MissingAttribute
 		response = new StdMutableResponse();
@@ -944,12 +603,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.INDETERMINATE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusDetail><MissingAttributeDetail Category=\"urn:oasis:names:tc:xacml:1.0:action\" AttributeId=\"mad\" DataTypeId=\"http://www.w3.org/2001/XMLSchema#string\"><AttributeValue>1111</AttributeValue><AttributeValue>2222</AttributeValue></MissingAttributeDetail></StatusDetail></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"/><StatusDetail><MissingAttributeDetail Category=\"urn:oasis:names:tc:xacml:1.0:action\" AttributeId=\"mad\" DataTypeId=\"http://www.w3.org/2001/XMLSchema#string\"><AttributeValue>1111</AttributeValue><AttributeValue>2222</AttributeValue></MissingAttributeDetail></StatusDetail></Status></Result></Response>");
 		
 //		StringNamespaceContext snc = new StringNamespaceContext();
 //		try {
@@ -979,7 +633,7 @@ public class DOMResponseTest {
 //		response.add(result);
 //		try {
 //			xmlResponse = DOMResponse.toString(response, false);
-//			assertEquals("{\"Response\":[{\"Status\":{\"StatusCode\":{\"Value\":\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"},\"StatusDetail\":\"<MissingAttributeDetail><AttributeValue>1111</AttributeValue><Category>urn:oasis:names:tc:xacml:1.0:action</Category><AttributeId>mad</AttributeId><DataType>http://www.w3.org/2001/XMLSchema#string</DataType></MissingAttributeDetail>\"},\"Decision\":\"Indeterminate\"}]}", xmlResponse);
+//			assertThat(xmlResponse).isEqualTo("{\"Response\":[{\"Status\":{\"StatusCode\":{\"Value\":\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"},\"StatusDetail\":\"<MissingAttributeDetail><AttributeValue>1111</AttributeValue><Category>urn:oasis:names:tc:xacml:1.0:action</Category><AttributeId>mad</AttributeId><DataType>http://www.w3.org/2001/XMLSchema#string</DataType></MissingAttributeDetail>\"},\"Decision\":\"Indeterminate\"}]}");
 //		} catch (Exception e) {
 //			fail("operation failed, e="+e);
 //		}
@@ -1003,7 +657,7 @@ public class DOMResponseTest {
 //		response.add(result);
 //		try {
 //			xmlResponse = DOMResponse.toString(response, false);
-//			assertEquals("{\"Response\":[{\"Status\":{\"StatusCode\":{\"Value\":\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"},\"StatusDetail\":\"<MissingAttributeDetail><AttributeValue>1111</AttributeValue><AttributeValue>2222</AttributeValue><Category>urn:oasis:names:tc:xacml:1.0:action</Category><AttributeId>mad</AttributeId><DataType>http://www.w3.org/2001/XMLSchema#string</DataType></MissingAttributeDetail>\"},\"Decision\":\"Indeterminate\"}]}", xmlResponse);
+//			assertThat(xmlResponse).isEqualTo("{\"Response\":[{\"Status\":{\"StatusCode\":{\"Value\":\"urn:oasis:names:tc:xacml:1.0:status:missing-attribute\"},\"StatusDetail\":\"<MissingAttributeDetail><AttributeValue>1111</AttributeValue><AttributeValue>2222</AttributeValue><Category>urn:oasis:names:tc:xacml:1.0:action</Category><AttributeId>mad</AttributeId><DataType>http://www.w3.org/2001/XMLSchema#string</DataType></MissingAttributeDetail>\"},\"Decision\":\"Indeterminate\"}]}");
 //		} catch (Exception e) {
 //			fail("operation failed, e="+e);
 //		}
@@ -1027,14 +681,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.INDETERMINATE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		// Status with StatusDetail with array valid detail with value when ProcessingError
 		response = new StdMutableResponse();
@@ -1053,15 +700,7 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.INDETERMINATE);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
-		
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		
 		// Status with nested child StatusCodes (child status containing child status containing...)
@@ -1075,12 +714,8 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.PERMIT);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"><StatusCode Value=\"child1StatusCode\"/></StatusCode><StatusMessage>I'm ok, you're ok</StatusMessage></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"><StatusCode Value=\"child1StatusCode\"/></StatusCode><StatusMessage>I'm ok, you're ok</StatusMessage></Status></Result></Response>");
+
 		response = new StdMutableResponse();
 		result = new StdMutableResult();
 		status = new StdMutableStatus();
@@ -1093,28 +728,18 @@ public class DOMResponseTest {
 		result.setStatus(status);
 		result.setDecision(Decision.PERMIT);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"><StatusCode Value=\"child1StatusCode\"><StatusCode Value=\"childChildStatusCode\"><StatusCode Value=\"childChildChildStatusCode\"/></StatusCode></StatusCode></StatusCode><StatusMessage>I'm ok, you're ok</StatusMessage></Status></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Status><StatusCode Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"><StatusCode Value=\"child1StatusCode\"><StatusCode Value=\"childChildStatusCode\"><StatusCode Value=\"childChildChildStatusCode\"/></StatusCode></StatusCode></StatusCode><StatusMessage>I'm ok, you're ok</StatusMessage></Status></Result></Response>");
 	}
 
 
 	
 	@Test
-	public void testObligations() {
+	public void testObligations() throws Exception {
 		
 		// create an XPathExpression for use later
 		StringNamespaceContext snc = new StringNamespaceContext();
-		try {
-			snc.add("defaultURI");
-			snc.add("md", "referenceForMD");
-		} catch (Exception e) {
-			fail("unable to create NamespaceContext e="+e);
-		}
+		snc.add("defaultURI");
+		snc.add("md", "referenceForMD");
 		XPathExpressionWrapper xpathExpressionWrapper = new XPathExpressionWrapper(snc, "//md:record");
 		XPathExpressionWrapper xpathExpressionWrapper2 = new XPathExpressionWrapper(snc, "//md:hospital");
 		
@@ -1128,12 +753,7 @@ public class DOMResponseTest {
 		obligation.setId(XACML3.ID_ACTION_IMPLIED_ACTION);
 		result.addObligation(obligation);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"></Obligation></Obligations></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"></Obligation></Obligations></Result></Response>");
 		
 		// obligation missing Id
 		response = new StdMutableResponse();
@@ -1142,16 +762,7 @@ public class DOMResponseTest {
 		obligation = new StdMutableObligation();
 		result.addObligation(obligation);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
-		
-		
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		//	AttributeAssignment	- with AttributeId, Value,  Category, DataType, Issuer
 		response = new StdMutableResponse();
@@ -1166,13 +777,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Bart")));
 		result.addObligation(obligation);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment></Obligation></Obligations></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment></Obligation></Obligations></Result></Response>");
 		
 		//	AttributeAssignment	- with AttributeId, Value, no Category, DataType, Issuer
 		response = new StdMutableResponse();
@@ -1187,12 +792,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Bart")));
 		result.addObligation(obligation);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment></Obligation></Obligations></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment></Obligation></Obligations></Result></Response>");
 		
 		//	AttributeAssignment	- Missing AttributeId
 		response = new StdMutableResponse();
@@ -1207,14 +807,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Bart")));
 		result.addObligation(obligation);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		//	AttributeAssignment	- Missing Value
 		response = new StdMutableResponse();
@@ -1229,14 +822,7 @@ public class DOMResponseTest {
 				null));
 		result.addObligation(obligation);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		// AttributeAssignment - missing required DataType (Different than JSON where DataType is optional with default String)
 		response = new StdMutableResponse();
@@ -1251,14 +837,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<String>(null, "Bart")));
 		result.addObligation(obligation);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		// AttributeAssignment - missing issuer
 		response = new StdMutableResponse();
@@ -1273,12 +852,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Bart")));
 		result.addObligation(obligation);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment></Obligation></Obligations></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment></Obligation></Obligations></Result></Response>");
 		
 		// AttributeAssignment - Integer type
 		response = new StdMutableResponse();
@@ -1293,13 +867,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<Integer>(DataTypes.DT_INTEGER.getId(), 1111)));
 		result.addObligation(obligation);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">1111</AttributeAssignment></Obligation></Obligations></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">1111</AttributeAssignment></Obligation></Obligations></Result></Response>");
 		
 		// AttributeAssignment - XPathExpression type
 		response = new StdMutableResponse();
@@ -1314,14 +882,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<XPathExpressionWrapper>(DataTypes.DT_XPATHEXPRESSION.getId(), xpathExpressionWrapper, new IdentifierImpl("SimpleXPathCategory"))));
 		result.addObligation(obligation);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression\" xmlns:md=\"referenceForMD\" xmlns=\"defaultURI\">//md:record</AttributeAssignment></Obligation></Obligations></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression\" xmlns:md=\"referenceForMD\" xmlns=\"defaultURI\">//md:record</AttributeAssignment></Obligation></Obligations></Result></Response>");
 		
 
 		//
@@ -1360,13 +921,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Maggie")));
 		result.addObligation(obligation);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Lisa</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Maggie</AttributeAssignment></Obligation></Obligations></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Lisa</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Maggie</AttributeAssignment></Obligation></Obligations></Result></Response>");
 		
 		//	AttributeAssignment	- Multiple Integer values with same Category and Id (one way of doing array)
 		response = new StdMutableResponse();
@@ -1391,13 +946,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<Integer>(DataTypes.DT_INTEGER.getId(), 3333)));
 		result.addObligation(obligation);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">1111</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">2222</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">3333</AttributeAssignment></Obligation></Obligations></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">1111</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">2222</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">3333</AttributeAssignment></Obligation></Obligations></Result></Response>");
 		
 		// Multiple XPathExpression values with same Category and Id (one way of doing array)
 		response = new StdMutableResponse();
@@ -1417,12 +966,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<XPathExpressionWrapper>(DataTypes.DT_XPATHEXPRESSION.getId(), xpathExpressionWrapper2, new IdentifierImpl("SimpleXPathCategory"))));
 		result.addObligation(obligation);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression\" xmlns:md=\"referenceForMD\" xmlns=\"defaultURI\">//md:record</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression\" xmlns:md=\"referenceForMD\" xmlns=\"defaultURI\">//md:hospital</AttributeAssignment></Obligation></Obligations></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}	
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Obligations><Obligation ObligationId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression\" xmlns:md=\"referenceForMD\" xmlns=\"defaultURI\">//md:record</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression\" xmlns:md=\"referenceForMD\" xmlns=\"defaultURI\">//md:hospital</AttributeAssignment></Obligation></Obligations></Result></Response>");
 		
 	}
 	
@@ -1430,16 +974,12 @@ public class DOMResponseTest {
 	
 	
 	@Test
-	public void testAdvice() {
+	public void testAdvice() throws Exception {
 		
 		// create an XPathExpression for use later
 		StringNamespaceContext snc = new StringNamespaceContext();
-		try {
-			snc.add("defaultURI");
-			snc.add("md", "referenceForMD");
-		} catch (Exception e) {
-			fail("unable to create NamespaceContext e="+e);
-		}
+		snc.add("defaultURI");
+		snc.add("md", "referenceForMD");
 		XPathExpressionWrapper xpathExpressionWrapper = new XPathExpressionWrapper(snc, "//md:record");
 		XPathExpressionWrapper xpathExpressionWrapper2 = new XPathExpressionWrapper(snc, "//md:hospital");
 		
@@ -1453,12 +993,7 @@ public class DOMResponseTest {
 		Advice.setId(XACML3.ID_ACTION_IMPLIED_ACTION);
 		result.addAdvice(Advice);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"></Advice></AssociatedAdvice></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"></Advice></AssociatedAdvice></Result></Response>");
 		
 		// Advice missing Id
 		response = new StdMutableResponse();
@@ -1467,15 +1002,7 @@ public class DOMResponseTest {
 		Advice = new StdMutableAdvice();
 		result.addAdvice(Advice);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
-		
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		
 		//	AttributeAssignment	- with AttributeId, Value,  Category, DataType, Issuer
@@ -1491,13 +1018,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Bart")));
 		result.addAdvice(Advice);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>");
 		
 		//	AttributeAssignment	- with AttributeId, Value, no Category, DataType, Issuer
 		response = new StdMutableResponse();
@@ -1512,12 +1033,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Bart")));
 		result.addAdvice(Advice);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>");
 		
 		//	AttributeAssignment	- Missing AttributeId
 		response = new StdMutableResponse();
@@ -1532,14 +1048,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Bart")));
 		result.addAdvice(Advice);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		//	AttributeAssignment	- Missing Value
 		response = new StdMutableResponse();
@@ -1554,14 +1063,7 @@ public class DOMResponseTest {
 				null));
 		result.addAdvice(Advice);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		// AttributeAssignment - missing Required DataType (Different than JSON where DataType is optional with default String)
 		response = new StdMutableResponse();
@@ -1576,14 +1078,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<String>(null, "Bart")));
 		result.addAdvice(Advice);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
 		
 		// AttributeAssignment - missing issuer
 		response = new StdMutableResponse();
@@ -1598,12 +1093,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Bart")));
 		result.addAdvice(Advice);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>");
 		
 		// AttributeAssignment - Integer type
 		response = new StdMutableResponse();
@@ -1618,13 +1108,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<Integer>(DataTypes.DT_INTEGER.getId(), 1111)));
 		result.addAdvice(Advice);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">1111</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">1111</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>");
 		
 		// AttributeAssignment - XPathExpression type
 		response = new StdMutableResponse();
@@ -1639,15 +1123,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<XPathExpressionWrapper>(DataTypes.DT_XPATHEXPRESSION.getId(), xpathExpressionWrapper, new IdentifierImpl("SimpleXPathCategory"))));
 		result.addAdvice(Advice);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression\" xmlns:md=\"referenceForMD\" xmlns=\"defaultURI\">//md:record</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
-		
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression\" xmlns:md=\"referenceForMD\" xmlns=\"defaultURI\">//md:record</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>");
 
 		//
 		// Technically arrays cannot occur in Obligations and Advice elements.  The XML spec boils down to the following definition:
@@ -1684,13 +1160,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Maggie")));
 		result.addAdvice(Advice);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Lisa</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Maggie</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Lisa</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">Maggie</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>");
 		
 		//	AttributeAssignment	- Multiple Integer values with same Category and Id (one way of doing array)
 		response = new StdMutableResponse();
@@ -1715,13 +1185,7 @@ public class DOMResponseTest {
 				new StdAttributeValue<Integer>(DataTypes.DT_INTEGER.getId(), 3333)));
 		result.addAdvice(Advice);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">1111</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">2222</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">3333</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">1111</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">2222</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"http://www.w3.org/2001/XMLSchema#integer\">3333</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>");
 		
 		// Multiple XPathExpression values with same Category and Id (one way of doing array)
 		response = new StdMutableResponse();
@@ -1741,35 +1205,20 @@ public class DOMResponseTest {
 				new StdAttributeValue<XPathExpressionWrapper>(DataTypes.DT_XPATHEXPRESSION.getId(), xpathExpressionWrapper2, new IdentifierImpl("SimpleXPathCategory"))));
 		result.addAdvice(Advice);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression\" xmlns:md=\"referenceForMD\" xmlns=\"defaultURI\">//md:record</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression\" xmlns:md=\"referenceForMD\" xmlns=\"defaultURI\">//md:hospital</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><AssociatedAdvice><Advice AdviceId=\"urn:oasis:names:tc:xacml:1.0:action:implied-action\"><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression\" xmlns:md=\"referenceForMD\" xmlns=\"defaultURI\">//md:record</AttributeAssignment><AttributeAssignment AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject\" DataType=\"urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression\" xmlns:md=\"referenceForMD\" xmlns=\"defaultURI\">//md:hospital</AttributeAssignment></Advice></AssociatedAdvice></Result></Response>");
 	}
 	
 	
 	
 	
-	
-
-	
-	
-
-	
 	// Attributes tests
 	@Test
-	public void testAttributes() {
+	public void testAttributes() throws Exception {
 		
 		// create an XPathExpression for use later
 		StringNamespaceContext snc = new StringNamespaceContext();
-		try {
-			snc.add("defaultURI");
-			snc.add("md", "referenceForMD");
-		} catch (Exception e) {
-			fail("unable to create NamespaceContext e="+e);
-		}
+		snc.add("defaultURI");
+		snc.add("md", "referenceForMD");
 		XPathExpressionWrapper xpathExpressionWrapper = new XPathExpressionWrapper(snc, "//md:record");
 		
 		
@@ -1785,13 +1234,7 @@ public class DOMResponseTest {
 		attrList.clear();
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"></Attributes></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"></Attributes></Result></Response>");
 		
 		// one Attribute
 		response = new StdMutableResponse();
@@ -1802,12 +1245,7 @@ public class DOMResponseTest {
 				attrList.add(new StdAttribute(categoryIdentifier, new IdentifierImpl("attrIdent1"), new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Apu"), "AIssue", true));
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute></Attributes></Result></Response>");
 		
 		// multiple attributes
 		response = new StdMutableResponse();
@@ -1822,12 +1260,7 @@ public class DOMResponseTest {
 			attrList.add(new StdAttribute(categoryIdentifier, new IdentifierImpl("attrIdent5"), new StdAttributeValue<Integer>(DataTypes.DT_INTEGER.getId(), 4567), "EIssue", true));
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent2\" Issuer=\"BIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#yearMonthDuration\">P10Y4M</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent3\" Issuer=\"CIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent4\" Issuer=\"DIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#boolean\">true</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent5\" Issuer=\"EIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent2\" Issuer=\"BIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#yearMonthDuration\">P10Y4M</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent3\" Issuer=\"CIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent4\" Issuer=\"DIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#boolean\">true</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent5\" Issuer=\"EIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes></Result></Response>");
 		
 		// IncludeInResult=false/true
 		response = new StdMutableResponse();
@@ -1838,12 +1271,7 @@ public class DOMResponseTest {
 				attrList.add(new StdAttribute(categoryIdentifier, new IdentifierImpl("attrIdent1"), new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Apu"), "AIssue", false));
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"></Attributes></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"></Attributes></Result></Response>");
 		
 		// Missing AttributeId (mandatory)
 		response = new StdMutableResponse();
@@ -1854,15 +1282,8 @@ public class DOMResponseTest {
 				attrList.add(new StdAttribute(categoryIdentifier, null, new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Apu"), "AIssue", true));
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
-		
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
+
 		// Missing mandatory Value
 		response = new StdMutableResponse();
 		result = new StdMutableResult();
@@ -1872,14 +1293,8 @@ public class DOMResponseTest {
 				attrList.add(new StdAttribute(categoryIdentifier, new IdentifierImpl("attrIdent1"), new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), null), "AIssue", true));
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
+
 		
 		// Missing optional Issuer
 		response = new StdMutableResponse();
@@ -1890,12 +1305,7 @@ public class DOMResponseTest {
 				attrList.add(new StdAttribute(categoryIdentifier, new IdentifierImpl("attrIdent1"), new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Apu"), null, true));
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute></Attributes></Result></Response>");
 		
 		// missing required DataType (different from JSON where DataType is optional and assumed to be String)
 		response = new StdMutableResponse();
@@ -1906,14 +1316,8 @@ public class DOMResponseTest {
 				attrList.add(new StdAttribute(categoryIdentifier, new IdentifierImpl("attrIdent1"), new StdAttributeValue<String>(null, "Apu"), "AIssue", true));
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
+
 		
 		// same id, same type different issuer
 		// (This is not an array of values because Issuer is different)
@@ -1927,12 +1331,7 @@ public class DOMResponseTest {
 			attrList.add(new StdAttribute(categoryIdentifier, new IdentifierImpl("attrIdent1"), new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Simpson"), "CIssue", true));
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"BIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"CIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Simpson</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"BIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"CIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Simpson</AttributeValue></Attribute></Attributes></Result></Response>");
 		
 		// same id, same type same issuer
 		// (This is an array of values)
@@ -1946,12 +1345,7 @@ public class DOMResponseTest {
 			attrList.add(new StdAttribute(categoryIdentifier, new IdentifierImpl("attrIdent1"), new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Simpson"), "AIssue", true));
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Simpson</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Simpson</AttributeValue></Attribute></Attributes></Result></Response>");
 		
 		// same Id, different types, same issuer
 		response = new StdMutableResponse();
@@ -1967,12 +1361,7 @@ public class DOMResponseTest {
 			attrList.add(new StdAttribute(categoryIdentifier, new IdentifierImpl("attrIdent1"), new StdAttributeValue<Integer>(DataTypes.DT_INTEGER.getId(), 4567), "AIssue", true));
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#yearMonthDuration\">P10Y4M</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#boolean\">true</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#yearMonthDuration\">P10Y4M</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#boolean\">true</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes></Result></Response>");
 		
 		// same Id, different types, different issuer
 		response = new StdMutableResponse();
@@ -1988,12 +1377,7 @@ public class DOMResponseTest {
 			attrList.add(new StdAttribute(categoryIdentifier, new IdentifierImpl("attrIdent1"), new StdAttributeValue<Integer>(DataTypes.DT_INTEGER.getId(), 4567), null, true));
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"BIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#yearMonthDuration\">P10Y4M</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"CIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"DIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#boolean\">true</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"EIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"BIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#yearMonthDuration\">P10Y4M</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"CIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"DIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#boolean\">true</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"EIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes></Result></Response>");
 
 		// different Id, different types, same issuer
 		response = new StdMutableResponse();
@@ -2008,13 +1392,7 @@ public class DOMResponseTest {
 			attrList.add(new StdAttribute(categoryIdentifier, new IdentifierImpl("attrIdent5"), new StdAttributeValue<Integer>(DataTypes.DT_INTEGER.getId(), 4567), "AIssue", true));
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent2\" Issuer=\"BIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#yearMonthDuration\">AIssue</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent3\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent4\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#boolean\">true</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent5\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent2\" Issuer=\"BIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#yearMonthDuration\">AIssue</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent3\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent4\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#boolean\">true</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent5\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes></Result></Response>");
 		
 		// one Attribute of type XPathExpression (the only complex data type)
 		response = new StdMutableResponse();
@@ -2025,13 +1403,7 @@ public class DOMResponseTest {
 				attrList.add(new StdAttribute(categoryIdentifier, new IdentifierImpl("attrIdent1"), new StdAttributeValue<XPathExpressionWrapper>(DataTypes.DT_XPATHEXPRESSION.getId(), xpathExpressionWrapper, new IdentifierImpl("xpathCategory")), "AIssue", true));
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression\" XPathCategory=\"xpathCategory\">//md:record</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"urn:oasis:names:tc:xacml:3.0:data-type:xpathExpression\" XPathCategory=\"xpathCategory\">//md:record</AttributeValue></Attribute></Attributes></Result></Response>");
 		
 		// multiple sets of values
 		response = new StdMutableResponse();
@@ -2053,13 +1425,7 @@ public class DOMResponseTest {
 				new StdAttribute(categoryIdentifier, new IdentifierImpl("attrIdent32"), new StdAttributeValue<String>(DataTypes.DT_STRING.getId(), "Der2"), "CIssue2", true) };
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, Arrays.asList(secondAttrList)));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent3\" Issuer=\"CIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent4\" Issuer=\"DIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#boolean\">true</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent5\" Issuer=\"EIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrNoIssuer\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes><Attributes Category=\"secondCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent12\" Issuer=\"AIssue2\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu2</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent32\" Issuer=\"CIssue2\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Der2</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent3\" Issuer=\"CIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent4\" Issuer=\"DIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#boolean\">true</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent5\" Issuer=\"EIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrNoIssuer\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes><Attributes Category=\"secondCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent12\" Issuer=\"AIssue2\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu2</AttributeValue></Attribute><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent32\" Issuer=\"CIssue2\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Der2</AttributeValue></Attribute></Attributes></Result></Response>");
 		
 		// array of values - same type
 		response = new StdMutableResponse();
@@ -2077,13 +1443,7 @@ public class DOMResponseTest {
 		attrList.add(mutableAttribute);
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Homer</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Ned</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Bart</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Homer</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Ned</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
 		
 		// array of values - compatible different types
 		response = new StdMutableResponse();
@@ -2099,13 +1459,7 @@ public class DOMResponseTest {
 		attrList.add(mutableAttribute);
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
 		
 		// array of values - incompatible different types (Different from JSON because these are not part of an array in XML, just separate values)
 		response = new StdMutableResponse();
@@ -2124,52 +1478,29 @@ public class DOMResponseTest {
 		attrList.add(mutableAttribute);
 		result.addAttributeCategory(new StdAttributeCategory(categoryIdentifier, attrList));
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#yearMonthDuration\">P10Y4M</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#boolean\">true</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><Attributes Category=\"firstCategory\"><Attribute IncludeInResult=\"true\" AttributeId=\"attrIdent1\" Issuer=\"AIssue\"><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">Apu</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#yearMonthDuration\">P10Y4M</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#double\">765.432</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#boolean\">true</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue><AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#integer\">4567</AttributeValue></Attribute></Attributes></Result></Response>", xmlResponse);
 	}
-	
-	
-	
-	
 	
 	// PolicyIdentifier tests
 	@Test
-	public void testPolicyIdentifier() {
+	public void testPolicyIdentifier() throws Exception {
 		
-		StdIdReference policyIdentifier1 = null;
-		StdIdReference policyIdentifier2 = null;
-		StdIdReference policySetIdentifier1 = null;
-		StdIdReference policySetIdentifier2 = null;
+		StdIdReference policyIdentifier1 = new StdIdReference(new IdentifierImpl("idRef1"), StdVersion.newInstance("1.2.3"));
+		StdIdReference policyIdentifier2 = new StdIdReference(new IdentifierImpl("idRef2_NoVersion"));
+		StdIdReference policySetIdentifier1 = new StdIdReference(new IdentifierImpl("idSetRef1"), StdVersion.newInstance("4.5.6.7.8.9.0"));
+		StdIdReference policySetIdentifier2 = new StdIdReference(new IdentifierImpl("idSetRef2_NoVersion"));
 		
 		// multiple PolicyIdentifiers of both types
 		response = new StdMutableResponse();
 		result = new StdMutableResult();
 		result.setDecision(Decision.PERMIT);
-		try {
-			policyIdentifier1 = new StdIdReference(new IdentifierImpl("idRef1"), StdVersion.newInstance("1.2.3"));
-			policyIdentifier2 = new StdIdReference(new IdentifierImpl("idRef2_NoVersion"));
-			policySetIdentifier1 = new StdIdReference(new IdentifierImpl("idSetRef1"), StdVersion.newInstance("4.5.6.7.8.9.0"));
-			policySetIdentifier2 = new StdIdReference(new IdentifierImpl("idSetRef2_NoVersion"));
-		} catch (ParseException e1) {
-			fail("creating policyIds, e="+e1);
-		}
+
 		result.addPolicyIdentifier(policyIdentifier1);
 		result.addPolicyIdentifier(policyIdentifier2);
 		result.addPolicySetIdentifier(policySetIdentifier1);
 		result.addPolicySetIdentifier(policySetIdentifier2);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><PolicyIdentifierList><PolicyIdReference Version=\"1.2.3\">idRef1</PolicyIdReference><PolicyIdReference>idRef2_NoVersion</PolicyIdReference><PolicySetIdReference Version=\"4.5.6.7.8.9.0\">idSetRef1</PolicySetIdReference><PolicySetIdReference>idSetRef2_NoVersion</PolicySetIdReference></PolicyIdentifierList></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><PolicyIdentifierList><PolicyIdReference Version=\"1.2.3\">idRef1</PolicyIdReference><PolicyIdReference>idRef2_NoVersion</PolicyIdReference><PolicySetIdReference Version=\"4.5.6.7.8.9.0\">idSetRef1</PolicySetIdReference><PolicySetIdReference>idSetRef2_NoVersion</PolicySetIdReference></PolicyIdentifierList></Result></Response>");
 		
 		// PolicyIdentifier exists but has no IdReferences
 		response = new StdMutableResponse();
@@ -2178,14 +1509,8 @@ public class DOMResponseTest {
 		policyIdentifier1 = null;
 		result.addPolicyIdentifier(policyIdentifier1);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
+
 		
 		// PolicySetIdentifier exists but has not IdReferences
 		response = new StdMutableResponse();
@@ -2194,53 +1519,27 @@ public class DOMResponseTest {
 		policySetIdentifier1 = null;
 		result.addPolicyIdentifier(policySetIdentifier1);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			fail("Operation should throw exception");
-		} catch (DOMStructureException e) {
-			// correct response
-		} catch (Exception e) {
-			fail ("Failed convert from object to XML: " + e);
-		}
+		assertThatExceptionOfType(DOMStructureException.class).isThrownBy(() -> DOMResponse.toString(response, false));
+
 		
 		// PolicyIdentifier with PolicyIdReference and no PolicySetIdReference
 		response = new StdMutableResponse();
 		result = new StdMutableResult();
 		result.setDecision(Decision.PERMIT);
-		try {
-			policyIdentifier1 = new StdIdReference(new IdentifierImpl("idRef1"), StdVersion.newInstance("1.2.3"));
-		} catch (ParseException e1) {
-			fail("creating policyIds, e="+e1);
-		}
+		policyIdentifier1 = new StdIdReference(new IdentifierImpl("idRef1"), StdVersion.newInstance("1.2.3"));
 		result.addPolicyIdentifier(policyIdentifier1);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><PolicyIdentifierList><PolicyIdReference Version=\"1.2.3\">idRef1</PolicyIdReference></PolicyIdentifierList></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><PolicyIdentifierList><PolicyIdReference Version=\"1.2.3\">idRef1</PolicyIdReference></PolicyIdentifierList></Result></Response>");
 		
 		
 		// PolicyIdentifier with no PolicyIdReference and with PolicySetIdReference
 		response = new StdMutableResponse();
 		result = new StdMutableResult();
 		result.setDecision(Decision.PERMIT);
-		try {
-			policySetIdentifier1 = new StdIdReference(new IdentifierImpl("idSetRef1"), StdVersion.newInstance("4.5.6.7.8.9.0"));
-		} catch (ParseException e1) {
-			fail("creating policyIds, e="+e1);
-		}
+		policySetIdentifier1 = new StdIdReference(new IdentifierImpl("idSetRef1"), StdVersion.newInstance("4.5.6.7.8.9.0"));
 		result.addPolicySetIdentifier(policySetIdentifier1);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><PolicyIdentifierList><PolicySetIdReference Version=\"4.5.6.7.8.9.0\">idSetRef1</PolicySetIdReference></PolicyIdentifierList></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
-		
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><PolicyIdentifierList><PolicySetIdReference Version=\"4.5.6.7.8.9.0\">idSetRef1</PolicySetIdReference></PolicyIdentifierList></Result></Response>");
 		
 		// IdReferences without version
 		response = new StdMutableResponse();
@@ -2257,41 +1556,9 @@ public class DOMResponseTest {
 		result.addPolicySetIdentifier(policySetIdentifier1);
 		result.addPolicySetIdentifier(policySetIdentifier2);
 		response.add(result);
-		try {
-			xmlResponse = DOMResponse.toString(response, false);
-			assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><PolicyIdentifierList><PolicyIdReference>idRef1</PolicyIdReference><PolicyIdReference>idRef2_NoVersion</PolicyIdReference><PolicySetIdReference>idSetRef1</PolicySetIdReference><PolicySetIdReference>idSetRef2_NoVersion</PolicySetIdReference></PolicyIdentifierList></Result></Response>", xmlResponse);
-		} catch (Exception e) {
-			fail("operation failed, e="+e);
-		}
+		assertThat(DOMResponse.toString(response, false)).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\"><Result><Decision>Permit</Decision><PolicyIdentifierList><PolicyIdReference>idRef1</PolicyIdReference><PolicyIdReference>idRef2_NoVersion</PolicyIdReference><PolicySetIdReference>idSetRef1</PolicySetIdReference><PolicySetIdReference>idSetRef2_NoVersion</PolicySetIdReference></PolicyIdentifierList></Result></Response>");
 	}
-
-
-//TODO - the XML spec implies that the Result Attributes may include the Content (It is part of the UML)
-	
-	
-	// test indentation???
-	
-	
 }
-
-
-/*
-Place to edit long strings ouput from tests
-
-
-Expected
-<?xml version="1.0" encoding="UTF-8"?><Response xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd"><Result><Decision>Permit</Decision></Result></Response>
-<?xml version="1.0" encoding="UTF-8"?><Response xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd"><Result><Decision>Permit</Decision></Result></Response>
-Actual
-
-
-
- */
-
-
-
-
-
 
 
 

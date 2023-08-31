@@ -1,14 +1,12 @@
 package com.att.research.xacmlatt.pdp.std.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.StdAttributeValue;
@@ -64,11 +62,11 @@ public class FunctionDefinitionBagSizeTest {
 		FunctionDefinitionBagSize<?> fd = (FunctionDefinitionBagSize<?>) StdFunctions.FD_STRING_BAG_SIZE;
 
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_STRING_BAG_SIZE, fd.getId());
-		assertEquals(DataTypes.DT_INTEGER.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_STRING_BAG_SIZE);
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_INTEGER.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
+		assertThat(fd.returnsBag()).isFalse();
 
 		
 		
@@ -77,46 +75,46 @@ public class FunctionDefinitionBagSizeTest {
 		arguments.clear();
 		arguments.add(attrBag1);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
-		assertEquals(java.math.BigInteger.class, res.getValue().getValue().getClass());
+		assertThat(res.isOk()).isTrue();
+		assertThat(res.getValue().getValue().getClass()).isEqualTo(java.math.BigInteger.class);
 		BigInteger resValue = (BigInteger)res.getValue().getValue();
-		assertEquals(BigInteger.valueOf(1), resValue);
+		assertThat(resValue).isEqualTo(BigInteger.valueOf(1));
 		
 		// null bag
 		arguments.clear();
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:string-bag-size Got null argument", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:string-bag-size Got null argument");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// bag with exactly one but of other type in it
 		arguments.clear();
 		arguments.add(attrBagOtherType);
 		res = fd.evaluate(null, arguments);
 		// NOTE: Size does not care about content type!
-		assertTrue(res.isOk());
-		assertEquals(java.math.BigInteger.class, res.getValue().getValue().getClass());
+		assertThat(res.isOk()).isTrue();
+		assertThat(res.getValue().getValue().getClass()).isEqualTo(java.math.BigInteger.class);
 		resValue = (BigInteger)res.getValue().getValue();
-		assertEquals(BigInteger.valueOf(1), resValue);
+		assertThat(resValue).isEqualTo(BigInteger.valueOf(1));
 		
 		// bag with none
 		arguments.clear();
 		arguments.add(attrBag0);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
-		assertEquals(java.math.BigInteger.class, res.getValue().getValue().getClass());
+		assertThat(res.isOk()).isTrue();
+		assertThat(res.getValue().getValue().getClass()).isEqualTo(java.math.BigInteger.class);
 		resValue = (BigInteger)res.getValue().getValue();
-		assertEquals(BigInteger.valueOf(0), resValue);
+		assertThat(resValue).isEqualTo(BigInteger.valueOf(0));
 		
 		// bag with multiple
 		arguments.clear();
 		arguments.add(attrBag2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
-		assertEquals(java.math.BigInteger.class, res.getValue().getValue().getClass());
+		assertThat(res.isOk()).isTrue();
+		assertThat(res.getValue().getValue().getClass()).isEqualTo(java.math.BigInteger.class);
 		resValue = (BigInteger)res.getValue().getValue();
-		assertEquals(BigInteger.valueOf(2), resValue);
+		assertThat(resValue).isEqualTo(BigInteger.valueOf(2));
 	}
 	
 	

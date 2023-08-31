@@ -1,13 +1,17 @@
 /*
  *
- *          Copyright (c) 2018-2019 AT&T Knowledge Ventures
+ *          Copyright (c) 2018-2019, 2023 AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 package com.att.research.xacml.std;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+import org.junit.jupiter.api.Test;
 import java.net.URI;
-import org.junit.Test;
+
+import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.Identifier;
 
 public class IdentifierImplTest {
@@ -15,26 +19,25 @@ public class IdentifierImplTest {
   @Test
   public void testHashCode() {
     Identifier id = new IdentifierImpl("com:test");
-    assertNotEquals(0, id.hashCode());
+    assertThat(0).isNotEqualTo(id.hashCode());
   }
 
   public void testIdentifierImplURI() {
     URI uri = URI.create("com:test");
     Identifier id = new IdentifierImpl(uri);
-    assertEquals(id.getUri(), uri);
+    assertThat(id.getUri()).isEqualTo(uri);
   }
 
-  @Test(expected = IllegalArgumentException.class)
   public void testIdentifierImplURINull() {
     URI uri = null;
-    new IdentifierImpl(uri);
+    assertThatExceptionOfType(DataTypeException.class).isThrownBy(() -> new IdentifierImpl(uri));
   }
 
   @Test
   public void testIdentifierImplString() {
     URI uri = URI.create("com:test");
     Identifier id = new IdentifierImpl(uri.toString());
-    assertEquals(uri.toString(), id.toString());
+    assertThat(uri.toString()).isEqualTo(id.toString());
   }
 
   @Test
@@ -42,32 +45,32 @@ public class IdentifierImplTest {
     URI uri = URI.create("com:test");
     Identifier id1 = new IdentifierImpl(uri);
     Identifier id = new IdentifierImpl(id1, "junit");
-    assertEquals("com:test:junit", id.toString());
+    assertThat("com:test:junit").isEqualTo(id.toString());
   }
 
   @Test
   public void testGensymString() {
     Identifier id = IdentifierImpl.gensym("test");
-    assertTrue(id.toString().startsWith("test"));
+    assertThat(id.toString().startsWith("test")).isTrue();
   }
 
   @Test
   public void testGensym() {
-    assertNotNull(IdentifierImpl.gensym());
+	  assertThat(IdentifierImpl.gensym()).isNotNull();
   }
 
   @Test
   public void testGetUri() {
     URI uri = URI.create("com:test");
     Identifier id1 = new IdentifierImpl(uri);
-    assertEquals(id1.getUri(), uri);
+    assertThat(id1.getUri()).isEqualTo(uri);
   }
 
   @Test
   public void testToString() {
     URI uri = URI.create("com:test");
     Identifier id1 = new IdentifierImpl(uri);
-    assertTrue(id1.toString().startsWith("com:test"));
+    assertThat(id1.toString().startsWith("com:test")).isTrue();
   }
 
   @Test
@@ -75,10 +78,10 @@ public class IdentifierImplTest {
     URI uri = URI.create("com:test");
     Identifier id1 = new IdentifierImpl(uri);
     Identifier id2 = new IdentifierImpl("com:test2");
-    assertEquals(id1, id1);
-    assertNotEquals(id2, id1);
-    assertNotEquals(new Object(), id1);
+    assertThat(id1).isEqualTo(id1);
+    assertThat(id2).isNotEqualTo(id1);
+    assertThat(new Object()).isNotEqualTo(id1);
     Object foo = null;
-    assertNotEquals(foo, id1);
+    assertThat(foo).isNotEqualTo(id1);
   }
 }

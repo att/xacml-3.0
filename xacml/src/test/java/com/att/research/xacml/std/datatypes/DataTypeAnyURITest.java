@@ -6,9 +6,12 @@
 
 package com.att.research.xacml.std.datatypes;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+
 import java.net.URI;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.std.IdentifierImpl;
@@ -18,31 +21,31 @@ public class DataTypeAnyURITest {
   @Test
   public void test() throws DataTypeException {
     DataTypeAnyURI dtURI = DataTypeAnyURI.newInstance();
-    assertNotNull(dtURI);
+    assertThat(dtURI).isNotNull();
     String str = "com:test";
     URI uri = dtURI.convert(str);
-    assertEquals(str, uri.toString());
-    assertNull(dtURI.toStringValue(null));
-    assertEquals(str, dtURI.toStringValue(uri));
-    assertNull(dtURI.convert(null));
+    assertThat(str).isEqualTo(uri.toString());
+    assertThat(dtURI.toStringValue(null)).isNull();;
+    assertThat(str).isEqualTo(dtURI.toStringValue(uri));
+    assertThat(dtURI.convert(null)).isNull();;
     URI uri2 = dtURI.convert(uri);
-    assertEquals(uri, uri2);
+    assertThat(uri).isEqualTo(uri2);
     Identifier id = new IdentifierImpl(str);
     uri2 = dtURI.convert(id);
     id = dtURI.getId();
-    assertEquals("http://www.w3.org/2001/XMLSchema#anyURI", id.toString());
-    assertEquals(uri, uri2);
+    assertThat("http://www.w3.org/2001/XMLSchema#anyURI").isEqualTo(id.toString());
+    assertThat(uri).isEqualTo(uri2);
     str = null;
     uri = dtURI.convert(str);
-    assertNull(uri);
+    assertThat(uri).isNull();
     DataTypeTestObject obj = new DataTypeTestObject();
-    assertNull(dtURI.convert(obj));
+    assertThat(dtURI.convert(obj)).isNull();
   }
   
-  @Test(expected = DataTypeException.class)
+  @Test
   public void test2() throws DataTypeException {
     DataTypeAnyURI dtURI = DataTypeAnyURI.newInstance();
-    dtURI.convert("I am * bad URI !!!!");
+    assertThatExceptionOfType(DataTypeException.class).isThrownBy(() -> dtURI.convert("I am * bad URI !!!!"));
   }
 
 }

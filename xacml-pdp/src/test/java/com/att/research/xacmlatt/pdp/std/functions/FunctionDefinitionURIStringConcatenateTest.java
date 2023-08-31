@@ -1,16 +1,19 @@
+/*
+ *
+ *          Copyright (c) 2023  AT&T Knowledge Ventures
+ *                     SPDX-License-Identifier: MIT
+ */
 package com.att.research.xacmlatt.pdp.std.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.XACML2;
 import com.att.research.xacml.std.datatypes.DataTypes;
 import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
@@ -42,41 +45,26 @@ public class FunctionDefinitionURIStringConcatenateTest {
 
 	@SuppressWarnings("deprecation")
 	@Test
-	public void testURI_string_concatenate() {
+	public void testURI_string_concatenate() throws DataTypeException {
 
-		// URI args
-		FunctionArgumentAttributeValue attrURI1 = null;
-
+		// URI args		
+		FunctionArgumentAttributeValue attrURI1 = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue("http://someplace"));
+	
 		
-		FunctionArgumentAttributeValue attrStrAbc = null;
-		FunctionArgumentAttributeValue attrStrSlashMno = null;
-		FunctionArgumentAttributeValue attrStrSlashInMiddle = null;
-		FunctionArgumentAttributeValue attrStrWithSpace = null;
-
-		
-		try {
-			attrURI1 = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue("http://someplace"));
-		
-			
-			attrStrAbc = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("Abc"));
-			attrStrSlashMno = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("/Mno"));
-			attrStrSlashInMiddle = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("hij/pqr"));
-			attrStrWithSpace = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("x y z"));
-			
-
-		} catch (Exception e) {
-			fail("creating attributes e="+ e);
-		}
+		FunctionArgumentAttributeValue attrStrAbc = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("Abc"));
+		FunctionArgumentAttributeValue attrStrSlashMno = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("/Mno"));
+		FunctionArgumentAttributeValue attrStrSlashInMiddle = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("hij/pqr"));
+		FunctionArgumentAttributeValue attrStrWithSpace = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("x y z"));
 		
 		// deprecation marking in the following line is correct - this function IS deprecated but still valid for XACML 3.0
 		FunctionDefinitionURIStringConcatenate fd = (FunctionDefinitionURIStringConcatenate) StdFunctions.FD_URI_STRING_CONCATENATE;
 
 		// check identity and type of the thing created
-		assertEquals(XACML2.ID_FUNCTION_URI_STRING_CONCATENATE, fd.getId());
-		assertEquals(DataTypes.DT_ANYURI.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML2.ID_FUNCTION_URI_STRING_CONCATENATE);
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_ANYURI.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
+		assertThat(fd.returnsBag()).isFalse();
 
 		
 		// add one string to uri
@@ -84,10 +72,10 @@ public class FunctionDefinitionURIStringConcatenateTest {
 		arguments.add(attrURI1);
 		arguments.add(attrStrAbc);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
-		assertEquals(java.net.URI.class, res.getValue().getValue().getClass());
+		assertThat(res.isOk()).isTrue();
+		assertThat(res.getValue().getValue().getClass()).isEqualTo(java.net.URI.class);
 		URI resValue = (URI)res.getValue().getValue();
-		assertEquals("http://someplaceAbc", resValue.toString());
+		assertThat(resValue.toString()).isEqualTo("http://someplaceAbc");
 		
 		
 		// add 2 strings to uri
@@ -96,10 +84,10 @@ public class FunctionDefinitionURIStringConcatenateTest {
 		arguments.add(attrStrAbc);
 		arguments.add(attrStrSlashMno);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
-		assertEquals(java.net.URI.class, res.getValue().getValue().getClass());
+		assertThat(res.isOk()).isTrue();
+		assertThat(res.getValue().getValue().getClass()).isEqualTo(java.net.URI.class);
 		resValue = (URI)res.getValue().getValue();
-		assertEquals("http://someplaceAbc/Mno", resValue.toString());
+		assertThat(resValue.toString()).isEqualTo("http://someplaceAbc/Mno");
 		
 		// slash in middle of string
 		arguments.clear();
@@ -107,10 +95,10 @@ public class FunctionDefinitionURIStringConcatenateTest {
 		arguments.add(attrStrSlashInMiddle);
 		arguments.add(attrStrSlashMno);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
-		assertEquals(java.net.URI.class, res.getValue().getValue().getClass());
+		assertThat(res.isOk()).isTrue();
+		assertThat(res.getValue().getValue().getClass()).isEqualTo(java.net.URI.class);
 		resValue = (URI)res.getValue().getValue();
-		assertEquals("http://someplacehij/pqr/Mno", resValue.toString());
+		assertThat(resValue.toString()).isEqualTo("http://someplacehij/pqr/Mno");
 		
 		// create bad uri
 		arguments.clear();
@@ -118,24 +106,24 @@ public class FunctionDefinitionURIStringConcatenateTest {
 		arguments.add(attrStrWithSpace);
 		arguments.add(attrStrSlashMno);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:uri-string-concatenate Final string 'http://someplacex y z/Mno' not URI, Illegal character in authority at index 7: http://someplacex y z/Mno", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:syntax-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:uri-string-concatenate Final string 'http://someplacex y z/Mno' not URI, Illegal character in authority at index 7: http://someplacex y z/Mno");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:syntax-error");
 		
 		// no args
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:uri-string-concatenate Expected 2 or more arguments, got 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:uri-string-concatenate Expected 2 or more arguments, got 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// one arg
 		arguments.clear();
 		arguments.add(attrURI1);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:uri-string-concatenate Expected 2 or more arguments, got 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:uri-string-concatenate Expected 2 or more arguments, got 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		
 		// first arg not uri
@@ -143,9 +131,9 @@ public class FunctionDefinitionURIStringConcatenateTest {
 		arguments.add(attrStrAbc);
 		arguments.add(attrURI1);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:uri-string-concatenate Expected data type 'anyURI' saw 'string' at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:uri-string-concatenate Expected data type 'anyURI' saw 'string' at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		
 		// 2nd arg not string
@@ -153,9 +141,9 @@ public class FunctionDefinitionURIStringConcatenateTest {
 		arguments.add(attrURI1);
 		arguments.add(attrURI1);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:uri-string-concatenate Expected data type 'string' saw 'anyURI' at arg index 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:uri-string-concatenate Expected data type 'string' saw 'anyURI' at arg index 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 	}
 	

@@ -1,10 +1,15 @@
 /*
  * Copyright (c) 2021, salesforce.com, inc.
+ * Modifications Copyright (c) 2023, AT&T Inc.
  * All rights reserved.
  * SPDX-License-Identifier: MIT
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 package com.att.research.xacmlatt.pdp.std.functions;
+
+import java.net.URI;
+import java.util.Iterator;
+import java.util.List;
 
 import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.api.RequestAttributes;
@@ -21,12 +26,6 @@ import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
 import com.att.research.xacmlatt.pdp.policy.FunctionArgument;
 import com.att.research.xacmlatt.pdp.policy.FunctionDefinition;
 import com.att.research.xacmlatt.pdp.policy.expressions.AttributeSelector;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpression;
-import java.net.URI;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * FunctionDefinitionAttributeSelector implements {@link FunctionDefinition} to implement the

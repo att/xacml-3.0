@@ -1,10 +1,17 @@
 /*
  * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, AT&T Inc.
  * All rights reserved.
  * SPDX-License-Identifier: MIT
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 package com.att.research.xacmlatt.pdp.policy.dom;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.StdStatusCode;
@@ -12,13 +19,11 @@ import com.att.research.xacml.std.dom.DOMProperties;
 import com.att.research.xacml.std.dom.DOMStructureException;
 import com.att.research.xacml.std.dom.DOMUtil;
 import com.att.research.xacmlatt.pdp.policy.LexicalEnvironment;
-import com.att.research.xacmlatt.pdp.policy.Policy;
-import com.att.research.xacmlatt.pdp.policy.expressions.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import com.att.research.xacmlatt.pdp.policy.expressions.ForAll;
+import com.att.research.xacmlatt.pdp.policy.expressions.ForAny;
+import com.att.research.xacmlatt.pdp.policy.expressions.Map;
+import com.att.research.xacmlatt.pdp.policy.expressions.QuantifiedExpression;
+import com.att.research.xacmlatt.pdp.policy.expressions.Select;
 
 /**
  * DOMQuantifiedExpression acts as a factory class for the various types of {@link QuantifiedExpression} from DOM
@@ -81,7 +86,6 @@ public class DOMQuantifiedExpression {
                 for (int i = 0 ; i < numChildren ; i++) {
                     Node child	= children.item(i);
                     if (child.getNodeType() == Node.ELEMENT_NODE && XACML3.XMLNS.equals(child.getNamespaceURI())) {
-                        String childName	= child.getLocalName();
                         if (DOMExpression.isExpression(child)) {
                             if (quantifiedExpression.getDomainExpression() == null) {
                                 quantifiedExpression.setDomainExpression(DOMExpression.newInstance(child, quantifiedExpression));

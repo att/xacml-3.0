@@ -1,17 +1,14 @@
 package com.att.research.xacmlatt.pdp.std.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.att.research.xacml.api.AttributeValue;
+import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.datatypes.DataTypes;
 import com.att.research.xacmlatt.pdp.policy.Bag;
@@ -46,7 +43,7 @@ public class FunctionDefinitionHigherOrderBagTest {
 	
 	
 	@Test
-	public void testAny_of() {
+	public void testAny_of() throws DataTypeException {
 		String a = "a";
 		String b = "b";
 		String c = "c";
@@ -81,68 +78,62 @@ public class FunctionDefinitionHigherOrderBagTest {
 		FunctionArgumentAttributeValue attrPredicateStringIntersection = null;
 		FunctionArgumentAttributeValue attrPredicateBooleanFromString = null;
 
-		try {
-			
-			// Create Bag contents
-			bagabcdefg = new Bag();
-				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(a));
-				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(b));
-				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(c));
-				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(d));
-				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(e));
-				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(f));
-				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(g));
-			bagbdfhj = new Bag();
-				bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(b));
-				bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(d));
-				bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(f));
-				bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(h));
-				bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(j));
-			bagace = new Bag();
-				bagace.add(DataTypes.DT_STRING.createAttributeValue(a));
-				bagace.add(DataTypes.DT_STRING.createAttributeValue(c));
-				bagace.add(DataTypes.DT_STRING.createAttributeValue(e));
-			bagb = new Bag();
-				bagb.add(DataTypes.DT_STRING.createAttributeValue(b));
-			bagaaacccef = new Bag();
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(a));
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(a));
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(a));
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(c));
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(c));
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(c));
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(e));
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(f));
-			bagInt = new Bag();
-				bagInt.add(DataTypes.DT_INTEGER.createAttributeValue(123));
-			bagStringInt = new Bag();
-				bagStringInt.add(DataTypes.DT_STRING.createAttributeValue(a));
-				bagStringInt.add(DataTypes.DT_INTEGER.createAttributeValue(123));
-			bagEmpty = new Bag();
-			bagStringBooleansTrue = new Bag();
-				bagStringBooleansTrue.add(DataTypes.DT_STRING.createAttributeValue("false"));
-				bagStringBooleansTrue.add(DataTypes.DT_STRING.createAttributeValue("false"));
-				bagStringBooleansTrue.add(DataTypes.DT_STRING.createAttributeValue("true"));
-			bagStringBooleansFalse = new Bag();
-				bagStringBooleansFalse.add(DataTypes.DT_STRING.createAttributeValue("false"));
-				bagStringBooleansFalse.add(DataTypes.DT_STRING.createAttributeValue("false"));
-			
-			
-			// create primitive attrs
-			attra = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(a));
-			attrb = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(b));
-			attrh = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(h));
-
-			
-			// predicates passed as function arguments
-			attrPredicateStringEqual = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_STRING_EQUAL));
-			attrPredicateStringIntersection = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_STRING_INTERSECTION));
-			attrPredicateBooleanFromString = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_BOOLEAN_FROM_STRING));
-
-		} catch (Exception ex) {
-			fail("creating attribute e="+ ex);
-		}
+		// Create Bag contents
+		bagabcdefg = new Bag();
+			bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(a));
+			bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(b));
+			bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(c));
+			bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(d));
+			bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(e));
+			bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(f));
+			bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(g));
+		bagbdfhj = new Bag();
+			bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(b));
+			bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(d));
+			bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(f));
+			bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(h));
+			bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(j));
+		bagace = new Bag();
+			bagace.add(DataTypes.DT_STRING.createAttributeValue(a));
+			bagace.add(DataTypes.DT_STRING.createAttributeValue(c));
+			bagace.add(DataTypes.DT_STRING.createAttributeValue(e));
+		bagb = new Bag();
+			bagb.add(DataTypes.DT_STRING.createAttributeValue(b));
+		bagaaacccef = new Bag();
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(a));
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(a));
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(a));
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(c));
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(c));
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(c));
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(e));
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(f));
+		bagInt = new Bag();
+			bagInt.add(DataTypes.DT_INTEGER.createAttributeValue(123));
+		bagStringInt = new Bag();
+			bagStringInt.add(DataTypes.DT_STRING.createAttributeValue(a));
+			bagStringInt.add(DataTypes.DT_INTEGER.createAttributeValue(123));
+		bagEmpty = new Bag();
+		bagStringBooleansTrue = new Bag();
+			bagStringBooleansTrue.add(DataTypes.DT_STRING.createAttributeValue("false"));
+			bagStringBooleansTrue.add(DataTypes.DT_STRING.createAttributeValue("false"));
+			bagStringBooleansTrue.add(DataTypes.DT_STRING.createAttributeValue("true"));
+		bagStringBooleansFalse = new Bag();
+			bagStringBooleansFalse.add(DataTypes.DT_STRING.createAttributeValue("false"));
+			bagStringBooleansFalse.add(DataTypes.DT_STRING.createAttributeValue("false"));
 		
+		
+		// create primitive attrs
+		attra = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(a));
+		attrb = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(b));
+		attrh = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(h));
+
+		
+		// predicates passed as function arguments
+		attrPredicateStringEqual = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_STRING_EQUAL));
+		attrPredicateStringIntersection = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_STRING_INTERSECTION));
+		attrPredicateBooleanFromString = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_BOOLEAN_FROM_STRING));
+
 		// make into attributes
 		FunctionArgumentBag attrBagabcdefg = new FunctionArgumentBag(bagabcdefg);
 		FunctionArgumentBag attrBagbdfhj = new FunctionArgumentBag(bagbdfhj);
@@ -155,11 +146,11 @@ public class FunctionDefinitionHigherOrderBagTest {
 		FunctionDefinitionHigherOrderBag<?,?> fd = (FunctionDefinitionHigherOrderBag<?,?>) StdFunctions.FD_ANY_OF;
 
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_ANY_OF, fd.getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(XACML3.ID_FUNCTION_ANY_OF).isEqualTo(fd.getId());
+		assertThat(DataTypes.DT_BOOLEAN.getId()).isEqualTo(fd.getDataTypeId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
+		assertThat(fd.returnsBag()).isFalse();
 		
 		// normal match
 		arguments.clear();
@@ -167,9 +158,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attra);
 		arguments.add(attrBagabcdefg);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// bag in first position - match
 		arguments.clear();
@@ -177,9 +168,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagabcdefg);
 		arguments.add(attra);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// normal no-match
 		arguments.clear();
@@ -187,9 +178,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attra);
 		arguments.add(attrBagbdfhj);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// multiple primitives 
 		arguments.clear();
@@ -199,9 +190,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagace);
 		arguments.add(attra);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of Predicate error: function:string-equal Expected 2 arguments, got 4", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of Predicate error: function:string-equal Expected 2 arguments, got 4");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		
 		// no primitives - predicate function expects 2	
@@ -209,26 +200,26 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrPredicateStringEqual);
 		arguments.add(attrBagace);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of Predicate error: function:string-equal Expected 2 arguments, got 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of Predicate error: function:string-equal Expected 2 arguments, got 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// no primitives - predicate expects only 1 arg
 		arguments.clear();
 		arguments.add(attrPredicateBooleanFromString);
 		arguments.add(attrBagStringBooleansTrue);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		arguments.clear();
 		arguments.add(attrPredicateBooleanFromString);
 		arguments.add(attrBagStringBooleansFalse);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// bag is empty
 		arguments.clear();
@@ -236,18 +227,18 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagEmpty);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 
 		// no bag
 		arguments.clear();
 		arguments.add(attrPredicateStringEqual);
 		arguments.add(attrh);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of Did not get any Bag argument; must have at least 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of Did not get any Bag argument; must have at least 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// extra bag
 		arguments.clear();
@@ -257,9 +248,10 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagStringBooleansTrue);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of must have only 1 bag; found one at index 2 and another at 4", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of must have only 1 bag; found one at index 2 and another at 4");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 	
 		// bad predicate
@@ -267,9 +259,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of First argument expected URI, got http://www.w3.org/2001/XMLSchema#string", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of First argument expected URI, got http://www.w3.org/2001/XMLSchema#string");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// non-boolean predicate
 		arguments.clear();
@@ -277,9 +269,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of Predicate Function must return boolean, but 'urn:oasis:names:tc:xacml:1.0:function:string-intersection' returns 'string", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of Predicate Function must return boolean, but 'urn:oasis:names:tc:xacml:1.0:function:string-intersection' returns 'string");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// predicate after first arg
 		arguments.clear();
@@ -287,9 +279,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrPredicateStringIntersection);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of Predicate error: function:string-equal Expected data type 'string' saw 'anyURI' at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of Predicate error: function:string-equal Expected data type 'string' saw 'anyURI' at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// bags of different types
 		arguments.clear();
@@ -297,16 +289,16 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
+		assertThat(res.isOk()).isFalse();
 		
 		// first null
 		arguments.clear();
 		arguments.add(null);
 		arguments.add(attrBagabcdefg);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of Predicate Function (first argument) was null", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of Predicate Function (first argument) was null");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// second null
 		arguments.clear();
@@ -314,9 +306,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagabcdefg);
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of Got null argument at index 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of Got null argument at index 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 
 	}
 	
@@ -325,7 +317,7 @@ public class FunctionDefinitionHigherOrderBagTest {
 	
 	
 	@Test
-	public void testAll_of() {
+	public void testAll_of() throws DataTypeException {
 		String a = "a";
 		String b = "b";
 		String c = "c";
@@ -364,69 +356,64 @@ public class FunctionDefinitionHigherOrderBagTest {
 		FunctionArgumentAttributeValue attrPredicateStringGreaterThan = null;
 		FunctionArgumentAttributeValue attrPredicateBooleanFromString = null;
 
-		try {
-			
-			// Create Bag contents
-			bagabcdefg = new Bag();
-				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(a));
-				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(b));
-				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(c));
-				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(d));
-				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(e));
-				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(f));
-				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(g));
-			bagbdfhj = new Bag();
-				bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(b));
-				bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(d));
-				bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(f));
-				bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(h));
-				bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(j));
-			bagace = new Bag();
-				bagace.add(DataTypes.DT_STRING.createAttributeValue(a));
-				bagace.add(DataTypes.DT_STRING.createAttributeValue(c));
-				bagace.add(DataTypes.DT_STRING.createAttributeValue(e));
-			bagb = new Bag();
-				bagb.add(DataTypes.DT_STRING.createAttributeValue(b));
-			bagaaacccef = new Bag();
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(a));
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(a));
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(a));
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(c));
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(c));
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(c));
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(e));
-				bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(f));
-			bagInt = new Bag();
-				bagInt.add(DataTypes.DT_INTEGER.createAttributeValue(123));
-			bagStringInt = new Bag();
-				bagStringInt.add(DataTypes.DT_STRING.createAttributeValue(a));
-				bagStringInt.add(DataTypes.DT_INTEGER.createAttributeValue(123));
-			bagEmpty = new Bag();
-			bagStringBooleansTrue = new Bag();
-				bagStringBooleansTrue.add(DataTypes.DT_STRING.createAttributeValue("true"));
-				bagStringBooleansTrue.add(DataTypes.DT_STRING.createAttributeValue("true"));
-				bagStringBooleansTrue.add(DataTypes.DT_STRING.createAttributeValue("true"));
-			bagStringBooleansFalse = new Bag();
-				bagStringBooleansFalse.add(DataTypes.DT_STRING.createAttributeValue("false"));
-				bagStringBooleansFalse.add(DataTypes.DT_STRING.createAttributeValue("false"));
-			
-			
-			
-			// create primitive attrs
-			attra = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(a));
-			attrh = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(h));
-			attrw = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(w));
+		// Create Bag contents
+		bagabcdefg = new Bag();
+			bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(a));
+			bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(b));
+			bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(c));
+			bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(d));
+			bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(e));
+			bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(f));
+			bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(g));
+		bagbdfhj = new Bag();
+			bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(b));
+			bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(d));
+			bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(f));
+			bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(h));
+			bagbdfhj.add(DataTypes.DT_STRING.createAttributeValue(j));
+		bagace = new Bag();
+			bagace.add(DataTypes.DT_STRING.createAttributeValue(a));
+			bagace.add(DataTypes.DT_STRING.createAttributeValue(c));
+			bagace.add(DataTypes.DT_STRING.createAttributeValue(e));
+		bagb = new Bag();
+			bagb.add(DataTypes.DT_STRING.createAttributeValue(b));
+		bagaaacccef = new Bag();
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(a));
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(a));
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(a));
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(c));
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(c));
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(c));
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(e));
+			bagaaacccef.add(DataTypes.DT_STRING.createAttributeValue(f));
+		bagInt = new Bag();
+			bagInt.add(DataTypes.DT_INTEGER.createAttributeValue(123));
+		bagStringInt = new Bag();
+			bagStringInt.add(DataTypes.DT_STRING.createAttributeValue(a));
+			bagStringInt.add(DataTypes.DT_INTEGER.createAttributeValue(123));
+		bagEmpty = new Bag();
+		bagStringBooleansTrue = new Bag();
+			bagStringBooleansTrue.add(DataTypes.DT_STRING.createAttributeValue("true"));
+			bagStringBooleansTrue.add(DataTypes.DT_STRING.createAttributeValue("true"));
+			bagStringBooleansTrue.add(DataTypes.DT_STRING.createAttributeValue("true"));
+		bagStringBooleansFalse = new Bag();
+			bagStringBooleansFalse.add(DataTypes.DT_STRING.createAttributeValue("false"));
+			bagStringBooleansFalse.add(DataTypes.DT_STRING.createAttributeValue("false"));
+		
+		
+		
+		// create primitive attrs
+		attra = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(a));
+		attrh = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(h));
+		attrw = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue(w));
 
-			
-			// predicates passed as function arguments
-			attrPredicateStringEqual = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_STRING_EQUAL));
-			attrPredicateStringIntersection = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_STRING_INTERSECTION));
-			attrPredicateStringGreaterThan = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_STRING_GREATER_THAN));
-			attrPredicateBooleanFromString = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_BOOLEAN_FROM_STRING));
+		
+		// predicates passed as function arguments
+		attrPredicateStringEqual = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_STRING_EQUAL));
+		attrPredicateStringIntersection = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_STRING_INTERSECTION));
+		attrPredicateStringGreaterThan = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_STRING_GREATER_THAN));
+		attrPredicateBooleanFromString = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_BOOLEAN_FROM_STRING));
 
-		} catch (Exception ex) {
-			fail("creating attribute e="+ ex);
-		}
 		
 		// make into attributes
 		FunctionArgumentBag attrBagabcdefg = new FunctionArgumentBag(bagabcdefg);
@@ -440,11 +427,11 @@ public class FunctionDefinitionHigherOrderBagTest {
 		FunctionDefinitionHigherOrderBag<?,?> fd = (FunctionDefinitionHigherOrderBag<?,?>) StdFunctions.FD_ALL_OF;
 
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_ALL_OF, fd.getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_ALL_OF);
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
+		assertThat(fd.returnsBag()).isFalse();
 		
 		// normal match
 		arguments.clear();
@@ -452,9 +439,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrw);
 		arguments.add(attrBagace);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// normal no-match
 		arguments.clear();
@@ -462,35 +449,35 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attra);
 		arguments.add(attrBagbdfhj);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// no primitives - predicate function expects 2	
 		arguments.clear();
 		arguments.add(attrPredicateStringEqual);
 		arguments.add(attrBagace);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of Predicate error: function:string-equal Expected 2 arguments, got 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of Predicate error: function:string-equal Expected 2 arguments, got 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// no primitives - predicate expects only 1 arg
 		arguments.clear();
 		arguments.add(attrPredicateBooleanFromString);
 		arguments.add(attrBagStringBooleansTrue);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		arguments.clear();
 		arguments.add(attrPredicateBooleanFromString);
 		arguments.add(attrBagStringBooleansFalse);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// bag is empty
 		arguments.clear();
@@ -498,18 +485,18 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagEmpty);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// no bag
 		arguments.clear();
 		arguments.add(attrPredicateStringGreaterThan);
 		arguments.add(attrh);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of Did not get any Bag argument; must have at least 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of Did not get any Bag argument; must have at least 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// extra bag
 		arguments.clear();
@@ -519,9 +506,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagStringBooleansTrue);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of must have only 1 bag; found one at index 2 and another at 4", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of must have only 1 bag; found one at index 2 and another at 4");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 	
 		// bad predicate
@@ -529,9 +516,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of First argument expected URI, got http://www.w3.org/2001/XMLSchema#string", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of First argument expected URI, got http://www.w3.org/2001/XMLSchema#string");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// non-boolean predicate
 		arguments.clear();
@@ -539,9 +526,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of Predicate Function must return boolean, but 'urn:oasis:names:tc:xacml:1.0:function:string-intersection' returns 'string", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of Predicate Function must return boolean, but 'urn:oasis:names:tc:xacml:1.0:function:string-intersection' returns 'string");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// predicate after first arg
 		arguments.clear();
@@ -549,9 +536,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrPredicateStringIntersection);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of Predicate error: function:string-greater-than Expected data type 'string' saw 'anyURI' at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of Predicate error: function:string-greater-than Expected data type 'string' saw 'anyURI' at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// bags of different types
 		arguments.clear();
@@ -559,16 +546,16 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
+		assertThat(res.isOk()).isFalse();
 		
 		// first null
 		arguments.clear();
 		arguments.add(null);
 		arguments.add(attrBagabcdefg);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of Predicate Function (first argument) was null", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of Predicate Function (first argument) was null");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// second null
 		arguments.clear();
@@ -576,26 +563,16 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagabcdefg);
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of Got null argument at index 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of Got null argument at index 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 
 	}
 	
 	
 	
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	@Test
-	public void testAny_of_any() {
+	public void testAny_of_any() throws DataTypeException {
 		String a = "a";
 		String b = "b";
 		String c = "c";
@@ -639,8 +616,6 @@ public class FunctionDefinitionHigherOrderBagTest {
 		FunctionArgumentAttributeValue attrPredicateBooleanFromString = null;
 		FunctionArgumentAttributeValue attrPredicateNof = null;
 
-		try {
-			
 			// Create Bag contents
 			bagabcdefg = new Bag();
 				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(a));
@@ -708,10 +683,6 @@ public class FunctionDefinitionHigherOrderBagTest {
 			attrPredicateBooleanFromString = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_BOOLEAN_FROM_STRING));
 			attrPredicateNof = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_N_OF));
 
-		} catch (Exception ex) {
-			fail("creating attribute e="+ ex);
-		}
-		
 		// make into attributes
 		FunctionArgumentBag attrBagabcdefg = new FunctionArgumentBag(bagabcdefg);
 		FunctionArgumentBag attrBagbdfhj = new FunctionArgumentBag(bagbdfhj);
@@ -726,11 +697,11 @@ public class FunctionDefinitionHigherOrderBagTest {
 		FunctionDefinitionHigherOrderBag<?,?> fd = (FunctionDefinitionHigherOrderBag<?,?>) StdFunctions.FD_ANY_OF_ANY;
 
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_ANY_OF_ANY, fd.getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_ANY_OF_ANY);
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
+		assertThat(fd.returnsBag()).isFalse();
 		
 		// normal match
 		arguments.clear();
@@ -738,9 +709,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrw);
 		arguments.add(attrBagace);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// normal no-match
 		arguments.clear();
@@ -748,44 +719,44 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attra);
 		arguments.add(attrBagbdfhj);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// no primitives - predicate function expects 2	
 		arguments.clear();
 		arguments.add(attrPredicateStringEqual);
 		arguments.add(attrBagace);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-any Predicate error: function:string-equal Expected 2 arguments, got 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-any Predicate error: function:string-equal Expected 2 arguments, got 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		arguments.add(attrPredicateStringEqual);
 		arguments.add(attrBagace);
 		arguments.add(attrBagace);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// no primitives - predicate expects only 1 arg
 		arguments.clear();
 		arguments.add(attrPredicateBooleanFromString);
 		arguments.add(attrBagStringBooleansTrue);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		arguments.clear();
 		arguments.add(attrPredicateBooleanFromString);
 		arguments.add(attrBagStringBooleansFalse);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// n-of with lots of bags - success
 		arguments.clear();
@@ -799,9 +770,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagBooleansTrue);
 		arguments.add(attrBagBooleansTrue);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// n-of with lots of bags - fail
 		arguments.clear();
@@ -821,9 +792,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagBooleansFalse);
 		arguments.add(attrBagBooleansFalse);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		
 		// bag is empty
@@ -832,9 +803,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagEmpty);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-any Bag is empty at index 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-any Bag is empty at index 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 
 		// no bag
@@ -842,27 +813,27 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrPredicateStringGreaterThan);
 		arguments.add(attrh);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-any Predicate error: function:string-greater-than Expected 2 arguments, got 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-any Predicate error: function:string-greater-than Expected 2 arguments, got 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		arguments.add(attrPredicateStringGreaterThan);
 		arguments.add(attrh);
 		arguments.add(attrh);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 	
 		// bad predicate
 		arguments.clear();
 		arguments.add(attrh);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-any First argument expected URI, got http://www.w3.org/2001/XMLSchema#string", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-any First argument expected URI, got http://www.w3.org/2001/XMLSchema#string");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// non-boolean predicate
 		arguments.clear();
@@ -870,9 +841,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-any Predicate Function must return boolean, but 'urn:oasis:names:tc:xacml:1.0:function:string-intersection' returns 'string", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-any Predicate Function must return boolean, but 'urn:oasis:names:tc:xacml:1.0:function:string-intersection' returns 'string");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// predicate after first arg
 		arguments.clear();
@@ -880,9 +851,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrPredicateStringIntersection);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-any Predicate error: function:string-greater-than Expected data type 'string' saw 'anyURI' at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-any Predicate error: function:string-greater-than Expected data type 'string' saw 'anyURI' at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// bags of different types
 		arguments.clear();
@@ -890,18 +861,18 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// first null
 		arguments.clear();
 		arguments.add(null);
 		arguments.add(attrBagabcdefg);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-any Predicate Function (first argument) was null", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-any Predicate Function (first argument) was null");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// second null
 		arguments.clear();
@@ -909,9 +880,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagabcdefg);
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-any Got null argument at index 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-any Got null argument at index 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 
 	}
 	
@@ -930,7 +901,7 @@ public class FunctionDefinitionHigherOrderBagTest {
 	
 	
 	@Test
-	public void testAll_of_any() {
+	public void testAll_of_any() throws DataTypeException {
 		String a = "a";
 		String b = "b";
 		String c = "c";
@@ -974,8 +945,6 @@ public class FunctionDefinitionHigherOrderBagTest {
 		FunctionArgumentAttributeValue attrPredicateStringGreaterThan = null;
 		FunctionArgumentAttributeValue attrPredicateBooleanFromString = null;
 
-		try {
-			
 			// Create Bag contents
 			bagabcdefg = new Bag();
 				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(a));
@@ -1045,9 +1014,6 @@ public class FunctionDefinitionHigherOrderBagTest {
 			attrPredicateStringGreaterThan = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_STRING_GREATER_THAN));
 			attrPredicateBooleanFromString = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_BOOLEAN_FROM_STRING));
 
-		} catch (Exception ex) {
-			fail("creating attribute e="+ ex);
-		}
 		
 		// make into attributes
 		FunctionArgumentBag attrBagabcdefg = new FunctionArgumentBag(bagabcdefg);
@@ -1060,11 +1026,11 @@ public class FunctionDefinitionHigherOrderBagTest {
 		FunctionDefinitionHigherOrderBag<?,?> fd = (FunctionDefinitionHigherOrderBag<?,?>) StdFunctions.FD_ALL_OF_ANY;
 
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_ALL_OF_ANY, fd.getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_ALL_OF_ANY);
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
+		assertThat(fd.returnsBag()).isFalse();
 		
 		// normal match
 		arguments.clear();
@@ -1072,9 +1038,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagabcdefg);
 		arguments.add(attrBagawx);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// normal no-match
 		arguments.clear();
@@ -1082,9 +1048,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagace);
 		arguments.add(attrBagawx);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// primitive instead of bag
 		arguments.clear();
@@ -1092,18 +1058,18 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attra);
 		arguments.add(attrBagace);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-any 2nd argument must be bag, got 'string'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-any 2nd argument must be bag, got 'string'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		arguments.add(attrPredicateStringEqual);
 		arguments.add(attrBagace);
 		arguments.add(attra);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-any 3rd argument must be bag, got 'string'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-any 3rd argument must be bag, got 'string'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// no primitives - predicate expects only 1 arg
 		arguments.clear();
@@ -1111,9 +1077,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagStringBooleansTrue);
 		arguments.add(attrBagStringBooleansTrue);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-any Predicate error: function:boolean-from-string Expected 1 arguments, got 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-any Predicate error: function:boolean-from-string Expected 1 arguments, got 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 
 		
@@ -1123,27 +1089,27 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagace);
 		arguments.add(attrBagEmpty);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		arguments.clear();
 		arguments.add(attrPredicateStringGreaterThan);
 		arguments.add(attrBagEmpty);
 		arguments.add(attrBagace);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// no bag
 		arguments.clear();
 		arguments.add(attrPredicateStringGreaterThan);
 		arguments.add(attrh);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-any Expected 3 arguments, got 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-any Expected 3 arguments, got 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 	
 		// bad predicate
@@ -1152,9 +1118,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagStringInt);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-any First argument expected URI, got http://www.w3.org/2001/XMLSchema#string", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-any First argument expected URI, got http://www.w3.org/2001/XMLSchema#string");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// non-boolean predicate
 		arguments.clear();
@@ -1162,9 +1128,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagStringInt);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-any Predicate Function must return boolean, but 'urn:oasis:names:tc:xacml:1.0:function:string-intersection' returns 'string", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-any Predicate Function must return boolean, but 'urn:oasis:names:tc:xacml:1.0:function:string-intersection' returns 'string");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// predicate after first arg
 		arguments.clear();
@@ -1172,9 +1138,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrPredicateStringIntersection);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-any 2nd argument must be bag, got 'anyURI'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-any 2nd argument must be bag, got 'anyURI'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// bags of different types
 		arguments.clear();
@@ -1182,24 +1148,24 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagace);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-any Predicate error: function:string-greater-than Expected data type 'string' saw 'integer' at arg index 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-any Predicate error: function:string-greater-than Expected data type 'string' saw 'integer' at arg index 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// no args
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-any Expected at least 2 arguments, got 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-any Expected at least 2 arguments, got 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// one arg
 		arguments.clear();
 		arguments.add(attrBagabcdefg);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-any Expected at least 2 arguments, got 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-any Expected at least 2 arguments, got 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 
 		// too many args
 		arguments.clear();
@@ -1208,9 +1174,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagabcdefg);
 		arguments.add(attrBagabcdefg);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-any Expected 3 arguments, got 4", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-any Expected 3 arguments, got 4");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		
 		// first null
@@ -1218,9 +1184,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(null);
 		arguments.add(attrBagabcdefg);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-any Expected 3 arguments, got 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-any Expected 3 arguments, got 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// second null
 		arguments.clear();
@@ -1228,25 +1194,14 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagabcdefg);
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-any 3rd argument must be bag, got 'null'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-any 3rd argument must be bag, got 'null'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
 	@Test
-	public void testAny_of_all() {
+	public void testAny_of_all() throws DataTypeException {
 		String a = "a";
 		String b = "b";
 		String c = "c";
@@ -1290,8 +1245,6 @@ public class FunctionDefinitionHigherOrderBagTest {
 		FunctionArgumentAttributeValue attrPredicateStringGreaterThan = null;
 		FunctionArgumentAttributeValue attrPredicateBooleanFromString = null;
 
-		try {
-			
 			// Create Bag contents
 			bagabcdefg = new Bag();
 				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(a));
@@ -1361,9 +1314,6 @@ public class FunctionDefinitionHigherOrderBagTest {
 			attrPredicateStringGreaterThan = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_STRING_GREATER_THAN));
 			attrPredicateBooleanFromString = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_BOOLEAN_FROM_STRING));
 
-		} catch (Exception ex) {
-			fail("creating attribute e="+ ex);
-		}
 		
 		// make into attributes
 		FunctionArgumentBag attrBagabcdefg = new FunctionArgumentBag(bagabcdefg);
@@ -1376,11 +1326,11 @@ public class FunctionDefinitionHigherOrderBagTest {
 		FunctionDefinitionHigherOrderBag<?,?> fd = (FunctionDefinitionHigherOrderBag<?,?>) StdFunctions.FD_ANY_OF_ALL;
 
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_ANY_OF_ALL, fd.getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_ANY_OF_ALL);
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
+		assertThat(fd.returnsBag()).isFalse();
 		
 		// normal match
 		arguments.clear();
@@ -1388,9 +1338,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagewx);
 		arguments.add(attrBagace);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// normal no-match
 		arguments.clear();
@@ -1398,9 +1348,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagace);
 		arguments.add(attrBagewx);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// primitive instead of bag
 		arguments.clear();
@@ -1408,18 +1358,18 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attra);
 		arguments.add(attrBagace);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-all 2nd argument must be bag, got 'string'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-all 2nd argument must be bag, got 'string'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		arguments.add(attrPredicateStringEqual);
 		arguments.add(attrBagace);
 		arguments.add(attra);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-all 3rd argument must be bag, got 'string'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-all 3rd argument must be bag, got 'string'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// no primitives - predicate expects only 1 arg
 		arguments.clear();
@@ -1427,9 +1377,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagStringBooleansTrue);
 		arguments.add(attrBagStringBooleansTrue);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-all Predicate error: function:boolean-from-string Expected 1 arguments, got 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-all Predicate error: function:boolean-from-string Expected 1 arguments, got 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// bag is empty
 		arguments.clear();
@@ -1437,27 +1387,27 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagace);
 		arguments.add(attrBagEmpty);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		arguments.clear();
 		arguments.add(attrPredicateStringGreaterThan);
 		arguments.add(attrBagEmpty);
 		arguments.add(attrBagace);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 
 		// no bag
 		arguments.clear();
 		arguments.add(attrPredicateStringGreaterThan);
 		arguments.add(attrh);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-all Expected 3 arguments, got 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-all Expected 3 arguments, got 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 	
 		// bad predicate
@@ -1466,9 +1416,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagStringInt);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-all First argument expected URI, got http://www.w3.org/2001/XMLSchema#string", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-all First argument expected URI, got http://www.w3.org/2001/XMLSchema#string");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// non-boolean predicate
 		arguments.clear();
@@ -1476,9 +1426,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagStringInt);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-all Predicate Function must return boolean, but 'urn:oasis:names:tc:xacml:1.0:function:string-intersection' returns 'string", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-all Predicate Function must return boolean, but 'urn:oasis:names:tc:xacml:1.0:function:string-intersection' returns 'string");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// predicate after first arg
 		arguments.clear();
@@ -1486,9 +1436,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrPredicateStringIntersection);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-all 2nd argument must be bag, got 'anyURI'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-all 2nd argument must be bag, got 'anyURI'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// bags of different types
 		arguments.clear();
@@ -1496,24 +1446,24 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagace);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-all Predicate error: function:string-greater-than Expected data type 'string' saw 'integer' at arg index 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-all Predicate error: function:string-greater-than Expected data type 'string' saw 'integer' at arg index 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// no args
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-all Expected at least 2 arguments, got 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-all Expected at least 2 arguments, got 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// one arg
 		arguments.clear();
 		arguments.add(attrBagabcdefg);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-all Expected at least 2 arguments, got 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-all Expected at least 2 arguments, got 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 
 		// too many args
 		arguments.clear();
@@ -1522,9 +1472,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagabcdefg);
 		arguments.add(attrBagabcdefg);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-all Expected 3 arguments, got 4", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-all Expected 3 arguments, got 4");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		
 		// first null
@@ -1532,9 +1482,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(null);
 		arguments.add(attrBagabcdefg);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-all Expected 3 arguments, got 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-all Expected 3 arguments, got 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// second null
 		arguments.clear();
@@ -1542,9 +1492,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagabcdefg);
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:any-of-all 3rd argument must be bag, got 'null'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:any-of-all 3rd argument must be bag, got 'null'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 
 	}
 	
@@ -1554,7 +1504,7 @@ public class FunctionDefinitionHigherOrderBagTest {
 	
 	
 	@Test
-	public void testAll_of_all() {
+	public void testAll_of_all() throws DataTypeException {
 		String a = "a";
 		String b = "b";
 		String c = "c";
@@ -1598,8 +1548,6 @@ public class FunctionDefinitionHigherOrderBagTest {
 		FunctionArgumentAttributeValue attrPredicateStringGreaterThan = null;
 		FunctionArgumentAttributeValue attrPredicateBooleanFromString = null;
 
-		try {
-			
 			// Create Bag contents
 			bagabcdefg = new Bag();
 				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(a));
@@ -1671,10 +1619,6 @@ public class FunctionDefinitionHigherOrderBagTest {
 			attrPredicateStringGreaterThan = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_STRING_GREATER_THAN));
 			attrPredicateBooleanFromString = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_BOOLEAN_FROM_STRING));
 
-		} catch (Exception ex) {
-			fail("creating attribute e="+ ex);
-		}
-		
 		// make into attributes
 		FunctionArgumentBag attrBagabcdefg = new FunctionArgumentBag(bagabcdefg);
 		FunctionArgumentBag attrBagace = new FunctionArgumentBag(bagace);
@@ -1687,11 +1631,11 @@ public class FunctionDefinitionHigherOrderBagTest {
 		FunctionDefinitionHigherOrderBag<?,?> fd = (FunctionDefinitionHigherOrderBag<?,?>) StdFunctions.FD_ALL_OF_ALL;
 
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_ALL_OF_ALL, fd.getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_ALL_OF_ALL);
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
+		assertThat(fd.returnsBag()).isFalse();
 		
 		// normal match
 		arguments.clear();
@@ -1699,9 +1643,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagwx);
 		arguments.add(attrBagace);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// normal no-match
 		arguments.clear();
@@ -1709,18 +1653,18 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagawx);
 		arguments.add(attrBagace);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		arguments.clear();
 		arguments.add(attrPredicateStringGreaterThan);
 		arguments.add(attrBagace);
 		arguments.add(attrBagwx);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// primitive instead of bag
 		arguments.clear();
@@ -1728,18 +1672,18 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attra);
 		arguments.add(attrBagace);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-all 2nd argument must be bag, got 'string'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-all 2nd argument must be bag, got 'string'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		arguments.add(attrPredicateStringEqual);
 		arguments.add(attrBagace);
 		arguments.add(attra);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-all 3rd argument must be bag, got 'string'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-all 3rd argument must be bag, got 'string'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// no primitives - predicate expects only 1 arg
 		arguments.clear();
@@ -1747,9 +1691,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagStringBooleansTrue);
 		arguments.add(attrBagStringBooleansTrue);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-all Predicate error: function:boolean-from-string Expected 1 arguments, got 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-all Predicate error: function:boolean-from-string Expected 1 arguments, got 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// bag is empty
 		arguments.clear();
@@ -1757,27 +1701,27 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagace);
 		arguments.add(attrBagEmpty);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		arguments.clear();
 		arguments.add(attrPredicateStringGreaterThan);
 		arguments.add(attrBagEmpty);
 		arguments.add(attrBagace);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// no bag
 		arguments.clear();
 		arguments.add(attrPredicateStringGreaterThan);
 		arguments.add(attrh);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-all Expected 3 arguments, got 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-all Expected 3 arguments, got 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 	
 		// bad predicate
@@ -1786,9 +1730,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagStringInt);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-all First argument expected URI, got http://www.w3.org/2001/XMLSchema#string", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-all First argument expected URI, got http://www.w3.org/2001/XMLSchema#string");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// non-boolean predicate
 		arguments.clear();
@@ -1796,9 +1740,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagStringInt);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-all Predicate Function must return boolean, but 'urn:oasis:names:tc:xacml:1.0:function:string-intersection' returns 'string", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-all Predicate Function must return boolean, but 'urn:oasis:names:tc:xacml:1.0:function:string-intersection' returns 'string");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// predicate after first arg
 		arguments.clear();
@@ -1806,9 +1750,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrPredicateStringIntersection);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-all 2nd argument must be bag, got 'anyURI'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-all 2nd argument must be bag, got 'anyURI'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// bags of different types
 		arguments.clear();
@@ -1816,24 +1760,24 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagwx);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-all Predicate error: function:string-greater-than Expected data type 'string' saw 'integer' at arg index 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-all Predicate error: function:string-greater-than Expected data type 'string' saw 'integer' at arg index 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// no args
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-all Expected at least 2 arguments, got 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-all Expected at least 2 arguments, got 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// one arg
 		arguments.clear();
 		arguments.add(attrBagabcdefg);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-all Expected at least 2 arguments, got 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-all Expected at least 2 arguments, got 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 
 		// too many args
 		arguments.clear();
@@ -1842,9 +1786,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagabcdefg);
 		arguments.add(attrBagabcdefg);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-all Expected 3 arguments, got 4", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-all Expected 3 arguments, got 4");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		
 		// first null
@@ -1852,9 +1796,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(null);
 		arguments.add(attrBagabcdefg);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-all Expected 3 arguments, got 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-all Expected 3 arguments, got 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// second null
 		arguments.clear();
@@ -1862,23 +1806,15 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagabcdefg);
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:all-of-all 3rd argument must be bag, got 'null'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:all-of-all 3rd argument must be bag, got 'null'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 
 	}
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
 	@Test
-	public void testMap() {
+	public void testMap() throws DataTypeException {
 		String a = "a";
 		String b = "b";
 		String c = "c";
@@ -1915,8 +1851,6 @@ public class FunctionDefinitionHigherOrderBagTest {
 		FunctionArgumentAttributeValue attrPredicateIntegerEqual = null;
 		FunctionArgumentAttributeValue attrPredicateIntegerAdd = null;
 
-		try {
-			
 			// Create Bag contents
 			bagabcdefg = new Bag();
 				bagabcdefg.add(DataTypes.DT_STRING.createAttributeValue(a));
@@ -1982,10 +1916,6 @@ public class FunctionDefinitionHigherOrderBagTest {
 			attrPredicateIntegerEqual = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_INTEGER_EQUAL));
 			attrPredicateIntegerAdd = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(XACML3.ID_FUNCTION_INTEGER_ADD));
 
-		} catch (Exception ex) {
-			fail("creating attribute e="+ ex);
-		}
-		
 		// make into attributes
 		FunctionArgumentBag attrBagabcdefg = new FunctionArgumentBag(bagabcdefg);
 		FunctionArgumentBag attrBagace = new FunctionArgumentBag(bagace);
@@ -1997,32 +1927,28 @@ public class FunctionDefinitionHigherOrderBagTest {
 		FunctionDefinitionHigherOrderBag<?,?> fd = (FunctionDefinitionHigherOrderBag<?,?>) StdFunctions.FD_MAP;
 
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_MAP, fd.getId());
-		assertNull( fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_MAP);
+		assertThat(fd.getDataTypeId()).isNull();;
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertTrue(fd.returnsBag());
+		assertThat(fd.returnsBag()).isTrue();
 		
 		// normal match
 		arguments.clear();
 		arguments.add(attrPredicateStringNormalizeToLowerCase);
 		arguments.add(attrBagace);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
-		assertTrue(res.isBag());
+		assertThat(res.isOk()).isTrue();
+		assertThat(res.isBag()).isTrue();
 		Bag bag = res.getBag();
-		assertEquals(3, bag.size());
+		assertThat(bag.size()).isEqualTo(3);
 		List<AttributeValue<?>> bagAttributes = bag.getAttributeValueList();
-		try {
-			assertTrue(bagAttributes.contains(DataTypes.DT_STRING.createAttributeValue("a")));
-			assertFalse(bagAttributes.contains(DataTypes.DT_STRING.createAttributeValue("A")));
-			assertTrue(bagAttributes.contains(DataTypes.DT_STRING.createAttributeValue("c")));
-			assertFalse(bagAttributes.contains(DataTypes.DT_STRING.createAttributeValue("C")));
-			assertTrue(bagAttributes.contains(DataTypes.DT_STRING.createAttributeValue("e")));
-			assertFalse(bagAttributes.contains(DataTypes.DT_STRING.createAttributeValue("E")));
-		} catch (Exception ex) {
-			fail("checking result e="+ex);
-		}
+		assertThat(bagAttributes.contains(DataTypes.DT_STRING.createAttributeValue("a"))).isTrue();
+		assertThat(bagAttributes.contains(DataTypes.DT_STRING.createAttributeValue("A"))).isFalse();
+		assertThat(bagAttributes.contains(DataTypes.DT_STRING.createAttributeValue("c"))).isTrue();
+		assertThat(bagAttributes.contains(DataTypes.DT_STRING.createAttributeValue("C"))).isFalse();
+		assertThat(bagAttributes.contains(DataTypes.DT_STRING.createAttributeValue("e"))).isTrue();
+		assertThat(bagAttributes.contains(DataTypes.DT_STRING.createAttributeValue("E"))).isFalse();
 		
 		// 2-input predicate
 		arguments.clear();
@@ -2030,18 +1956,15 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrInt7);
 		arguments.add(attrBagInt789);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
-		assertTrue(res.isBag());
+		assertThat(res.isOk()).isTrue();
+		assertThat(res.isBag()).isTrue();
 		bag = res.getBag();
-		assertEquals(3, bag.size());
+		assertThat(bag.size()).isEqualTo(3);
 		bagAttributes = bag.getAttributeValueList();
-		try {
-			assertTrue(bagAttributes.contains(DataTypes.DT_INTEGER.createAttributeValue("14")));
-			assertTrue(bagAttributes.contains(DataTypes.DT_INTEGER.createAttributeValue("15")));
-			assertTrue(bagAttributes.contains(DataTypes.DT_INTEGER.createAttributeValue("16")));
-		} catch (Exception ex) {
-			fail("checking result e="+ex);
-		}
+
+		assertThat(bagAttributes.contains(DataTypes.DT_INTEGER.createAttributeValue("14"))).isTrue();
+		assertThat(bagAttributes.contains(DataTypes.DT_INTEGER.createAttributeValue("15"))).isTrue();
+		assertThat(bagAttributes.contains(DataTypes.DT_INTEGER.createAttributeValue("16"))).isTrue();
 		
 		
 		// predicate returns booleans
@@ -2050,18 +1973,14 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrInt7);
 		arguments.add(attrBagInt789);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
-		assertTrue(res.isBag());
+		assertThat(res.isOk()).isTrue();
+		assertThat(res.isBag()).isTrue();
 		bag = res.getBag();
-		assertEquals(3, bag.size());
+		assertThat(bag.size()).isEqualTo(3);
 		bagAttributes = bag.getAttributeValueList();
-		try {
-			assertEquals(bagAttributes.get(0), (DataTypes.DT_BOOLEAN.createAttributeValue(true)));
-			assertEquals(bagAttributes.get(1), (DataTypes.DT_BOOLEAN.createAttributeValue(false)));
-			assertEquals(bagAttributes.get(2), (DataTypes.DT_BOOLEAN.createAttributeValue(false)));
-		} catch (Exception ex) {
-			fail("checking result e="+ex);
-		}
+		assertThat((DataTypes.DT_BOOLEAN.createAttributeValue(true))).isEqualTo(bagAttributes.get(0));
+		assertThat((DataTypes.DT_BOOLEAN.createAttributeValue(false))).isEqualTo(bagAttributes.get(1));
+		assertThat((DataTypes.DT_BOOLEAN.createAttributeValue(false))).isEqualTo(bagAttributes.get(2));
 		
 		// predicate returns bag
 
@@ -2072,9 +1991,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrPredicateIntegerAdd);
 		arguments.add(attrBagace);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:map Predicate error: function:integer-add Expected 2 arguments, got 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:map Predicate error: function:integer-add Expected 2 arguments, got 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// bag is empty
 		arguments.clear();
@@ -2082,19 +2001,19 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagEmpty);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
-		assertTrue(res.isBag());
+		assertThat(res.isOk()).isTrue();
+		assertThat(res.isBag()).isTrue();
 		bag = res.getBag();
-		assertEquals(0, bag.size());;
+		assertThat(bag.size()).isEqualTo(0);;
 
 		// no bag
 		arguments.clear();
 		arguments.add(attrPredicateStringNormalizeToLowerCase);
 		arguments.add(attrh);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:map Did not get any Bag argument; must have at least 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:map Did not get any Bag argument; must have at least 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// extra bag
 		arguments.clear();
@@ -2104,9 +2023,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagStringBooleansTrue);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:map must have only 1 bag; found one at index 2 and another at 4", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:map must have only 1 bag; found one at index 2 and another at 4");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 	
 		// bad predicate
@@ -2114,9 +2033,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:map First argument expected URI, got http://www.w3.org/2001/XMLSchema#string", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:map First argument expected URI, got http://www.w3.org/2001/XMLSchema#string");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// predicate gets unexpected number of args
 		arguments.clear();
@@ -2124,9 +2043,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:map Predicate error: function:string-normalize-to-lower-case Expected 1 arguments, got 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:map Predicate error: function:string-normalize-to-lower-case Expected 1 arguments, got 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// predicate gets bad primitive type
 		arguments.clear();
@@ -2134,9 +2053,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrPredicateStringNormalizeToLowerCase);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:map Predicate error: function:string-normalize-to-lower-case Expected 1 arguments, got 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:map Predicate error: function:string-normalize-to-lower-case Expected 1 arguments, got 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// bags of different types
 		arguments.clear();
@@ -2144,16 +2063,16 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrh);
 		arguments.add(attrBagStringInt);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
+		assertThat(res.isOk()).isFalse();
 		
 		// first null
 		arguments.clear();
 		arguments.add(null);
 		arguments.add(attrBagabcdefg);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:map Predicate Function (first argument) was null", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:map Predicate Function (first argument) was null");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// second null
 		arguments.clear();
@@ -2161,9 +2080,9 @@ public class FunctionDefinitionHigherOrderBagTest {
 		arguments.add(attrBagabcdefg);
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("function:map Got null argument at index 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:map Got null argument at index 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 
 	}
 	

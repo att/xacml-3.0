@@ -1,10 +1,13 @@
 /*
  * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, AT&T Inc.
  * All rights reserved.
  * SPDX-License-Identifier: MIT
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 package com.att.research.xacml.std.datatypes;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.att.research.xacml.api.Attribute;
 import com.att.research.xacml.api.AttributeValue;
@@ -17,7 +20,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -30,7 +34,6 @@ import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.*;
 
 /**
  * Entity datatype (de)serialization tests.
@@ -41,7 +44,7 @@ public class DataTypeEntityTest {
     @Test
     public void testNull() throws Exception {
         DataTypeEntity entityType = DataTypeEntity.newInstance();
-        assertNull(entityType.convert(null));
+        assertThat(entityType.convert(null)).isNull();
     }
 
     @Test
@@ -74,48 +77,48 @@ public class DataTypeEntityTest {
 
     private static void validateParse(RequestAttributes entity) {
         // Make sure the parse was successful
-        assertNotNull(entity);
-        assertEquals(3, entity.getAttributes().size());
+        assertThat(entity).isNotNull();
+        assertThat(3).isEqualTo(entity.getAttributes().size());
 
         // Validate the nested string attribute
         Attribute stringAttribute = entity.getAttributes(new IdentifierImpl("urn:example:xacml:attribute:relationship-kind")).next();
-        AttributeValue stringValue = stringAttribute.getValues().iterator().next();
-        assertEquals("employee", stringValue.getValue());
+        AttributeValue<?> stringValue = stringAttribute.getValues().iterator().next();
+        assertThat("employee").isEqualTo(stringValue.getValue());
 
         // Validate the nested date attribute
         Attribute dateAttribute = entity.getAttributes(new IdentifierImpl("urn:example:xacml:attribute:start-date")).next();
-        AttributeValue dateValue = dateAttribute.getValues().iterator().next();
-        assertEquals(2013, ((ISO8601Date)dateValue.getValue()).getYear());
-        assertEquals(9, ((ISO8601Date)dateValue.getValue()).getMonth());
-        assertEquals(1, ((ISO8601Date)dateValue.getValue()).getDay());
+        AttributeValue<?> dateValue = dateAttribute.getValues().iterator().next();
+        assertThat(2013).isEqualTo(((ISO8601Date)dateValue.getValue()).getYear());
+        assertThat(9).isEqualTo(((ISO8601Date)dateValue.getValue()).getMonth());
+        assertThat(1).isEqualTo(((ISO8601Date)dateValue.getValue()).getDay());
 
         // Validate the nested entity attribute
         Attribute entityAttribute = entity.getAttributes(new IdentifierImpl("urn:example:xacml:attribute:organization")).next();
-        AttributeValue entityValue = entityAttribute.getValues().iterator().next();
-        assertEquals(2, ((RequestAttributes)entityValue.getValue()).getAttributes().size());
+        AttributeValue<?> entityValue = entityAttribute.getValues().iterator().next();
+        assertThat(2).isEqualTo(((RequestAttributes)entityValue.getValue()).getAttributes().size());
     }
 
     private static void validateContent(RequestAttributes entity) throws Exception, DOMStructureException {
         // Make sure the parse was successful
-        assertNotNull("Missing entity", entity);
-        assertNotNull("Missing content node", entity.getContentRoot());
+    	assertThat(entity).isNotNull().withFailMessage("Missing entity");
+    	assertThat(entity.getContentRoot()).isNotNull().withFailMessage("Missing content node");
 
         XPath xPath = XPathFactory.newInstance().newXPath();
         xPath.setNamespaceContext(new NodeNamespaceContext(entity.getContentRoot().getOwnerDocument()));
 
         // Validate relationship kind
         Node nodeRelationshipKind = entity.getContentNodeByXpathExpression(xPath.compile("/ex:Relationship/ex:RelationshipKind"));
-        assertEquals("employee", nodeRelationshipKind.getTextContent());
+        assertThat("employee").isEqualTo(nodeRelationshipKind.getTextContent());
 
         // Validate start date
         Node nodeStartDate = entity.getContentNodeByXpathExpression(xPath.compile("/ex:Relationship/ex:StartDate"));
-        assertEquals("2013-09-01", nodeStartDate.getTextContent());
+        assertThat("2013-09-01").isEqualTo(nodeStartDate.getTextContent());
 
         // Validate start organization
         Node nodeOrganizationName = entity.getContentNodeByXpathExpression(xPath.compile("/ex:Relationship/ex:Organization/ex:OrganizationName"));
-        assertEquals("Acme Inc.", nodeOrganizationName.getTextContent());
+        assertThat("Acme Inc.").isEqualTo(nodeOrganizationName.getTextContent());
         Node nodeOrganizationType = entity.getContentNodeByXpathExpression(xPath.compile("/ex:Relationship/ex:Organization/ex:OrganizationType"));
-        assertEquals("commercial", nodeOrganizationType.getTextContent());
+        assertThat("commercial").isEqualTo(nodeOrganizationType.getTextContent());
     }
 
     private static Document fromXMLString(String xml) throws Exception {

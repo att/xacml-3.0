@@ -1,15 +1,14 @@
 package com.att.research.xacmlatt.pdp.std.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.datatypes.DataTypes;
 import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
@@ -36,76 +35,66 @@ public class FunctionDefinitionLogicalTest {
 	// use the same args for each test
 	FunctionArgumentAttributeValue attrT = null;
 	FunctionArgumentAttributeValue attrF = null;
-	public FunctionDefinitionLogicalTest () {
-		try {
-			attrT = new FunctionArgumentAttributeValue(DataTypes.DT_BOOLEAN.createAttributeValue(true));
-			attrF = new FunctionArgumentAttributeValue(DataTypes.DT_BOOLEAN.createAttributeValue(false));
-		} catch (Exception e) {
-			fail("creating attribute e="+ e);
-		}
+	public FunctionDefinitionLogicalTest () throws Exception {
+		attrT = new FunctionArgumentAttributeValue(DataTypes.DT_BOOLEAN.createAttributeValue(true));
+		attrF = new FunctionArgumentAttributeValue(DataTypes.DT_BOOLEAN.createAttributeValue(false));
 	}
 	
 	
 	@Test
-	public void testOR() {
-		FunctionArgumentAttributeValue attr5 = null;
-		try {
-			attr5 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(5));
-
-		} catch (Exception e) {
-			fail("creating attribute e="+ e);
-		}
+	public void testOR() throws DataTypeException {
+		FunctionArgumentAttributeValue attr5 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(5));
 		
 		FunctionDefinitionLogical fd = (FunctionDefinitionLogical) StdFunctions.FD_OR;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_OR, fd.getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeArgs().getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_OR);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
+		assertThat(fd.returnsBag()).isFalse();
 		
 		
 		// test normal 
 		arguments.add(attrT);
 		arguments.add(attrF);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(true), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(true));
 		
 		arguments.clear();
 		arguments.add(attrF);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(false), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(false));
 		
 		//	test no args
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(false), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(false));
 		
 		// first true, second error
 		arguments.clear();
 		arguments.add(attrT);
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(true), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(true));
 		
 		// first false, second error
 		arguments.clear();
 		arguments.add(attrF);
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:or Got null argument", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:or Got null argument");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// multiple false
 		arguments.clear();
@@ -115,91 +104,84 @@ public class FunctionDefinitionLogicalTest {
 		arguments.add(attrF);
 		arguments.add(attrF);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(false), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(false));
 		
 		// non-boolean
 		arguments.clear();
 		arguments.add(attrF);
 		arguments.add(attr5);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:or Expected data type 'boolean' saw 'integer'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:or Expected data type 'boolean' saw 'integer'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// first arg error
 		arguments.clear();
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:or Got null argument", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:or Got null argument");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 	}
 
 	
 	@Test
-	public void testAND() {
-		FunctionArgumentAttributeValue attr5 = null;
-		try {
-			attr5 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(5));
-
-		} catch (Exception e) {
-			fail("creating attribute e="+ e);
-		}
-		
+	public void testAND() throws Exception {
+		FunctionArgumentAttributeValue attr5 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(5));
 		
 		FunctionDefinitionLogical fd = (FunctionDefinitionLogical) StdFunctions.FD_AND;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_AND, fd.getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeArgs().getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_AND);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
+		assertThat(fd.returnsBag()).isFalse();
 		
 		
 		// test normal 
 		arguments.add(attrT);
 		arguments.add(attrF);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(false), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(false));
 		
 		arguments.clear();
 		arguments.add(attrF);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(false), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(false));
 		
 		//	test no args
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(true), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(true));
 		
 		// first true, second error
 		arguments.clear();
 		arguments.add(attrT);
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:and Got null argument", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:and Got null argument");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// first false, second error
 		arguments.clear();
 		arguments.add(attrF);
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(false), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(false));
 		
 		// multiple true
 		arguments.clear();
@@ -209,26 +191,26 @@ public class FunctionDefinitionLogicalTest {
 		arguments.add(attrT);
 		arguments.add(attrT);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(true), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(true));
 		
 		// non-boolean
 		arguments.clear();
 		arguments.add(attrT);
 		arguments.add(attr5);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals("function:and Expected data type 'boolean' saw 'integer'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:and Expected data type 'boolean' saw 'integer'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// first arg error
 		arguments.clear();
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals("function:and Got null argument", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:and Got null argument");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 	}
 	
@@ -236,26 +218,19 @@ public class FunctionDefinitionLogicalTest {
 	
 	
 	@Test
-	public void testN_of() {
-		FunctionArgumentAttributeValue attr0 = null;
-		FunctionArgumentAttributeValue attr2 = null;
-		try {
-			attr0 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(0));
-			attr2 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(2));
-		} catch (Exception e) {
-			fail("creating attribute e="+ e);
-		}
-		
+	public void testN_of() throws DataTypeException {
+		FunctionArgumentAttributeValue attr0 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(0));
+		FunctionArgumentAttributeValue attr2 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(2));
 		
 		FunctionDefinitionLogical fd = (FunctionDefinitionLogical) StdFunctions.FD_N_OF;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_N_OF, fd.getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeArgs().getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_N_OF);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
+		assertThat(fd.returnsBag()).isFalse();
 		
 		
 		// test normal 
@@ -264,9 +239,9 @@ public class FunctionDefinitionLogicalTest {
 		arguments.add(attrF);
 		arguments.add(attrT);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(true), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(true));
 		
 		// normal fail
 		arguments.clear();
@@ -274,9 +249,9 @@ public class FunctionDefinitionLogicalTest {
 		arguments.add(attrT);
 		arguments.add(attrF);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(false), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(false));
 		
 		
 		// null count
@@ -285,9 +260,9 @@ public class FunctionDefinitionLogicalTest {
 		arguments.add(attrT);
 		arguments.add(attrF);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(true), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(true));
 		
 		// 0 count
 		arguments.clear();
@@ -295,9 +270,9 @@ public class FunctionDefinitionLogicalTest {
 		arguments.add(attrT);
 		arguments.add(attrF);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(true), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(true));
 		
 		// bad object type for count
 		arguments.clear();
@@ -305,18 +280,18 @@ public class FunctionDefinitionLogicalTest {
 		arguments.add(attrT);
 		arguments.add(attrF);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:n-of For input string: \"true\"", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo("function:n-of For input string: \"true\"");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// count larger than list
 		arguments.clear();
 		arguments.add(attr2);
 		arguments.add(attrT);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:n-of Expected 2 arguments but only 1 arguments in list after the count", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:n-of Expected 2 arguments but only 1 arguments in list after the count");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// aborts after find ok
 		arguments.clear();
@@ -325,9 +300,9 @@ public class FunctionDefinitionLogicalTest {
 		arguments.add(attrT);
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(true), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(true));
 		
 		// error before find ok
 		arguments.clear();
@@ -335,9 +310,9 @@ public class FunctionDefinitionLogicalTest {
 		arguments.add(null);
 		arguments.add(attrT);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:n-of Got null argument", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:n-of Got null argument");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		
 		// non-boolean in list
@@ -346,9 +321,9 @@ public class FunctionDefinitionLogicalTest {
 		arguments.add(attrT);
 		arguments.add(attr0);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:n-of Expected data type 'boolean' saw 'integer'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:n-of Expected data type 'boolean' saw 'integer'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 				
 	}
 	
@@ -359,44 +334,44 @@ public class FunctionDefinitionLogicalTest {
 		FunctionDefinitionLogical fd = (FunctionDefinitionLogical) StdFunctions.FD_NOT;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_NOT, fd.getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeArgs().getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_NOT);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
+		assertThat(fd.returnsBag()).isFalse();
 		
 		
 		// test normal 
 		arguments.clear();
 		arguments.add(attrT);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(false), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(false));
 		
 		arguments.clear();
 		arguments.add(attrF);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertEquals(Boolean.valueOf(true), resValue);
+		assertThat(resValue).isEqualTo(Boolean.valueOf(true));
 		
 		
 		// test null/0 args
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:not Expected 1 argument, got 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:not Expected 1 argument, got 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// test 2 args
 		arguments.clear();
 		arguments.add(attrT);
 		arguments.add(attrF);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:not Expected 1 argument, got 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:not Expected 1 argument, got 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 	}
 }

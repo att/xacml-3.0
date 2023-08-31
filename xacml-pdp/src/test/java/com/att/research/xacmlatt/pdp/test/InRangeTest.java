@@ -1,6 +1,6 @@
 /*
  *
- *          Copyright (c) 2013,2019-2021  AT&T Knowledge Ventures
+ *          Copyright (c) 2013,2019-2021, 2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 
@@ -15,11 +15,13 @@ import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
 import java.util.Properties;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.att.research.xacml.api.Decision;
 import com.att.research.xacml.api.Response;
 import com.att.research.xacml.api.Result;
@@ -78,7 +80,7 @@ public class InRangeTest {
     
   }
   
-  @BeforeClass
+  @BeforeAll
   public static void beforeClassSetup() throws Exception {
     System.out.println(XACML3.ID_ENTITY_TIME_ZONE.stringValue());
     
@@ -90,7 +92,7 @@ public class InRangeTest {
     pdp = factory.newEngine(properties);
   }
   
-  @Ignore("Until a better algorithm for DateatimeinDayOfWeekRange is come up with, this needs to be ignored.")
+  @Disabled("Until a better algorithm for DateatimeinDayOfWeekRange is come up with, this needs to be ignored.")
   @Test
   public void testTimeInRecurring() throws Exception {
     TestRequest request = new TestRequest();

@@ -5,16 +5,15 @@
  */
 package com.att.research.xacmlatt.pdp.std.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.datatypes.DataTypes;
 import com.att.research.xacml.std.datatypes.ISO8601Date;
@@ -82,9 +81,9 @@ public class FunctionDefinitionComparisonTest {
 	
 	/**
 	 * Set up some common variables on startup
+	 * @throws DataTypeException 
 	 */
-	public FunctionDefinitionComparisonTest() {
-	try {
+	public FunctionDefinitionComparisonTest() throws DataTypeException {
 		stringAttr1 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("abc"));
 		stringAttr1a = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("abc"));
 		stringAttr2 = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("def"));
@@ -148,13 +147,6 @@ public class FunctionDefinitionComparisonTest {
 		isoDate = new ISO8601Date("+00:03", 1920, 5, 8);
 		isoDateTime = new ISO8601DateTime("+00:03", 1920, 5, 8, 12, 12, 12, 12);
 		attrDateTimeWithTimeZone = new FunctionArgumentAttributeValue(DataTypes.DT_DATETIME.createAttributeValue(isoDateTime));
-		
-		
-		
-		
-	} catch (Exception e) {
-		fail("Error creating values e="+ e);
-	}
 	}
 	
 	/**
@@ -166,46 +158,46 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_STRING_GREATER_THAN;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_STRING_GREATER_THAN, fd.getId());
-		assertEquals(DataTypes.DT_STRING.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_STRING_GREATER_THAN);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_STRING.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat(fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(stringAttr1);
 		arguments.add(stringAttr1a);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 
 		// check first < second
 		arguments.clear();
 		arguments.add(stringAttr1);
 		arguments.add(stringAttr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(stringAttr1);
 		arguments.add(stringAttrNeg1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// test bad args data types?  Not needed?
 		arguments.clear();
 		arguments.add(intAttr1);
 		arguments.add(stringAttr1);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
+		assertThat(res.isOk()).isFalse();
 	}
 	
 	@Test
@@ -214,39 +206,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_STRING_GREATER_THAN_OR_EQUAL;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_STRING_GREATER_THAN_OR_EQUAL, fd.getId());
-		assertEquals(DataTypes.DT_STRING.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_STRING_GREATER_THAN_OR_EQUAL);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_STRING.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(stringAttr1);
 		arguments.add(stringAttr1a);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// check first < second
 		arguments.clear();
 		arguments.add(stringAttr1);
 		arguments.add(stringAttr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(stringAttr1);
 		arguments.add(stringAttrNeg1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 	}
 	
 	@Test
@@ -255,39 +247,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_STRING_LESS_THAN;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_STRING_LESS_THAN, fd.getId());
-		assertEquals(DataTypes.DT_STRING.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_STRING_LESS_THAN);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_STRING.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(stringAttr1);
 		arguments.add(stringAttr1a);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 
 		// check first < second
 		arguments.clear();
 		arguments.add(stringAttr1);
 		arguments.add(stringAttr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(stringAttr1);
 		arguments.add(stringAttrNeg1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 	}
 	
 	@Test
@@ -296,39 +288,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_STRING_LESS_THAN_OR_EQUAL;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_STRING_LESS_THAN_OR_EQUAL, fd.getId());
-		assertEquals(DataTypes.DT_STRING.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_STRING_LESS_THAN_OR_EQUAL);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_STRING.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(stringAttr1);
 		arguments.add(stringAttr1a);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// check first < second
 		arguments.clear();
 		arguments.add(stringAttr1);
 		arguments.add(stringAttr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(stringAttr1);
 		arguments.add(stringAttrNeg1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 	}
 
 	
@@ -342,46 +334,46 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_INTEGER_GREATER_THAN;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_INTEGER_GREATER_THAN, fd.getId());
-		assertEquals(DataTypes.DT_INTEGER.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_INTEGER_GREATER_THAN);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_INTEGER.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(intAttr1);
 		arguments.add(intAttr1a);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 
 		// check first < second
 		arguments.clear();
 		arguments.add(intAttr1);
 		arguments.add(intAttr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(intAttr1);
 		arguments.add(intAttrNeg1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// test bad args data types?  Not needed?
 		arguments.clear();
 		arguments.add(stringAttr1);
 		arguments.add(intAttr1);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
+		assertThat(res.isOk()).isFalse();
 	}
 	
 	@Test
@@ -390,39 +382,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_INTEGER_GREATER_THAN_OR_EQUAL;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_INTEGER_GREATER_THAN_OR_EQUAL, fd.getId());
-		assertEquals(DataTypes.DT_INTEGER.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_INTEGER_GREATER_THAN_OR_EQUAL);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_INTEGER.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(intAttr1);
 		arguments.add(intAttr1a);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// check first < second
 		arguments.clear();
 		arguments.add(intAttr1);
 		arguments.add(intAttr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(intAttr1);
 		arguments.add(intAttrNeg1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 	}
 	
 	@Test
@@ -431,39 +423,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_INTEGER_LESS_THAN;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_INTEGER_LESS_THAN, fd.getId());
-		assertEquals(DataTypes.DT_INTEGER.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_INTEGER_LESS_THAN);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_INTEGER.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(intAttr1);
 		arguments.add(intAttr1a);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 
 		// check first < second
 		arguments.clear();
 		arguments.add(intAttr1);
 		arguments.add(intAttr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(intAttr1);
 		arguments.add(intAttrNeg1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 	}
 	
 	@Test
@@ -472,39 +464,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_INTEGER_LESS_THAN_OR_EQUAL;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_INTEGER_LESS_THAN_OR_EQUAL, fd.getId());
-		assertEquals(DataTypes.DT_INTEGER.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_INTEGER_LESS_THAN_OR_EQUAL);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_INTEGER.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(intAttr1);
 		arguments.add(intAttr1a);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// check first < second
 		arguments.clear();
 		arguments.add(intAttr1);
 		arguments.add(intAttr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(intAttr1);
 		arguments.add(intAttrNeg1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 	}
 	
 	
@@ -519,46 +511,47 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_DOUBLE_GREATER_THAN;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_DOUBLE_GREATER_THAN, fd.getId());
-		assertEquals(DataTypes.DT_DOUBLE.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_DOUBLE_GREATER_THAN);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_DOUBLE.getId());
+		
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(attr1);
 		arguments.add(attr1a);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attr1);
 		arguments.add(attr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attr1);
 		arguments.add(attrNeg1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// test bad args data types?  Not needed?
 		arguments.clear();
 		arguments.add(stringAttr1);
 		arguments.add(intAttr1);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
+		assertThat(res.isOk()).isFalse();
 
 	}
 	
@@ -568,39 +561,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_DOUBLE_GREATER_THAN_OR_EQUAL;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_DOUBLE_GREATER_THAN_OR_EQUAL, fd.getId());
-		assertEquals(DataTypes.DT_DOUBLE.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_DOUBLE_GREATER_THAN_OR_EQUAL);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_DOUBLE.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(attr1);
 		arguments.add(attr1a);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attr1);
 		arguments.add(attr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attr1);
 		arguments.add(attrNeg1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 	}
 	
 	@Test
@@ -609,39 +602,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_DOUBLE_LESS_THAN;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_DOUBLE_LESS_THAN, fd.getId());
-		assertEquals(DataTypes.DT_DOUBLE.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_DOUBLE_LESS_THAN);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_DOUBLE.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(attr1);
 		arguments.add(attr1a);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attr1);
 		arguments.add(attr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attr1);
 		arguments.add(attrNeg1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 	}
 	
 	@Test
@@ -650,39 +643,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_DOUBLE_LESS_THAN_OR_EQUAL;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_DOUBLE_LESS_THAN_OR_EQUAL, fd.getId());
-		assertEquals(DataTypes.DT_DOUBLE.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_DOUBLE_LESS_THAN_OR_EQUAL);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_DOUBLE.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(attr1);
 		arguments.add(attr1a);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attr1);
 		arguments.add(attr2);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attr1);
 		arguments.add(attrNeg1);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 	}
 
 	
@@ -697,54 +690,54 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_DATE_GREATER_THAN;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_DATE_GREATER_THAN, fd.getId());
-		assertEquals(DataTypes.DT_DATE.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_DATE_GREATER_THAN);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_DATE.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(attrDateToday);
 		arguments.add(attrDateSameDay);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attrDateToday);
 		arguments.add(attrDateTommorrow);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attrDateToday);
 		arguments.add(attrDateYesterday);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// test bad args data types?  One with TimeZone and one without
 		arguments.clear();
 		arguments.add(stringAttr1);
 		arguments.add(intAttr1);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
+		assertThat(res.isOk()).isFalse();
 
 		// test with TimeZone vs without
 		arguments.clear();
 		arguments.add(attrDateWithTimeZone);
 		arguments.add(attrDateNoTimeZone);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 	
 
 	}
@@ -755,39 +748,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_DATE_GREATER_THAN_OR_EQUAL;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_DATE_GREATER_THAN_OR_EQUAL, fd.getId());
-		assertEquals(DataTypes.DT_DATE.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_DATE_GREATER_THAN_OR_EQUAL);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_DATE.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(attrDateToday);
 		arguments.add(attrDateSameDay);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attrDateToday);
 		arguments.add(attrDateTommorrow);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attrDateToday);
 		arguments.add(attrDateYesterday);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 	}
 	
 	@Test
@@ -796,39 +789,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_DATE_LESS_THAN;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_DATE_LESS_THAN, fd.getId());
-		assertEquals(DataTypes.DT_DATE.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_DATE_LESS_THAN);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_DATE.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(attrDateToday);
 		arguments.add(attrDateSameDay);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attrDateToday);
 		arguments.add(attrDateTommorrow);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attrDateToday);
 		arguments.add(attrDateYesterday);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 	}
 	
 	@Test
@@ -837,45 +830,40 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_DATE_LESS_THAN_OR_EQUAL;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_DATE_LESS_THAN_OR_EQUAL, fd.getId());
-		assertEquals(DataTypes.DT_DATE.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_DATE_LESS_THAN_OR_EQUAL);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_DATE.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 
 		// first == second
 		arguments.add(attrDateToday);
 		arguments.add(attrDateSameDay);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attrDateToday);
 		arguments.add(attrDateTommorrow);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attrDateToday);
 		arguments.add(attrDateYesterday);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 	}
-	
-	
-	
-	
-	
 	
 	
 	/**
@@ -888,54 +876,54 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_TIME_GREATER_THAN;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_TIME_GREATER_THAN, fd.getId());
-		assertEquals(DataTypes.DT_TIME.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_TIME_GREATER_THAN);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_TIME.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(attrTimeToday);
 		arguments.add(attrTimeSameDay);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attrTimeToday);
 		arguments.add(attrTimeTommorrow);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attrTimeToday);
 		arguments.add(attrTimeYesterday);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// test bad args data types?  One with TimeZone and one without
 		arguments.clear();
 		arguments.add(stringAttr1);
 		arguments.add(intAttr1);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
+		assertThat(res.isOk()).isFalse();
 
 		// test with TimeZone vs without
 		arguments.clear();
 		arguments.add(attrTimeWithTimeZone);
 		arguments.add(attrTimeNoTimeZone);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 	
 
 	}
@@ -946,39 +934,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_TIME_GREATER_THAN_OR_EQUAL;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_TIME_GREATER_THAN_OR_EQUAL, fd.getId());
-		assertEquals(DataTypes.DT_TIME.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_TIME_GREATER_THAN_OR_EQUAL);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_TIME.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(attrTimeToday);
 		arguments.add(attrTimeSameDay);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attrTimeToday);
 		arguments.add(attrTimeTommorrow);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attrTimeToday);
 		arguments.add(attrTimeYesterday);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 	}
 	
 	@Test
@@ -987,39 +975,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_TIME_LESS_THAN;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_TIME_LESS_THAN, fd.getId());
-		assertEquals(DataTypes.DT_TIME.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_TIME_LESS_THAN);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_TIME.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(attrTimeToday);
 		arguments.add(attrTimeSameDay);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attrTimeToday);
 		arguments.add(attrTimeTommorrow);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attrTimeToday);
 		arguments.add(attrTimeYesterday);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 	}
 	
 	@Test
@@ -1028,39 +1016,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_TIME_LESS_THAN_OR_EQUAL;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_TIME_LESS_THAN_OR_EQUAL, fd.getId());
-		assertEquals(DataTypes.DT_TIME.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_TIME_LESS_THAN_OR_EQUAL);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_TIME.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(attrTimeToday);
 		arguments.add(attrTimeSameDay);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attrTimeToday);
 		arguments.add(attrTimeTommorrow);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attrTimeToday);
 		arguments.add(attrTimeYesterday);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 	}
 	
 	
@@ -1074,54 +1062,54 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_DATETIME_GREATER_THAN;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_DATETIME_GREATER_THAN, fd.getId());
-		assertEquals(DataTypes.DT_DATETIME.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_DATETIME_GREATER_THAN);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_DATETIME.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(attrDateTimeToday);
 		arguments.add(attrDateTimeSameDay);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attrDateTimeToday);
 		arguments.add(attrDateTimeTommorrow);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attrDateTimeToday);
 		arguments.add(attrDateTimeYesterday);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// test bad args data types?  One with TimeZone and one without
 		arguments.clear();
 		arguments.add(stringAttr1);
 		arguments.add(intAttr1);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
+		assertThat(res.isOk()).isFalse();
 
 		// test with TimeZone vs without
 		arguments.clear();
 		arguments.add(attrDateTimeWithTimeZone);
 		arguments.add(attrDateTimeNoTimeZone);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.isOk());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.isOk()).isFalse();
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 	
 
 	}
@@ -1132,39 +1120,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_DATETIME_GREATER_THAN_OR_EQUAL;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_DATETIME_GREATER_THAN_OR_EQUAL, fd.getId());
-		assertEquals(DataTypes.DT_DATETIME.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_DATETIME_GREATER_THAN_OR_EQUAL);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_DATETIME.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(attrDateTimeToday);
 		arguments.add(attrDateTimeSameDay);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attrDateTimeToday);
 		arguments.add(attrDateTimeTommorrow);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attrDateTimeToday);
 		arguments.add(attrDateTimeYesterday);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 	}
 	
 	@Test
@@ -1173,39 +1161,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_DATETIME_LESS_THAN;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_DATETIME_LESS_THAN, fd.getId());
-		assertEquals(DataTypes.DT_DATETIME.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_DATETIME_LESS_THAN);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_DATETIME.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(attrDateTimeToday);
 		arguments.add(attrDateTimeSameDay);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attrDateTimeToday);
 		arguments.add(attrDateTimeTommorrow);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attrDateTimeToday);
 		arguments.add(attrDateTimeYesterday);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 	}
 	
 	@Test
@@ -1214,39 +1202,39 @@ public class FunctionDefinitionComparisonTest {
 		FunctionDefinitionComparison<?> fd = (FunctionDefinitionComparison<?>) StdFunctions.FD_DATETIME_LESS_THAN_OR_EQUAL;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_DATETIME_LESS_THAN_OR_EQUAL, fd.getId());
-		assertEquals(DataTypes.DT_DATETIME.getId(), fd.getDataTypeArgs().getId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_DATETIME_LESS_THAN_OR_EQUAL);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_DATETIME.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		// first == second
 		arguments.add(attrDateTimeToday);
 		arguments.add(attrDateTimeSameDay);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// first < second
 		arguments.clear();
 		arguments.add(attrDateTimeToday);
 		arguments.add(attrDateTimeTommorrow);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// first > second
 		arguments.clear();
 		arguments.add(attrDateTimeToday);
 		arguments.add(attrDateTimeYesterday);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 	}
 
 

@@ -1,14 +1,19 @@
 /*
  *
- *          Copyright (c) 2020  AT&T Knowledge Ventures
+ *          Copyright (c) 2020,2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 
 package com.att.research.xacml.std.json;
 
 import java.io.Serializable;
-import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.w3c.dom.Node;
 
 import com.att.research.xacml.api.AttributeCategory;
 import com.att.research.xacml.api.DataType;
@@ -21,17 +26,6 @@ import com.google.gson.annotations.SerializedName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 @Data
 public class GsonJsonCategory implements Serializable {

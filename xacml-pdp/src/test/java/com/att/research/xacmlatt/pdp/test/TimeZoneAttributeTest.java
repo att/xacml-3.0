@@ -1,6 +1,6 @@
 /*
  *
- *          Copyright (c) 2013,2019-2020  AT&T Knowledge Ventures
+ *          Copyright (c) 2013,2019-2020, 2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 
@@ -16,11 +16,13 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.Decision;
 import com.att.research.xacml.api.Response;
@@ -72,7 +74,7 @@ public class TimeZoneAttributeTest {
     
   }
   
-  @BeforeClass
+  @BeforeAll
   public static void beforeClassSetup() throws Exception {
     System.out.println(XACML3.ID_ENTITY_TIME_ZONE.stringValue());
     
@@ -163,7 +165,7 @@ public class TimeZoneAttributeTest {
    * 
    * @throws Exception exception
    */
-  @Ignore("See above comment as to why this is ignored.")
+  @Disabled("See above comment as to why this is ignored.")
   @Test
   public void testTimeZoneExample41() throws Exception {
     MyRequestAttributes request = new MyRequestAttributes();
@@ -172,7 +174,7 @@ public class TimeZoneAttributeTest {
     runExample41(request);    
   }
   
-  @Ignore("Ignored for same reason as other JUnit - policy is flawed.")
+  @Disabled("Ignored for same reason as other JUnit - policy is flawed.")
   @Test
   public void testTimeZoneExample41Efficient() throws Exception {
     MyRequestAttributes request = new MyRequestAttributes();

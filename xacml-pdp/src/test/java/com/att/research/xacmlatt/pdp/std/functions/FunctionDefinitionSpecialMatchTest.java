@@ -1,17 +1,20 @@
+/*
+ *
+ *          Copyright (c) 2013,2023  AT&T Knowledge Ventures
+ *                     SPDX-License-Identifier: MIT
+ */
 package com.att.research.xacmlatt.pdp.std.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.datatypes.DataTypes;
 import com.att.research.xacmlatt.pdp.policy.Bag;
@@ -38,7 +41,7 @@ public class FunctionDefinitionSpecialMatchTest {
 	List<FunctionArgument> arguments = new ArrayList<FunctionArgument>();
 	
 	@Test
-	public void testX500NameMatch() {
+	public void testX500NameMatch() throws DataTypeException {
 		// assume that the contents of the name components are not significant and we can treat them as simple blocks of "<name>=<value>"
 		String A = "cn=Some person";
 		String B = "O=Medico Corp";
@@ -66,8 +69,6 @@ public class FunctionDefinitionSpecialMatchTest {
 		FunctionArgumentAttributeValue attrBad = null;
 		FunctionArgumentBag attrBag = new FunctionArgumentBag(new Bag());
 
-		
-		try {
 			attrABC = new FunctionArgumentAttributeValue(DataTypes.DT_X500NAME.createAttributeValue(abc));
 			attrDABC = new FunctionArgumentAttributeValue(DataTypes.DT_X500NAME.createAttributeValue(dabc));
 			attrABCD = new FunctionArgumentAttributeValue(DataTypes.DT_X500NAME.createAttributeValue(abcd));
@@ -76,20 +77,17 @@ public class FunctionDefinitionSpecialMatchTest {
 			attrDEF = new FunctionArgumentAttributeValue(DataTypes.DT_X500NAME.createAttributeValue(def));
 
 			attrBad = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(123));
-		} catch (Exception e) {
-			fail("creating attribute e="+ e);
-		}
 		
 		FunctionDefinitionX500NameMatch fd = (FunctionDefinitionX500NameMatch) StdFunctions.FD_X500NAME_MATCH;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_X500NAME_MATCH, fd.getId());
-		assertEquals(DataTypes.DT_X500NAME.getId(), fd.getDataTypeArgs().getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_X500NAME_MATCH);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_X500NAME.getId());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		
 		// test normal, first exact match for second
@@ -97,72 +95,72 @@ public class FunctionDefinitionSpecialMatchTest {
 		arguments.add(attrABC);
 		arguments.add(attrABC);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// test first is end of second
 		arguments.clear();
 		arguments.add(attrABC);
 		arguments.add(attrDABC);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// first exact match for sub-section but not end of second
 		arguments.clear();
 		arguments.add(attrABC);
 		arguments.add(attrABCD);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// components of first match components in second but not contiguous
 		arguments.clear();
 		arguments.add(attrABC);
 		arguments.add(attrADBC);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// components of first match components in second but not in order
 		arguments.clear();
 		arguments.add(attrABC);
 		arguments.add(attrDCAB);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first does not match second at all
 		arguments.clear();
 		arguments.add(attrABC);
 		arguments.add(attrDEF);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first arg larger than 2nd arg
 		arguments.clear();
 		arguments.add(attrABCD);
 		arguments.add(attrABC);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// bad arg types
 		arguments.clear();
 		arguments.add(attrABC);
 		arguments.add(attrBad);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:x500Name-match Expected data type 'x500Name' saw 'integer' at arg index 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:x500Name-match Expected data type 'x500Name' saw 'integer' at arg index 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// too many args
 		arguments.clear();
@@ -170,47 +168,47 @@ public class FunctionDefinitionSpecialMatchTest {
 		arguments.add(attrABC);
 		arguments.add(attrABC);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:x500Name-match Expected 2 arguments, got 3", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:x500Name-match Expected 2 arguments, got 3");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// too few args
 		arguments.clear();
 		arguments.add(attrABC);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:x500Name-match Expected 2 arguments, got 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:x500Name-match Expected 2 arguments, got 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:x500Name-match Expected 2 arguments, got 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:x500Name-match Expected 2 arguments, got 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// one arg is bag
 		arguments.clear();
 		arguments.add(attrABC);
 		arguments.add(attrBag);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:x500Name-match Expected a simple value, saw a bag at arg index 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:x500Name-match Expected a simple value, saw a bag at arg index 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// null arg
 		arguments.clear();
 		arguments.add(null);
 		arguments.add(attrBag);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:x500Name-match Got null argument at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:x500Name-match Got null argument at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 	}
 
 	
 	@Test
-	public void testRfc822NameMatch() {
+	public void testRfc822NameMatch() throws DataTypeException {
 
 		
 		
@@ -239,7 +237,6 @@ public class FunctionDefinitionSpecialMatchTest {
 
 		FunctionArgumentBag attrBag = new FunctionArgumentBag(new Bag());
 
-		try {
 			attrStringabcxyz = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("abc@xyz"));
 			attrStringABCxyz = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("ABC@xyz"));
 			attrStringabcXYZ = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("abc@XYZ"));
@@ -260,19 +257,16 @@ public class FunctionDefinitionSpecialMatchTest {
 			attrRfcabcxyz = new FunctionArgumentAttributeValue(DataTypes.DT_RFC822NAME.createAttributeValue("abc@xyz"));
 			attrRfcwholedomainpart = new FunctionArgumentAttributeValue(DataTypes.DT_RFC822NAME.createAttributeValue("abc@whole.domain.part"));
 			attrRfcWholeDomainPart = new FunctionArgumentAttributeValue(DataTypes.DT_RFC822NAME.createAttributeValue("abc@Whole.Domain.Part"));
-		} catch (Exception e) {
-			fail("creating attribute e="+ e);
-		}
 		
 		FunctionDefinitionRFC822NameMatch fd = (FunctionDefinitionRFC822NameMatch) StdFunctions.FD_RFC822NAME_MATCH;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_RFC822NAME_MATCH, fd.getId());
-		assertEquals(DataTypes.DT_RFC822NAME.getId(), fd.getDataTypeArgs().getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_RFC822NAME_MATCH);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_RFC822NAME.getId());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
+		assertThat(fd.returnsBag()).isFalse();
 		
 		
 		// string identical to name - exact match on whole search term
@@ -280,27 +274,27 @@ public class FunctionDefinitionSpecialMatchTest {
 		arguments.add(attrStringabcxyz);
 		arguments.add(attrRfcabcxyz);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.getStatus().isOk());
+		assertThat(res.getStatus().isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// no match local case different
 		arguments.clear();
 		arguments.add(attrStringABCxyz);
 		arguments.add(attrRfcabcxyz);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.getStatus().isOk());
+		assertThat(res.getStatus().isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// match domain case different
 		arguments.clear();
 		arguments.add(attrStringabcXYZ);
 		arguments.add(attrRfcabcxyz);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.getStatus().isOk());
+		assertThat(res.getStatus().isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 
 		// partial local + partial domain
@@ -308,115 +302,115 @@ public class FunctionDefinitionSpecialMatchTest {
 		arguments.add(attrStringcx);
 		arguments.add(attrRfcabcxyz);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.getStatus().isOk());
+		assertThat(res.getStatus().isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// whole domain
 		arguments.clear();
 		arguments.add(attrStringwholedomainpart);
 		arguments.add(attrRfcwholedomainpart);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.getStatus().isOk());
+		assertThat(res.getStatus().isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// whole domain different case
 		arguments.clear();
 		arguments.add(attrStringWholeDomainPart);
 		arguments.add(attrRfcwholedomainpart);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.getStatus().isOk());
+		assertThat(res.getStatus().isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		arguments.clear();
 		arguments.add(attrStringwholedomainpart);
 		arguments.add(attrRfcWholeDomainPart);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.getStatus().isOk());
+		assertThat(res.getStatus().isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// whole domain fail
 		arguments.clear();
 		arguments.add(attrStringWholeDomain);
 		arguments.add(attrRfcWholeDomainPart);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.getStatus().isOk());
+		assertThat(res.getStatus().isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// partial domain match
 		arguments.clear();
 		arguments.add(attrStringDomainPart);
 		arguments.add(attrRfcWholeDomainPart);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.getStatus().isOk());
+		assertThat(res.getStatus().isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// partial domain different case
 		arguments.clear();
 		arguments.add(attrStringdomainpart);
 		arguments.add(attrRfcWholeDomainPart);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.getStatus().isOk());
+		assertThat(res.getStatus().isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// partial domain fail
 		arguments.clear();
 		arguments.add(attrStringdotWholeDomain);
 		arguments.add(attrRfcWholeDomainPart);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.getStatus().isOk());
+		assertThat(res.getStatus().isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		arguments.clear();
 		arguments.add(attrStringdomain);
 		arguments.add(attrRfcWholeDomainPart);
 		res = fd.evaluate(null, arguments);
-		assertTrue(res.getStatus().isOk());
+		assertThat(res.getStatus().isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// search term contains more than 1 @
 		arguments.clear();
 		arguments.add(attrStringMultipleAt);
 		arguments.add(attrRfcabcxyz);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:rfc822Name-match String contained more than 1 '@' in 'name@with@multipleAts'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:rfc822Name-match String contained more than 1 '@' in 'name@with@multipleAts'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// search term missing local part
 		arguments.clear();
 		arguments.add(attrStringMissingLocal);
 		arguments.add(attrRfcabcxyz);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:rfc822Name-match String missing local part in '@multipleAts'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:rfc822Name-match String missing local part in '@multipleAts'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// search term missing domain part
 		arguments.clear();
 		arguments.add(attrStringMissingDomain);
 		arguments.add(attrRfcabcxyz);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:rfc822Name-match String missing domain part in 'localpart@'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:rfc822Name-match String missing domain part in 'localpart@'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// bad arg types
 		arguments.clear();
 		arguments.add(attrRfcabcxyz);
 		arguments.add(attrStringNoMatch);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:rfc822Name-match Expected data type 'string' saw 'rfc822Name' at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:rfc822Name-match Expected data type 'string' saw 'rfc822Name' at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// too many args
 		arguments.clear();
@@ -424,41 +418,41 @@ public class FunctionDefinitionSpecialMatchTest {
 		arguments.add(attrStringNoMatch);
 		arguments.add(attrStringNoMatch);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:rfc822Name-match Expected 2 arguments, got 3", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:rfc822Name-match Expected 2 arguments, got 3");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// too few args
 		arguments.clear();
 		arguments.add(attrStringNoMatch);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:rfc822Name-match Expected 2 arguments, got 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:rfc822Name-match Expected 2 arguments, got 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:rfc822Name-match Expected 2 arguments, got 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:rfc822Name-match Expected 2 arguments, got 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// one arg is bag
 		arguments.clear();
 		arguments.add(attrStringNoMatch);
 		arguments.add(attrBag);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:rfc822Name-match Expected a simple value, saw a bag at arg index 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:rfc822Name-match Expected a simple value, saw a bag at arg index 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// null arg
 		arguments.clear();
 		arguments.add(null);
 		arguments.add(attrStringNoMatch);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:rfc822Name-match Got null argument at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:rfc822Name-match Got null argument at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		
 		

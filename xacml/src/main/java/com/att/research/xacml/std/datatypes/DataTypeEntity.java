@@ -6,14 +6,15 @@
  */
 package com.att.research.xacml.std.datatypes;
 
+import org.w3c.dom.Node;
+
 import com.att.research.xacml.api.DataTypeException;
-import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.api.RequestAttributes;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.StdMutableRequestAttributes;
-import com.att.research.xacml.std.dom.*;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import com.att.research.xacml.std.dom.DOMRequestAttributes;
+import com.att.research.xacml.std.dom.DOMStructureException;
+import com.att.research.xacml.std.dom.DOMUtil;
 
 /**
  * DataTypeEntity implements the entity data type from the

@@ -1,6 +1,6 @@
 /*
  *
- *          Copyright (c) 2020  AT&T Knowledge Ventures
+ *          Copyright (c) 2020, 2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 
@@ -8,23 +8,25 @@ package com.att.research.xacml.std.json;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigInteger;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.att.research.xacml.std.datatypes.*;
-import com.google.common.collect.Iterators;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.att.research.xacml.api.Attribute;
 import com.att.research.xacml.api.AttributeValue;
 import com.att.research.xacml.api.DataTypeException;
@@ -36,17 +38,24 @@ import com.att.research.xacml.api.XACML2;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.IdentifierImpl;
 import com.att.research.xacml.std.StdAttributeValue;
-import org.w3c.dom.Node;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
+import com.att.research.xacml.std.datatypes.DataTypeAnyURI;
+import com.att.research.xacml.std.datatypes.DataTypeBoolean;
+import com.att.research.xacml.std.datatypes.DataTypeDate;
+import com.att.research.xacml.std.datatypes.DataTypeDateTime;
+import com.att.research.xacml.std.datatypes.DataTypeDouble;
+import com.att.research.xacml.std.datatypes.DataTypeInteger;
+import com.att.research.xacml.std.datatypes.DataTypeRFC822Name;
+import com.att.research.xacml.std.datatypes.DataTypeTime;
+import com.att.research.xacml.std.datatypes.DataTypeX500Name;
+import com.att.research.xacml.std.datatypes.DataTypeXPathExpression;
+import com.att.research.xacml.std.datatypes.NodeNamespaceContext;
+import com.google.common.collect.Iterators;
 
 public class JsonRequestTranslatorTest {
 	private static final Logger logger	= LoggerFactory.getLogger(JsonRequestTranslatorTest.class);
 
-	@Rule
-	public TemporaryFolder folder = new TemporaryFolder();
+	@TempDir
+	Path folder;
 
 	@Test
 	public void test4231() throws Exception {
@@ -604,16 +613,14 @@ public class JsonRequestTranslatorTest {
         				DataTypeDateTime.newInstance().convert("2020-01-01T08:23:47-05:00")))
         		)).isTrue();
 
-        if (! hasAttribute(request, 
+        assertThat(hasAttribute(request, 
         		XACML1.ID_SUBJECT_CATEGORY_CODEBASE, 
         		new IdentifierImpl("id:code"), 
         		null, 
         		false, 
         		Arrays.asList(new StdAttributeValue<>(XACML3.ID_DATATYPE_STRING, "image:build"),
 						new StdAttributeValue<>(XACML3.ID_DATATYPE_STRING, "5"))
-        		)) {
-        	fail("id:code is incorrect");
-        }
+        		)).isTrue();
 
         assertThat(hasAttribute(request, 
         		XACML1.ID_SUBJECT_CATEGORY_CODEBASE, 
@@ -639,20 +646,6 @@ public class JsonRequestTranslatorTest {
         		Arrays.asList(new StdAttributeValue<>(XACML3.ID_DATATYPE_BOOLEAN, Boolean.parseBoolean("false")))
         		)).isTrue();
 
-        /*
-        assertThat(hasAttribute(request, 
-        		XACML1.ID_SUBJECT_CATEGORY_REQUESTING_MACHINE, 
-        		new IdentifierImpl("id:machine"), 
-        		null, 
-        		false, 
-        		Arrays.asList(new StdAttributeValue<>(XACML3.ID_DATATYPE_STRING, 
-        				Arrays.asList(
-        						ImmutableMap.of("rack", "topleft"),
-        						ImmutableMap.of("id", BigInteger.valueOf(10))
-        						)))
-        		)).isTrue();
-         */
-        // @formatter:on
     }
     
     private void validateAllJson(String strJson) {
@@ -724,7 +717,7 @@ public class JsonRequestTranslatorTest {
     @Test
     public void testExceptions() {
         assertThatExceptionOfType(JSONStructureException.class).isThrownBy(() -> {
-            JsonRequestTranslator.load(new File(folder.getRoot().getAbsolutePath() + "/idontexist.json"));
+            JsonRequestTranslator.load(folder.resolve("/idontexist.json").toFile());
         });
         assertThatExceptionOfType(JSONStructureException.class).isThrownBy(() -> {
             JsonRequestTranslator.load("iamnot a json string at all");

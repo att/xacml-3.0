@@ -1,18 +1,18 @@
 /*
  *
- *          Copyright (c) 2018-2020 AT&T Knowledge Ventures
+ *          Copyright (c) 2018-2020, 2023 AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 
 package com.att.research.xacml.std.datatypes;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ISO8601DateTest {
 
@@ -23,8 +23,8 @@ public class ISO8601DateTest {
 		//
 		LocalDate local = LocalDate.now();
 		ISO8601Date iso8601 = ISO8601Date.fromLocalDate(local);
-		assertEquals(local.getYear(), iso8601.getYear());
-		assertNotEquals(0, iso8601.hashCode());
+		assertThat(local.getYear()).isEqualTo(iso8601.getYear());
+		assertThat(iso8601.hashCode()).isNotZero();
 	}
 	
 	@Test
@@ -33,42 +33,42 @@ public class ISO8601DateTest {
 		// String test
 		//
 	    ISO8601Date iso8601 = ISO8601Date.fromISO8601DateString("2007-04-05");
-		assertEquals(2007, iso8601.getYear());
-		assertEquals(04, iso8601.getMonth());
-		assertEquals(05, iso8601.getDay());
-		assertFalse(iso8601.getHasTimeZone());
+	    assertThat(2007).isEqualTo(iso8601.getYear());
+	    assertThat(04).isEqualTo(iso8601.getMonth());
+	    assertThat(05).isEqualTo(iso8601.getDay());
+	    assertThat(iso8601.getHasTimeZone()).isFalse();
 		
-		assertEquals(iso8601, new ISO8601Date(2007, 04, 05));
+		assertThat(iso8601).isEqualTo(new ISO8601Date(2007, 04, 05));
 		
 		iso8601 = ISO8601Date.fromISO8601DateString("2007-04-05-05:00");
-		assertEquals(2007, iso8601.getYear());
-		assertEquals(04, iso8601.getMonth());
-		assertEquals(05, iso8601.getDay());
-		assertTrue(iso8601.getHasTimeZone());
+		assertThat(2007).isEqualTo(iso8601.getYear());
+		assertThat(04).isEqualTo(iso8601.getMonth());
+		assertThat(05).isEqualTo(iso8601.getDay());
+		assertThat(iso8601.getHasTimeZone()).isTrue();
 
 		iso8601 = ISO8601Date.fromISO8601DateString("2007-04-05");
-		assertFalse(iso8601.getHasTimeZone());
+		assertThat(iso8601.getHasTimeZone()).isFalse();
 		
-		assertEquals(ISO8601Date.fromISO8601DateString("2007-04-05"), iso8601);
-		assertNotEquals(iso8601, new Object());
+		assertThat(ISO8601Date.fromISO8601DateString("2007-04-05")).isEqualTo(iso8601);
+		assertThat(iso8601).isNotEqualTo(new Object());
 		//
 		// Constructor coverage
 		//
-		assertTrue(iso8601.stringValue(false).startsWith("2007-04-05"));
-		assertTrue(iso8601.stringValue().startsWith("2007-04-05"));
-		assertTrue(iso8601.toString().startsWith("2007-04-05"));
-		assertEquals(iso8601, new ISO8601Date(iso8601.getYear(), iso8601.getMonth(), iso8601.getDay()));
+		assertThat(iso8601.stringValue(false).startsWith("2007-04-05")).isTrue();
+		assertThat(iso8601.stringValue().startsWith("2007-04-05")).isTrue();
+		assertThat(iso8601.toString().startsWith("2007-04-05")).isTrue();
+		assertThat(iso8601).isEqualTo(new ISO8601Date(iso8601.getYear(), iso8601.getMonth(), iso8601.getDay()));
 		ZoneOffset offset = null;
-		assertEquals(iso8601, new ISO8601Date(offset, 2007, 04, 05));
+		assertThat(iso8601).isEqualTo(new ISO8601Date(offset, 2007, 04, 05));
 		
 		//
 		// Duration
 		//
 		ISO8601Date add = iso8601.add(ISO8601Duration.newInstance("P3Y"));
-		assertEquals(2010, add.getYear());
-		assertTrue(iso8601.compareTo(add) < 0);
+		assertThat(2010).isEqualTo(add.getYear());
+		assertThat(iso8601.compareTo(add)).isLessThan(0);
 		ISO8601Date sub = iso8601.sub(ISO8601Duration.newInstance("P3Y"));
-		assertEquals(2004, sub.getYear());
-		assertTrue(iso8601.compareTo(sub) > 0);
+		assertThat(2004).isEqualTo(sub.getYear());
+		assertThat(iso8601.compareTo(sub)).isGreaterThan(0);
 	}
 }

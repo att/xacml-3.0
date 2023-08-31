@@ -1,19 +1,22 @@
 /*
  *
- *          Copyright (c) 2020  AT&T Knowledge Ventures
+ *          Copyright (c) 2020, 2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 
 package com.att.research.xacmlatt.pdp.std.functions;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import com.att.research.xacml.api.AttributeValue;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.StdAttributeValue;
@@ -31,7 +34,7 @@ public class FunctionDefinitionTimeWithOffsetTest {
   private static final FunctionDefinition fd = new FunctionDefinitionTimeWithOffset();
   private static List<FunctionArgument> arguments = new ArrayList<FunctionArgument>();
 
-  @Before
+  @BeforeEach
   public void beforeEachTest() {
     arguments.clear();
   }

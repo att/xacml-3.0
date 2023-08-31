@@ -1,13 +1,12 @@
 package com.att.research.xacmlatt.pdp.std.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,10 +14,12 @@ import java.util.List;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.Request;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.IdentifierImpl;
@@ -27,6 +28,7 @@ import com.att.research.xacml.std.StdStatus;
 import com.att.research.xacml.std.datatypes.DataTypes;
 import com.att.research.xacml.std.datatypes.XPathExpressionWrapper;
 import com.att.research.xacml.std.dom.DOMRequest;
+import com.att.research.xacml.std.dom.DOMStructureException;
 import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
 import com.att.research.xacmlatt.pdp.policy.FunctionArgument;
 import com.att.research.xacmlatt.pdp.policy.FunctionArgumentAttributeValue;
@@ -200,9 +202,12 @@ public class FunctionDefinitionXPathTest {
 	
 	/**
 	 * Set up all variables in one place because it is complicated (lots of steps needed for each attribute)
+	 * @throws DataTypeException 
+	 * @throws XPathExpressionException 
+	 * @throws IOException 
+	 * @throws DOMStructureException 
 	 */
-	public FunctionDefinitionXPathTest() {
-		try {
+	public FunctionDefinitionXPathTest() throws DataTypeException, XPathExpressionException, IOException, DOMStructureException {
 			XPathFactory xPathFactory = XPathFactory.newInstance();
 			XPath xpath = xPathFactory.newXPath();
 			xpath.setNamespaceContext(nameSpaceContext);
@@ -338,10 +343,8 @@ public class FunctionDefinitionXPathTest {
 					tFile.delete();
 			} catch (com.att.research.xacml.std.dom.DOMStructureException e) {
 				// this is what it should do, so just continue
-			} catch (Exception e) {
-				fail("Unexpected exception for bad XML, e="+e);
-			}	
-				
+			}
+			
 			// Bad XML - Content not under a Category
 			reqString = reqStrMainStart + reqStrContentMdRecord + reqStrResourceStart + reqStrResourceEnd + reqStrActionStart + reqStrActionEnd + reqStrMainEnd;
 				tFile = File.createTempFile("functionJunit", "request");
@@ -354,8 +357,6 @@ public class FunctionDefinitionXPathTest {
 					tFile.delete();
 			} catch (com.att.research.xacml.std.dom.DOMStructureException e) {
 				// this is what it should do, so just continue
-			} catch (Exception e) {
-				fail("Unexpected exception for bad XML, e="+e);
 			}
 				
 			// Bad XML - Content is not valid XML
@@ -370,13 +371,7 @@ public class FunctionDefinitionXPathTest {
 					tFile.delete();
 			} catch (com.att.research.xacml.std.dom.DOMStructureException e) {
 				// this is what it should do, so just continue
-			} catch (Exception e) {
-				fail("Unexpected exception for bad XML, e="+e);
 			}
-			
-		} catch (Exception e) {
-			fail("Constructor initializing variables, e="+ e + "  cause="+e.getCause());
-		}
 		
 	}
 	
@@ -395,71 +390,71 @@ public class FunctionDefinitionXPathTest {
 		FunctionDefinitionXPath<?> fd = (FunctionDefinitionXPath<?>) StdFunctions.FD_XPATH_NODE_COUNT;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_XPATH_NODE_COUNT, fd.getId());
-		assertEquals(DataTypes.DT_XPATHEXPRESSION.getId(), fd.getDataTypeArgs().getId());
-		assertEquals(DataTypes.DT_INTEGER.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_XPATH_NODE_COUNT);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_XPATHEXPRESSION.getId());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_INTEGER.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(1), fd.getNumArgs());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat(fd.getNumArgs()).isEqualTo(Integer.valueOf(1));
 		
 
 		// match all elements within context
 		arguments.clear();
 		arguments.add(attrXSlashSlashStar);
 		ExpressionResult res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		BigInteger resValue = (BigInteger)res.getValue().getValue();
-		assertEquals(new BigInteger("18"), resValue);
+		assertThat(resValue).isEqualTo(new BigInteger("18"));
 	
 		// match exactly 1 element
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdMalignancy);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (BigInteger)res.getValue().getValue();
-		assertEquals(new BigInteger("1"), resValue);
+		assertThat(resValue).isEqualTo(new BigInteger("1"));
 		
 		// match a few but not all
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (BigInteger)res.getValue().getValue();
-		assertEquals(new BigInteger("2"), resValue);
+		assertThat(resValue).isEqualTo(new BigInteger("2"));
 		
 		
 		// verify variables using in other tests: count nodes immediately under md:record
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdRecordSlashStar);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (BigInteger)res.getValue().getValue();
-		assertEquals(new BigInteger("3"), resValue);
+		assertThat(resValue).isEqualTo(new BigInteger("3"));
 		
 		// verify variables using in other tests: count number of records containing patient_info
 		arguments.clear();
 		arguments.add(attrXMdPatientInfo);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (BigInteger)res.getValue().getValue();
-		assertEquals(new BigInteger("1"), resValue);
+		assertThat(resValue).isEqualTo(new BigInteger("1"));
 		
 		// verify variables using in other tests: count number of records containing md:name
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (BigInteger)res.getValue().getValue();
-		assertEquals(new BigInteger("2"), resValue);
+		assertThat(resValue).isEqualTo(new BigInteger("2"));
 		
 		// verify variables using in other tests: count number of records containing md:malignancy
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdMalignancy);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (BigInteger)res.getValue().getValue();
-		assertEquals(new BigInteger("1"), resValue);
+		assertThat(resValue).isEqualTo(new BigInteger("1"));
 		
 		
 		
@@ -468,34 +463,34 @@ public class FunctionDefinitionXPathTest {
 		arguments.clear();
 		arguments.add(attrXNotInRequest);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (BigInteger)res.getValue().getValue();
-		assertEquals(new BigInteger("0"), resValue);
+		assertThat(resValue).isEqualTo(new BigInteger("0"));
 		
 		// Resources included twice
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestDoubleResources, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-count More than one Content section for id 'urn:oasis:names:tc:xacml:3.0:attribute-category:resource'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:syntax-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-count More than one Content section for id 'urn:oasis:names:tc:xacml:3.0:attribute-category:resource'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:syntax-error");
 		
 
 		// Content in both Resource and Action categories (ok)
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestResourceActionContent, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (BigInteger)res.getValue().getValue();
-		assertEquals(new BigInteger("2"), resValue);
+		assertThat(resValue).isEqualTo(new BigInteger("2"));
 
 		// Content only in Action category (missing in Resources -> 0 according to spec)
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestContentInAction, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (BigInteger)res.getValue().getValue();
-		assertEquals(new BigInteger("0"), resValue);
+		assertThat(resValue).isEqualTo(new BigInteger("0"));
 
 		
 
@@ -506,41 +501,41 @@ public class FunctionDefinitionXPathTest {
 		arguments.clear();
 		arguments.add(attrXEmpty);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-count Got null EvaluationContext", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-count Got null EvaluationContext");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// null Request
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdRecord);
 		res = fd.evaluate(new StdEvaluationContext(null, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-count Got null Request in EvaluationContext", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-count Got null Request in EvaluationContext");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// null attribute
 		arguments.clear();
 		arguments.add(attrXnull);
 		res = fd.evaluate(new StdEvaluationContext(requestEmpty, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-count Got null attribute at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-count Got null attribute at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// no value
 		arguments.clear();
 		arguments.add(attrXNoValue);
 		res = fd.evaluate(new StdEvaluationContext(requestEmpty, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-count XPathExpression returned null at index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-count XPathExpression returned null at index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// no category
 		arguments.clear();
 		arguments.add(attrXNoCategory);
 		res = fd.evaluate(new StdEvaluationContext(requestEmpty, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-count Got null Category at index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:syntax-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-count Got null Category at index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:syntax-error");
 		
 
 		// too many args
@@ -548,32 +543,32 @@ public class FunctionDefinitionXPathTest {
 		arguments.add(attrXEmpty);
 		arguments.add(attrXEmpty);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-count Expected 1 arguments, got 2", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-count Expected 1 arguments, got 2");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// too few args
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-count Expected 1 arguments, got 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-count Expected 1 arguments, got 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// bad arg type
 		arguments.clear();
 		arguments.add(attrBadType);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-count Expected data type 'xpathExpression' saw 'string' at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-count Expected data type 'xpathExpression' saw 'string' at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// null args
 		arguments.clear();
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-count Got null argument at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-count Got null argument at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 	}
 
@@ -585,13 +580,13 @@ public class FunctionDefinitionXPathTest {
 		FunctionDefinitionXPath<?> fd = (FunctionDefinitionXPath<?>) StdFunctions.FD_XPATH_NODE_EQUAL;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_XPATH_NODE_EQUAL, fd.getId());
-		assertEquals(DataTypes.DT_XPATHEXPRESSION.getId(), fd.getDataTypeArgs().getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_XPATH_NODE_EQUAL);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_XPATHEXPRESSION.getId());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		
 		// test normal success - exactly the same set
@@ -599,45 +594,45 @@ public class FunctionDefinitionXPathTest {
 		arguments.add(attrXSlashSlashMdName);
 		arguments.add(attrXSlashSlashMdName);
 		ExpressionResult res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// success - second list is subset of first list
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdRecordSlashStar);
 		arguments.add(attrXMdPatientInfo);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// success - first list is subset of second list
 		arguments.clear();
 		arguments.add(attrXMdPatientInfo);
 		arguments.add(attrXSlashSlashMdRecordSlashStar);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// success - second list contains children of first list
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdRecord);
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// success - first list contains children of second list
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdName);
 		arguments.add(attrXSlashSlashMdRecord);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 
 		
@@ -646,27 +641,27 @@ public class FunctionDefinitionXPathTest {
 		arguments.add(attrXSlashSlashMdMalignancy);
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first list contains nothing
 		arguments.clear();
 		arguments.add(attrXNotInRequest);
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// second list contains nothing
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdName);
 		arguments.add(attrXNotInRequest);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);		
+		assertThat(resValue).isFalse();		
 		
 		
 		
@@ -681,9 +676,9 @@ public class FunctionDefinitionXPathTest {
 		arguments.add(attrXSlashSlashMdName);
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestDoubleResources, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal More than one Content section for id 'urn:oasis:names:tc:xacml:3.0:attribute-category:resource'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:syntax-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal More than one Content section for id 'urn:oasis:names:tc:xacml:3.0:attribute-category:resource'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:syntax-error");
 		
 		
 
@@ -692,18 +687,18 @@ public class FunctionDefinitionXPathTest {
 		arguments.add(attrXSlashSlashMdName);
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestResourceActionContent, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// Content only in Action category (missing in Resources -> 0 according to spec)
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdName);
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestContentInAction, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		
 		// null Evaluation Context
@@ -711,69 +706,69 @@ public class FunctionDefinitionXPathTest {
 		arguments.add(attrXSlashSlashMdRecord);
 		arguments.add(attrXSlashSlashMdRecord);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal Got null EvaluationContext", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal Got null EvaluationContext");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// null Request
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdRecord);
 		arguments.add(attrXSlashSlashMdRecord);
 		res = fd.evaluate(new StdEvaluationContext(null, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal Got null Request in EvaluationContext", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal Got null Request in EvaluationContext");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// null attribute
 		arguments.clear();
 		arguments.add(attrXnull);
 		arguments.add(attrXSlashSlashMdRecord);
 		res = fd.evaluate(new StdEvaluationContext(requestEmpty, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal Got null attribute at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal Got null attribute at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdRecord);
 		arguments.add(attrXnull);
 		res = fd.evaluate(new StdEvaluationContext(requestEmpty, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal Got null attribute at arg index 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal Got null attribute at arg index 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// no value
 		arguments.clear();
 		arguments.add(attrXNoValue);
 		arguments.add(attrXSlashSlashMdRecord);
 		res = fd.evaluate(new StdEvaluationContext(requestEmpty, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal XPathExpression returned null at index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal XPathExpression returned null at index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdRecord);
 		arguments.add(attrXNoValue);
 		res = fd.evaluate(new StdEvaluationContext(requestEmpty, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal XPathExpression returned null at index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal XPathExpression returned null at index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// no category
 		arguments.clear();
 		arguments.add(attrXNoCategory);
 		arguments.add(attrXSlashSlashMdRecord);
 		res = fd.evaluate(new StdEvaluationContext(requestEmpty, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal Got null Category at index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:syntax-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal Got null Category at index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:syntax-error");
 		
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdRecord);
 		arguments.add(attrXNoCategory);
 		res = fd.evaluate(new StdEvaluationContext(requestEmpty, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal XPathExpression returned null at index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal XPathExpression returned null at index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// too many args
 		arguments.clear();
@@ -781,57 +776,57 @@ public class FunctionDefinitionXPathTest {
 		arguments.add(attrXEmpty);
 		arguments.add(attrXEmpty);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal Expected 2 arguments, got 3", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal Expected 2 arguments, got 3");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// too few args
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal Expected 2 arguments, got 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal Expected 2 arguments, got 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		arguments.add(attrXEmpty);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal Expected 2 arguments, got 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal Expected 2 arguments, got 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 			
 		// bad arg type
 		arguments.clear();
 		arguments.add(attrBadType);
 		arguments.add(attrXEmpty);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal Expected data type 'xpathExpression' saw 'string' at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal Expected data type 'xpathExpression' saw 'string' at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		arguments.add(attrXEmpty);
 		arguments.add(attrBadType);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal Expected data type 'xpathExpression' saw 'string' at arg index 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal Expected data type 'xpathExpression' saw 'string' at arg index 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// null args
 		arguments.clear();
 		arguments.add(attrXEmpty);
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal Got null argument at arg index 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal Got null argument at arg index 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		arguments.add(null);
 		arguments.add(attrXEmpty);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-equal Got null argument at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-equal Got null argument at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 	}
 	
@@ -845,13 +840,13 @@ public class FunctionDefinitionXPathTest {
 		FunctionDefinitionXPath<?> fd = (FunctionDefinitionXPath<?>) StdFunctions.FD_XPATH_NODE_MATCH;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_XPATH_NODE_MATCH, fd.getId());
-		assertEquals(DataTypes.DT_XPATHEXPRESSION.getId(), fd.getDataTypeArgs().getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_XPATH_NODE_MATCH);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_XPATHEXPRESSION.getId());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_BOOLEAN.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(2), fd.getNumArgs());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat( fd.getNumArgs()).isEqualTo(Integer.valueOf(2));
 		
 		
 		// test normal success - exactly the same set
@@ -859,45 +854,45 @@ public class FunctionDefinitionXPathTest {
 		arguments.add(attrXSlashSlashMdName);
 		arguments.add(attrXSlashSlashMdName);
 		ExpressionResult res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Boolean resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// success - second list is subset of first list
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdRecordSlashStar);
 		arguments.add(attrXMdPatientInfo);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// success - first list is subset of second list
 		arguments.clear();
 		arguments.add(attrXMdPatientInfo);
 		arguments.add(attrXSlashSlashMdRecordSlashStar);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// success - second list contains children of first list
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdRecord);
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 		
 		// success - first list contains children of second list
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdName);
 		arguments.add(attrXSlashSlashMdRecord);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		
 		
@@ -906,27 +901,27 @@ public class FunctionDefinitionXPathTest {
 		arguments.add(attrXSlashSlashMdMalignancy);
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// first list contains nothing
 		arguments.clear();
 		arguments.add(attrXNotInRequest);
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		// second list contains nothing
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdName);
 		arguments.add(attrXNotInRequest);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);	
+		assertThat(resValue).isFalse();	
 		
 //TODO		
 		//?????
@@ -939,9 +934,9 @@ public class FunctionDefinitionXPathTest {
 		arguments.add(attrXSlashSlashMdName);
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestDoubleResources, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match More than one Content section for id 'urn:oasis:names:tc:xacml:3.0:attribute-category:resource'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:syntax-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match More than one Content section for id 'urn:oasis:names:tc:xacml:3.0:attribute-category:resource'");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:syntax-error");
 		
 
 		// Content in both Resource and Action categories (ok)
@@ -949,18 +944,18 @@ public class FunctionDefinitionXPathTest {
 		arguments.add(attrXSlashSlashMdName);
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestResourceActionContent, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(resValue).isTrue();
 
 		// Content only in Action category (missing in Resources -> 0 according to spec)
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdName);
 		arguments.add(attrXSlashSlashMdName);
 		res = fd.evaluate(new StdEvaluationContext(requestContentInAction, null, null), arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		resValue = (Boolean)res.getValue().getValue();
-		assertFalse(resValue);
+		assertThat(resValue).isFalse();
 		
 		
 		// null Evaluation Context
@@ -968,69 +963,69 @@ public class FunctionDefinitionXPathTest {
 		arguments.add(attrXSlashSlashMdRecord);
 		arguments.add(attrXSlashSlashMdRecord);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match Got null EvaluationContext", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match Got null EvaluationContext");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// null Request
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdRecord);
 		arguments.add(attrXSlashSlashMdRecord);
 		res = fd.evaluate(new StdEvaluationContext(null, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match Got null Request in EvaluationContext", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match Got null Request in EvaluationContext");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// null attribute
 		arguments.clear();
 		arguments.add(attrXnull);
 		arguments.add(attrXSlashSlashMdRecord);
 		res = fd.evaluate(new StdEvaluationContext(requestEmpty, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match Got null attribute at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match Got null attribute at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdRecord);
 		arguments.add(attrXnull);
 		res = fd.evaluate(new StdEvaluationContext(requestEmpty, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match Got null attribute at arg index 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match Got null attribute at arg index 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// no value
 		arguments.clear();
 		arguments.add(attrXNoValue);
 		arguments.add(attrXSlashSlashMdRecord);
 		res = fd.evaluate(new StdEvaluationContext(requestEmpty, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match XPathExpression returned null at index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match XPathExpression returned null at index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdRecord);
 		arguments.add(attrXNoValue);
 		res = fd.evaluate(new StdEvaluationContext(requestEmpty, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match XPathExpression returned null at index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match XPathExpression returned null at index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// no category
 		arguments.clear();
 		arguments.add(attrXNoCategory);
 		arguments.add(attrXSlashSlashMdRecord);
 		res = fd.evaluate(new StdEvaluationContext(requestEmpty, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match Got null Category at index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:syntax-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match Got null Category at index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:syntax-error");
 		
 		arguments.clear();
 		arguments.add(attrXSlashSlashMdRecord);
 		arguments.add(attrXNoCategory);
 		res = fd.evaluate(new StdEvaluationContext(requestEmpty, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match XPathExpression returned null at index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match XPathExpression returned null at index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// too many args
 		arguments.clear();
@@ -1038,57 +1033,57 @@ public class FunctionDefinitionXPathTest {
 		arguments.add(attrXEmpty);
 		arguments.add(attrXEmpty);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match Expected 2 arguments, got 3", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match Expected 2 arguments, got 3");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// too few args
 		arguments.clear();
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match Expected 2 arguments, got 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match Expected 2 arguments, got 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		arguments.add(attrXEmpty);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match Expected 2 arguments, got 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match Expected 2 arguments, got 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 			
 		// bad arg type
 		arguments.clear();
 		arguments.add(attrBadType);
 		arguments.add(attrXEmpty);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match Expected data type 'xpathExpression' saw 'string' at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match Expected data type 'xpathExpression' saw 'string' at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		arguments.add(attrXEmpty);
 		arguments.add(attrBadType);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match Expected data type 'xpathExpression' saw 'string' at arg index 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match Expected data type 'xpathExpression' saw 'string' at arg index 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		// null args
 		arguments.clear();
 		arguments.add(attrXEmpty);
 		arguments.add(null);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match Got null argument at arg index 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match Got null argument at arg index 1");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		arguments.clear();
 		arguments.add(null);
 		arguments.add(attrXEmpty);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:xpath-node-match Got null argument at arg index 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat(res.getStatus().getStatusMessage()).isEqualTo( "function:xpath-node-match Got null argument at arg index 0");
+		assertThat(res.getStatus().getStatusCode().getStatusCodeValue().stringValue()).isEqualTo("urn:oasis:names:tc:xacml:1.0:status:processing-error");
 		
 		
 		

@@ -5,17 +5,17 @@
  */
 package com.att.research.xacmlatt.pdp.test.custom;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.std.IdentifierImpl;
 import com.att.research.xacmlatt.pdp.policy.FunctionDefinition;
 import com.att.research.xacmlatt.pdp.policy.FunctionDefinitionFactory;
 import com.att.research.xacmlatt.pdp.std.StdFunctionDefinitionFactory;
 import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionBagOneAndOnly;
-
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.HashMap;
-import java.util.Map;
 
 public class CustomFunctionDefinitionFactory extends FunctionDefinitionFactory {
 	private static Map<Identifier,FunctionDefinition> 	mapFunctionDefinitions	= new HashMap<Identifier,FunctionDefinition>();

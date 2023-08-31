@@ -1,6 +1,6 @@
 /*
  *
- *          Copyright (c) 2020  AT&T Knowledge Ventures
+ *          Copyright (c) 2020, 2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 package com.att.research.xacml.std.datatypes;
@@ -10,7 +10,8 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import java.text.ParseException;
 import java.time.ZoneOffset;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 public class ISOZoneOffsetTest {
 

@@ -1,6 +1,6 @@
 /*
  *
- *          Copyright (c) 2013,2019  AT&T Knowledge Ventures
+ *          Copyright (c) 2013,2019, 2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 package com.att.research.xacmlatt.pdp.policy;
@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.att.research.xacml.util.StringUtils;
-import com.google.common.collect.Iterators;
 
 /**
  * VariableMap is a collection of {@link com.att.research.xacmlatt.pdp.policy.VariableDefinition}s that are accessible by

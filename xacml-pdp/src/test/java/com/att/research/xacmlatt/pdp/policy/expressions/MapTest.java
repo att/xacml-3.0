@@ -1,21 +1,24 @@
 /*
  * Copyright (c) 2021, salesforce.com, inc.
+ * Modifications Copyright (c) 2023 AT&T Inc.
  * All rights reserved.
  * SPDX-License-Identifier: MIT
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 package com.att.research.xacmlatt.pdp.policy.expressions;
 
-import com.att.research.xacml.api.XACML3;
-import com.att.research.xacmlatt.pdp.eval.EvaluationException;
-import com.att.research.xacmlatt.pdp.policy.*;
-import com.att.research.xacmlatt.pdp.std.StdEvaluationContext;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import com.att.research.xacml.api.XACML3;
+import com.att.research.xacmlatt.pdp.eval.EvaluationException;
+import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
+import com.att.research.xacmlatt.pdp.policy.LexicalEnvironment;
+import com.att.research.xacmlatt.pdp.policy.Policy;
+
 
 /**
  * Tests for Map quantified expression. See section 5.3 of the
@@ -36,9 +39,9 @@ public class MapTest extends QuantifiedExpressionTest {
      */
     @Override
     protected void assertEmptyDomainResult(ExpressionResult result) {
-        assertTrue(result.isOk());
-        assertTrue(result.isBag());
-        assertEquals(0, result.getBag().size());
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.isBag()).isTrue();
+        assertThat(result.getBag().size()).isEqualTo(0);
     }
 
     /**
@@ -48,8 +51,6 @@ public class MapTest extends QuantifiedExpressionTest {
     @Test
     public void testMapBehavior() throws EvaluationException {
         Policy policy = new Policy();
-        StdEvaluationContext evaluationContext = new StdEvaluationContext(null, null, null);
-        PolicyDefaults policyDefaults = new PolicyDefaults(null, null);
 
         // Create a quantified expression with an iterant that converts the boolean domain value to string
         QuantifiedExpression quantifiedExpression = newInstance(policy);
@@ -61,10 +62,11 @@ public class MapTest extends QuantifiedExpressionTest {
 
         // Evaluate the quantified expression and make sure it returns a bag with values {TRUE, FALSE}
         ExpressionResult result = evaluate(quantifiedExpression);
-        assertTrue(result.getStatus().getStatusMessage(), result.isOk());
-        assertTrue(result.isBag());
-        assertEquals(2, result.getBag().size());
-        assertEquals("true", result.getBag().getAttributeValueList().get(0).getValue());
-        assertEquals("false", result.getBag().getAttributeValueList().get(1).getValue());
+        assertThat(result.getStatus().getStatusMessage()).isNull();
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.isBag()).isTrue();
+        assertThat(result.getBag().size()).isEqualTo(2);
+        assertThat(result.getBag().getAttributeValueList().get(0).getValue()).isEqualTo("true");
+        assertThat(result.getBag().getAttributeValueList().get(1).getValue()).isEqualTo("false");
     }
 }

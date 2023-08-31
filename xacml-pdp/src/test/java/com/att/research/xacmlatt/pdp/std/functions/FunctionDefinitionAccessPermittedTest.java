@@ -1,9 +1,7 @@
 package com.att.research.xacmlatt.pdp.std.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,8 +12,8 @@ import java.util.List;
 
 import javax.xml.namespace.NamespaceContext;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.att.research.xacml.api.Request;
 import com.att.research.xacml.api.XACML3;
@@ -230,10 +228,7 @@ public class FunctionDefinitionAccessPermittedTest {
 	/**
 	 * Set up all variables in one place because it is complicated (lots of steps needed for each attribute)
 	 */
-	public FunctionDefinitionAccessPermittedTest() {
-		try {
-
-
+	public FunctionDefinitionAccessPermittedTest() throws Exception {
 			// create Function Attributes for URIs
 			attrUriNull = null;
 			attrUriEmpty = new FunctionArgumentAttributeValue(DataTypes.DT_ANYURI.createAttributeValue(""));
@@ -278,19 +273,15 @@ public class FunctionDefinitionAccessPermittedTest {
 					
 			// Content included twice - error
 			reqString = reqStrMainResourceStart + reqStrContentMdRecordSimpson + reqStrContentMdRecordSimpson +reqStrResourceAllEnd;
-				tFile = File.createTempFile("functionJunit", "request");
-				bw = new BufferedWriter(new FileWriter(tFile));
+				final var tFile1 = File.createTempFile("functionJunit", "request");
+				bw = new BufferedWriter(new FileWriter(tFile1));
 				bw.append(reqString);
 				bw.flush();
 				bw.close();
-			try {
-				requestDoubleContent = DOMRequest.load(tFile);
-					tFile.delete();
-			} catch (com.att.research.xacml.std.dom.DOMStructureException e) {
-				// this is what it should do, so just continue
-			} catch (Exception e) {
-				fail("Unexpected exception for bad XML, e="+e);
-			}
+			assertThatExceptionOfType(com.att.research.xacml.std.dom.DOMStructureException.class).isThrownBy(() -> {
+				requestDoubleContent = DOMRequest.load(tFile1);
+			});
+			tFile1.delete();
 			
 			// content included in both Resource and Action - ok
 			reqString = reqStrMainResourceStart + reqStrContentMdRecordSimpson + reqStrResourceEnd + reqStrActionStart + reqStrContentMdRecordSimpson + reqStrActionEnd + reqStrMainEnd;
@@ -313,49 +304,34 @@ public class FunctionDefinitionAccessPermittedTest {
 				tFile.delete();
 			
 				
-				
-			// Test that Bad XML is caught
-			@SuppressWarnings("unused")
-			Request requestContentMisplaced = null;
-			@SuppressWarnings("unused")
-			Request requestMalformedContent = null;
-				
-				
 			// Bad XML - Content not under a Category
 			reqString = reqStrMainStart + reqStrContentMdRecordSimpson + reqStrResourceStart + reqStrResourceEnd + reqStrActionStart + reqStrActionEnd + reqStrMainEnd;
-				tFile = File.createTempFile("functionJunit", "request");
-				bw = new BufferedWriter(new FileWriter(tFile));
+				final var tFile2 = File.createTempFile("functionJunit", "request");
+				bw = new BufferedWriter(new FileWriter(tFile2));
 				bw.append(reqString);
 				bw.flush();
 				bw.close();
-			try {
-				requestContentMisplaced = DOMRequest.load(tFile);
-					tFile.delete();
-			} catch (com.att.research.xacml.std.dom.DOMStructureException e) {
-				// this is what it should do, so just continue
-			} catch (Exception e) {
-				fail("Unexpected exception for bad XML, e="+e);
-			}
+			assertThatExceptionOfType(com.att.research.xacml.std.dom.DOMStructureException.class).isThrownBy(() -> {
+				DOMRequest.load(tFile2);
+			});
+			tFile2.delete();
 				
 			// Bad XML - Content is not valid XML
 			reqString = reqStrMainResourceStart + reqStrMalformedContent + reqStrResourceAllEnd;
-				tFile = File.createTempFile("functionJunit", "request");
-				bw = new BufferedWriter(new FileWriter(tFile));
+				final var tFile3 = File.createTempFile("functionJunit", "request");
+				bw = new BufferedWriter(new FileWriter(tFile3));
 				bw.append(reqString);
 				bw.flush();
 				bw.close();
-			try {
-				requestMalformedContent = DOMRequest.load(tFile);
-					tFile.delete();
-			} catch (com.att.research.xacml.std.dom.DOMStructureException e) {
-				// this is what it should do, so just continue
-			} catch (Exception e) {
-				fail("Unexpected exception for bad XML, e="+e);
-			}
-			
-		} catch (Exception e) {
-			fail("Constructor initializing variables, e="+ e + "  cause="+e.getCause());
-		}
+			assertThatExceptionOfType(com.att.research.xacml.std.dom.DOMStructureException.class).isThrownBy(() -> {
+				DOMRequest.load(tFile3);
+			})/*
+			 *
+			 *          Copyright (c) 2013,2023  AT&T Knowledge Ventures
+			 *                     SPDX-License-Identifier: MIT
+			 */
+;
+			tFile3.delete();
 		
 	}
 	
@@ -366,21 +342,20 @@ public class FunctionDefinitionAccessPermittedTest {
 	
 	
 	
-	@Ignore
+	@Disabled
 	@Test
 	public void testAccess_permitted() {
 
 		ExpressionResult res = null;
-		Boolean resValue = null;
 		
 		FunctionDefinitionAccessPermitted fd = (FunctionDefinitionAccessPermitted) StdFunctions.FD_ACCESS_PERMITTED;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_ACCESS_PERMITTED, fd.getId());
-		assertEquals(DataTypes.DT_BOOLEAN.getId(), fd.getDataTypeId());
+		assertThat(XACML3.ID_FUNCTION_ACCESS_PERMITTED).isEqualTo(fd.getId());
+		assertThat(DataTypes.DT_BOOLEAN.getId()).isEqualTo(fd.getDataTypeId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
+		assertThat(fd.returnsBag()).isFalse();
 
 		
 
@@ -389,9 +364,8 @@ public class FunctionDefinitionAccessPermittedTest {
 		arguments.add(attrUriResources);
 		arguments.add(attrXEmpty);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
-		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(res.isOk()).isTrue();
+		assertThat((Boolean)res.getValue().getValue()).isTrue();
 
 
 				
@@ -407,44 +381,42 @@ public class FunctionDefinitionAccessPermittedTest {
 		arguments.add(attrUriResources);
 		arguments.add(attrXContentSpringer);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
-		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(res.isOk()).isTrue();
+		assertThat((Boolean)res.getValue().getValue()).isTrue();
 		
 		arguments.clear();
 		arguments.add(attrUriResources);
 		arguments.add(attrXSpringer);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertTrue(res.isOk());
-		resValue = (Boolean)res.getValue().getValue();
-		assertTrue(resValue);
+		assertThat(res.isOk()).isTrue();
+		assertThat((Boolean)res.getValue().getValue()).isTrue();
 		
 		// second arg not valid XML
 		arguments.clear();
 		arguments.add(attrUriResources);
 		arguments.add(attrXBadXML);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:access-permitted Parsing of XML string failed.  Cause='The element type \"md:hospital_info\" must be terminated by the matching end-tag \"</md:hospital_info>\".'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:syntax-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());	
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat( "function:access-permitted Parsing of XML string failed.  Cause='The element type \"md:hospital_info\" must be terminated by the matching end-tag \"</md:hospital_info>\".'").isEqualTo(res.getStatus().getStatusMessage());
+		assertThat("urn:oasis:names:tc:xacml:1.0:status:syntax-error").isEqualTo(res.getStatus().getStatusCode().getStatusCodeValue().stringValue());	
 		
 		// null Evaluation Context
 		arguments.clear();
 		arguments.add(attrUriNotCategory);
 		arguments.add(attrXContentSimpson);
 		res = fd.evaluate(null, arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:access-permitted First argument must be a urn for an attribute-category, not 'urn:oasis:names:tc:xacml:1.0:resource:resource-id", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:syntax-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat("function:access-permitted First argument must be a urn for an attribute-category).isEqualTo(not 'urn:oasis:names:tc:xacml:1.0:resource:resource-id").isEqualTo(res.getStatus().getStatusMessage());
+		assertThat("urn:oasis:names:tc:xacml:1.0:status:syntax-error").isEqualTo(res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
 		
 		// null Request
 		arguments.clear();
 		arguments.add(attrUriAction);
 		arguments.add(attrXContentSimpson);
 		res = fd.evaluate(new StdEvaluationContext(null, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:access-permitted Got null Request in EvaluationContext", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat( "function:access-permitted Got null Request in EvaluationContext").isEqualTo(res.getStatus().getStatusMessage());
+		assertThat("urn:oasis:names:tc:xacml:1.0:status:processing-error").isEqualTo(res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
 		
 	
 		// first arg not uri
@@ -452,42 +424,42 @@ public class FunctionDefinitionAccessPermittedTest {
 		arguments.add(attrUriNotCategory);
 		arguments.add(attrXContentSimpson);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:access-permitted First argument must be a urn for an attribute-category, not 'urn:oasis:names:tc:xacml:1.0:resource:resource-id", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:syntax-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat("function:access-permitted First argument must be a urn for an attribute-category).isEqualTo(not 'urn:oasis:names:tc:xacml:1.0:resource:resource-id").isEqualTo(res.getStatus().getStatusMessage());
+		assertThat("urn:oasis:names:tc:xacml:1.0:status:syntax-error").isEqualTo(res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
 		
 		// first arg not attribute-category urn
 		arguments.clear();
 		arguments.add(attrXContentSimpson);
 		arguments.add(attrXContentSimpson);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:access-permitted Expected data type 'anyURI' saw 'string'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat( "function:access-permitted Expected data type 'anyURI' saw 'string'").isEqualTo(res.getStatus().getStatusMessage());
+		assertThat("urn:oasis:names:tc:xacml:1.0:status:processing-error").isEqualTo(res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
 		
 		// second arg not string
 		arguments.clear();
 		arguments.add(attrUriAction);
 		arguments.add(attrUriAction);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:access-permitted Expected data type 'string' saw 'anyURI'", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat( "function:access-permitted Expected data type 'string' saw 'anyURI'").isEqualTo(res.getStatus().getStatusMessage());
+		assertThat("urn:oasis:names:tc:xacml:1.0:status:processing-error").isEqualTo(res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
 		
 
 		// too few args
 		arguments.clear();
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:access-permitted Expected 2 arguments, got 0", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat("function:access-permitted Expected 2 arguments).isEqualTo(got 0").isEqualTo( res.getStatus().getStatusMessage());
+		assertThat("urn:oasis:names:tc:xacml:1.0:status:processing-error").isEqualTo(res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
 		
 		arguments.clear();
 		arguments.add(attrXContentSimpson);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:access-permitted Expected 2 arguments, got 1", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat("function:access-permitted Expected 2 arguments).isEqualTo(got 1").isEqualTo(res.getStatus().getStatusMessage());
+		assertThat("urn:oasis:names:tc:xacml:1.0:status:processing-error").isEqualTo(res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
 		
 		
 		// too many args
@@ -496,9 +468,9 @@ public class FunctionDefinitionAccessPermittedTest {
 		arguments.add(attrXContentSimpson);
 		arguments.add(attrXContentSimpson);
 		res = fd.evaluate(new StdEvaluationContext(requestMdRecord, null, null), arguments);
-		assertFalse(res.getStatus().isOk());
-		assertEquals( "function:access-permitted Expected 2 arguments, got 3", res.getStatus().getStatusMessage());
-		assertEquals("urn:oasis:names:tc:xacml:1.0:status:processing-error", res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
+		assertThat(res.getStatus().isOk()).isFalse();
+		assertThat("function:access-permitted Expected 2 arguments).isEqualTo(got 3").isEqualTo(res.getStatus().getStatusMessage());
+		assertThat("urn:oasis:names:tc:xacml:1.0:status:processing-error").isEqualTo(res.getStatus().getStatusCode().getStatusCodeValue().stringValue());
 		
 		
 	}

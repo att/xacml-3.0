@@ -1,12 +1,11 @@
 /*
  *
- *          Copyright (c) 2013,2019  AT&T Knowledge Ventures
+ *          Copyright (c) 2013,2019, 2023  AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 
 package com.att.research.xacmlatt.pdp.policy.dom;
 
-import com.att.research.xacmlatt.pdp.policy.LexicalEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -20,7 +19,7 @@ import com.att.research.xacml.std.dom.DOMProperties;
 import com.att.research.xacml.std.dom.DOMStructureException;
 import com.att.research.xacml.std.dom.DOMUtil;
 import com.att.research.xacmlatt.pdp.policy.Expression;
-import com.att.research.xacmlatt.pdp.policy.Policy;
+import com.att.research.xacmlatt.pdp.policy.LexicalEnvironment;
 import com.att.research.xacmlatt.pdp.policy.expressions.AttributeValueExpression;
 import com.att.research.xacmlatt.pdp.policy.expressions.Function;
 import com.att.research.xacmlatt.pdp.policy.expressions.VariableReference;

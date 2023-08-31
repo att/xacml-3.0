@@ -18,22 +18,32 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 
-import com.att.research.xacml.std.annotations.*;
-import com.att.research.xacml.std.dom.DOMStructureException;
-import com.att.research.xacml.std.dom.DOMUtil;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
+
 import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.Response;
+import com.att.research.xacml.std.annotations.RequestParser;
+import com.att.research.xacml.std.annotations.XACMLAction;
+import com.att.research.xacml.std.annotations.XACMLAttribute;
+import com.att.research.xacml.std.annotations.XACMLContent;
+import com.att.research.xacml.std.annotations.XACMLEnvironment;
+import com.att.research.xacml.std.annotations.XACMLMultiRequest;
+import com.att.research.xacml.std.annotations.XACMLRequest;
+import com.att.research.xacml.std.annotations.XACMLRequestReference;
+import com.att.research.xacml.std.annotations.XACMLResource;
+import com.att.research.xacml.std.annotations.XACMLSubject;
 import com.att.research.xacml.std.datatypes.HexBinary;
 import com.att.research.xacml.std.datatypes.IPAddress;
 import com.att.research.xacml.std.datatypes.IPv4Address;
 import com.att.research.xacml.std.datatypes.ISO8601DateTime;
 import com.att.research.xacml.std.datatypes.ISO8601Time;
-import com.att.research.xacml.util.FactoryException;
+import com.att.research.xacml.std.dom.DOMStructureException;
+import com.att.research.xacml.std.dom.DOMUtil;
 import com.att.research.xacml.test.TestBase;
-import org.w3c.dom.Node;
+import com.att.research.xacml.util.FactoryException;
 
 /**
  * This example application shows how to use annotations for Java classes to create requests to send to the

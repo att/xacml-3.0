@@ -1,25 +1,31 @@
 /*
  * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, AT&T Inc.
  * All rights reserved.
  * SPDX-License-Identifier: MIT
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 package com.att.research.xacml.std.json;
 
-import com.att.research.xacml.api.Identifier;
-import com.att.research.xacml.api.RequestAttributes;
-import com.att.research.xacml.api.XACML3;
-import com.google.gson.*;
-import org.junit.Test;
-import org.w3c.dom.Node;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.io.StringReader;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.Node;
+
+import com.att.research.xacml.api.Identifier;
+import com.att.research.xacml.api.RequestAttributes;
+import com.att.research.xacml.api.XACML3;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * Unit tests for {@link JsonAttributeValueSerialization}.
@@ -36,8 +42,8 @@ public class JsonAttributeValueSerializationTest {
                 "}";
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
-        assertEquals(XACML3.ID_DATATYPE_STRING, value.getDataType());
-        assertEquals("manager", value.getValue());
+        assertThat(XACML3.ID_DATATYPE_STRING).isEqualTo(value.getDataType());
+        assertThat("manager").isEqualTo(value.getValue());
     }
 
     @Test
@@ -49,8 +55,8 @@ public class JsonAttributeValueSerializationTest {
                         "}";
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
-        assertEquals(XACML3.ID_DATATYPE_BOOLEAN, value.getDataType());
-        assertEquals(true, value.getValue());
+        assertThat(XACML3.ID_DATATYPE_BOOLEAN).isEqualTo(value.getDataType());
+        assertThat(true).isEqualTo(value.getValue());
     }
 
     @Test
@@ -62,8 +68,8 @@ public class JsonAttributeValueSerializationTest {
                 "}";
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
-        assertEquals(XACML3.ID_DATATYPE_INTEGER, value.getDataType());
-        assertEquals(5, ((Number)value.getValue()).intValue());
+        assertThat(XACML3.ID_DATATYPE_INTEGER).isEqualTo(value.getDataType());
+        assertThat(((Number)value.getValue()).intValue()).isEqualTo(5);
     }
 
     @Test
@@ -75,8 +81,8 @@ public class JsonAttributeValueSerializationTest {
                 "}";
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
-        assertEquals(XACML3.ID_DATATYPE_DOUBLE, value.getDataType());
-        assertEquals(2.3, value.getValue());
+        assertThat(XACML3.ID_DATATYPE_DOUBLE).isEqualTo(value.getDataType());
+        assertThat(value.getValue()).isEqualTo(2.3);
     }
 
     @Test
@@ -88,8 +94,8 @@ public class JsonAttributeValueSerializationTest {
                 "}";
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
-        assertEquals(XACML3.ID_DATATYPE_STRING, value.getDataType());
-        assertArrayEquals(new Object[]{"manager", "administrator"}, ((List<?>)value.getValue()).toArray());
+        assertThat(XACML3.ID_DATATYPE_STRING).isEqualTo(value.getDataType());
+        assertThat(((List<?>)value.getValue()).toArray()).containsExactlyInAnyOrder(new Object[]{"manager", "administrator"});
     }
 
     @Test
@@ -101,8 +107,8 @@ public class JsonAttributeValueSerializationTest {
                 "}";
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
-        assertEquals(XACML3.ID_DATATYPE_BOOLEAN, value.getDataType());
-        assertArrayEquals(new Object[] {true, false}, ((List)value.getValue()).toArray());
+        assertThat(XACML3.ID_DATATYPE_BOOLEAN).isEqualTo(value.getDataType());
+        assertThat(((List<?>)value.getValue()).toArray()).containsExactlyInAnyOrder(new Object[] {true, false});
     }
 
     @Test
@@ -114,8 +120,8 @@ public class JsonAttributeValueSerializationTest {
                 "}";
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
-        assertEquals(XACML3.ID_DATATYPE_INTEGER, value.getDataType());
-        assertArrayEquals(new Object[] {BigInteger.valueOf(3), BigInteger.valueOf(-4)}, ((List<?>)value.getValue()).toArray());
+        assertThat(XACML3.ID_DATATYPE_INTEGER).isEqualTo(value.getDataType());
+        assertThat(((List<?>)value.getValue()).toArray()).containsExactlyInAnyOrder(new Object[] {BigInteger.valueOf(3), BigInteger.valueOf(-4)});
     }
 
     @Test
@@ -127,8 +133,8 @@ public class JsonAttributeValueSerializationTest {
                 "}";
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
-        assertEquals(XACML3.ID_DATATYPE_DOUBLE, value.getDataType());
-        assertArrayEquals(new Object[] {999.222, -53.77777}, ((List<?>)value.getValue()).toArray());
+        assertThat(XACML3.ID_DATATYPE_DOUBLE).isEqualTo(value.getDataType());
+        assertThat(((List<?>)value.getValue()).toArray()).containsExactlyInAnyOrder(new Object[] {999.222, -53.77777});
     }
 
     /**
@@ -145,8 +151,9 @@ public class JsonAttributeValueSerializationTest {
                 "}";
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
-        assertEquals(XACML3.ID_DATATYPE_DOUBLE, value.getDataType());
-        assertArrayEquals(new Object[] {6.0, -53.77777}, ((List<?>)value.getValue()).toArray());
+        assertThat(XACML3.ID_DATATYPE_DOUBLE).isEqualTo(value.getDataType());
+        assertThat(((List<?>)value.getValue()).toArray());
+        assertThat(((List<?>)value.getValue()).toArray()).containsExactlyInAnyOrder(new Object[] {6.0, -53.77777});
     }
 
     /**
@@ -163,8 +170,8 @@ public class JsonAttributeValueSerializationTest {
                 "}";
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
-        assertEquals(XACML3.ID_DATATYPE_STRING, value.getDataType());
-        assertArrayEquals(new Object[] {"6", "-53.77777", "false", "abc"}, ((List<?>)value.getValue()).toArray());
+        assertThat(XACML3.ID_DATATYPE_STRING).isEqualTo(value.getDataType());
+        assertThat(((List<?>)value.getValue()).toArray()).containsExactlyInAnyOrder(new Object[] {"6", "-53.77777", "false", "abc"});
     }
 
     @Test
@@ -174,13 +181,7 @@ public class JsonAttributeValueSerializationTest {
                 "  \"AttributeId\": \"urn:test:datatype:inference\",\n" +
                 "  \"Value\": [[6, 2.666], [4, -53.77777, false], \"abc\"]\n" +
                 "}";
-        try {
-            GsonJsonAttribute attribute = fromJSONString(json);
-            fail("Should not allow arrays of arrays as value");
-        }
-        catch (JsonParseException e) {
-            assertEquals("Unexpected value: [6,2.666]", e.getMessage());
-        }
+        assertThatExceptionOfType(JsonParseException.class).isThrownBy(() -> fromJSONString(json)).withMessage("Unexpected value: [6,2.666]");
     }
 
     @Test
@@ -198,8 +199,8 @@ public class JsonAttributeValueSerializationTest {
                 "}";
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
-        assertEquals(XACML3.ID_DATATYPE_ENTITY, value.getDataType());
-        assertEquals(1, ((RequestAttributes)value.getValue()).getAttributes().size());
+        assertThat(XACML3.ID_DATATYPE_ENTITY).isEqualTo(value.getDataType());
+        assertThat(((RequestAttributes)value.getValue()).getAttributes()).hasSize(1);
     }
 
     @Test
@@ -218,8 +219,8 @@ public class JsonAttributeValueSerializationTest {
                 "}";
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
-        assertEquals(XACML3.ID_DATATYPE_ENTITY, value.getDataType());
-        assertEquals(1, ((RequestAttributes)value.getValue()).getAttributes().size());
+        assertThat(XACML3.ID_DATATYPE_ENTITY).isEqualTo(value.getDataType());
+        assertThat(((RequestAttributes)value.getValue()).getAttributes()).hasSize(1);
     }
 
     @SuppressWarnings("unchecked")
@@ -247,10 +248,10 @@ public class JsonAttributeValueSerializationTest {
                 "}";
         GsonJsonAttribute attribute = fromJSONString(json);
         GsonJsonAttributeValue value = attribute.getValue();
-        assertEquals(XACML3.ID_DATATYPE_ENTITY, value.getDataType());
-        assertEquals(2, ((Collection<RequestAttributes>)value.getValue()).size());
-        assertEquals(1, ((Collection<RequestAttributes>)value.getValue()).iterator().next().getAttributes().size());
-        assertEquals(1, ((Collection<RequestAttributes>)value.getValue()).iterator().next().getAttributes().size());
+        assertThat(XACML3.ID_DATATYPE_ENTITY).isEqualTo(value.getDataType());
+        assertThat(((Collection<RequestAttributes>)value.getValue())).hasSize(2);
+        assertThat(((Collection<RequestAttributes>)value.getValue()).iterator().next().getAttributes()).hasSize(1);
+        assertThat(((Collection<RequestAttributes>)value.getValue()).iterator().next().getAttributes()).hasSize(1);
     }
 
     private static GsonJsonAttribute fromJSONString(String json) throws Exception {
@@ -261,10 +262,6 @@ public class JsonAttributeValueSerializationTest {
         } catch (JsonSyntaxException | JsonIOException e) {
             throw new JSONStructureException("Failed to load json string", e);
         }
-    }
-
-    private static String toJSONString(GsonJsonAttributeValue gsonJsonAttributeValue) {
-        return newGson(true).toJson(gsonJsonAttributeValue);
     }
 
     private static Gson newGson(boolean prettyPrint) {

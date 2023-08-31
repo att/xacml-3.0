@@ -1,33 +1,42 @@
 /*
  * Copyright (c) 2021, salesforce.com, inc.
+ * Modifications Copyright (c) 2023 AT&T Inc.
  * All rights reserved.
  * SPDX-License-Identifier: MIT
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 package com.att.research.xacmlatt.pdp.test.entity;
 
-import com.att.research.xacml.api.Decision;
-import com.att.research.xacml.api.Response;
-import com.att.research.xacml.api.Result;
-import com.att.research.xacml.api.pdp.PDPEngine;
-import com.att.research.xacml.api.pdp.PDPEngineFactory;
-import com.att.research.xacml.std.annotations.*;
-import com.att.research.xacmlatt.pdp.policy.expressions.ForAny;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Node;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.Node;
+
+import com.att.research.xacml.api.Decision;
+import com.att.research.xacml.api.Response;
+import com.att.research.xacml.api.Result;
+import com.att.research.xacml.api.pdp.PDPEngine;
+import com.att.research.xacml.api.pdp.PDPEngineFactory;
+import com.att.research.xacml.std.annotations.RequestParser;
+import com.att.research.xacml.std.annotations.XACMLAction;
+import com.att.research.xacml.std.annotations.XACMLAttribute;
+import com.att.research.xacml.std.annotations.XACMLContent;
+import com.att.research.xacml.std.annotations.XACMLEntity;
+import com.att.research.xacml.std.annotations.XACMLEnvironment;
+import com.att.research.xacml.std.annotations.XACMLRequest;
+import com.att.research.xacml.std.annotations.XACMLResource;
+import com.att.research.xacml.std.annotations.XACMLSubject;
+import com.att.research.xacmlatt.pdp.policy.expressions.ForAny;
 
 /**
  * These tests are based on the examples provided in section 7 of the
@@ -37,10 +46,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author ygrignon
  */
 public class EntityTest {
-    private static final Logger logger    = LoggerFactory.getLogger(EntityTest.class);
     private static PDPEngine pdp;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClassSetup() throws Exception {
         Properties properties = new Properties();
         try (InputStream inStream = new FileInputStream("src/test/resources/testsets/entity/xacml.properties")) {
@@ -118,7 +126,8 @@ public class EntityTest {
             this.organization = organization;
         }
 
-        public Relationship() {}
+        @SuppressWarnings("unused")
+		public Relationship() {}
 
         @XACMLAttribute(attributeId = "urn:example:xacml:attribute:relationship-kind")
         public String relationshipKind;

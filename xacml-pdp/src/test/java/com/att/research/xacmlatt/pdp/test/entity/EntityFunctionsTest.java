@@ -1,12 +1,38 @@
 /*
  * Copyright (c) 2023, salesforce.com, inc.
+ * Modifications Copyright (c) 2023 AT&T Inc.
  * All rights reserved.
  * SPDX-License-Identifier: MIT
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 package com.att.research.xacmlatt.pdp.test.entity;
 
-import com.att.research.xacml.api.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.math.BigInteger;
+import java.net.URI;
+import java.util.Collections;
+import java.util.List;
+
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import com.att.research.xacml.api.Attribute;
+import com.att.research.xacml.api.AttributeValue;
+import com.att.research.xacml.api.DataTypeException;
+import com.att.research.xacml.api.Identifier;
+import com.att.research.xacml.api.Request;
+import com.att.research.xacml.api.RequestAttributes;
+import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.IdentifierImpl;
 import com.att.research.xacml.std.StdAttribute;
 import com.att.research.xacml.std.StdRequestAttributes;
@@ -20,27 +46,19 @@ import com.att.research.xacml.std.datatypes.DataTypes;
 import com.att.research.xacml.std.datatypes.XPathExpressionWrapper;
 import com.att.research.xacml.std.dom.DOMStructureException;
 import com.att.research.xacmlatt.pdp.eval.EvaluationContext;
-import com.att.research.xacmlatt.pdp.policy.*;
+import com.att.research.xacmlatt.pdp.policy.Bag;
+import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
+import com.att.research.xacmlatt.pdp.policy.FunctionArgument;
+import com.att.research.xacmlatt.pdp.policy.FunctionArgumentAttributeValue;
+import com.att.research.xacmlatt.pdp.policy.FunctionArgumentBag;
+import com.att.research.xacmlatt.pdp.policy.FunctionDefinition;
 import com.att.research.xacmlatt.pdp.std.StdEvaluationContext;
 import com.att.research.xacmlatt.pdp.std.StdFunctionDefinitionFactory;
-import com.att.research.xacmlatt.pdp.std.functions.*;
-import org.junit.Test;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.StringReader;
-import java.math.BigInteger;
-import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.Assert.*;
+import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionAttributeDesignator;
+import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionAttributeSelector;
+import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionBag;
+import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionBagOneAndOnly;
+import com.att.research.xacmlatt.pdp.std.functions.FunctionDefinitionBagSize;
 
 /**
  * Tests that <a href="https://docs.oasis-open.org/xacml/xacml-3.0-related-entities/v1.0/cs02/xacml-3.0-related-entities-v1.0-cs02.html">
@@ -91,35 +109,35 @@ public class EntityFunctionsTest {
 
     private void testAttributeDesignator(EvaluationContext evaluationContext, FunctionArgument entity, FunctionArgument key, FunctionArgument dataType) throws DataTypeException {
         FunctionDefinition fd = getFunctionDefinition("urn:oasis:names:tc:xacml:3.0:function:attribute-designator");
-        assertTrue(fd instanceof FunctionDefinitionAttributeDesignator);
+        assertThat(fd).isInstanceOf(FunctionDefinitionAttributeDesignator.class);
 
         FunctionArgument mustBePresent = new FunctionArgumentAttributeValue(DataTypeBoolean.AV_TRUE);
         FunctionArgument issuer = new FunctionArgumentAttributeValue(DataTypes.DT_STRING.createAttributeValue("issuer"));
 
         // Three parameters signature: must NOT be present, matching no issuer
         ExpressionResult result = fd.evaluate(evaluationContext, List.of(entity, key, dataType));
-        assertTrue(result.isOk());
-        assertTrue(result.isBag());
-        assertEquals(DataTypeBoolean.AV_TRUE, result.getValue());
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.isBag()).isTrue();
+        assertThat(result.getValue()).isEqualTo(DataTypeBoolean.AV_TRUE);
 
         // Four parameters signature: must be present, matching no issuer
         result = fd.evaluate(evaluationContext, List.of(entity, key, dataType, mustBePresent));
-        assertTrue(result.isOk());
-        assertTrue(result.isBag());
-        assertEquals(DataTypeBoolean.AV_TRUE, result.getValue());
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.isBag()).isTrue();
+        assertThat(result.getValue()).isEqualTo(DataTypeBoolean.AV_TRUE);
 
         // Five parameters signature, must be present, mismatched issuer
         result = fd.evaluate(evaluationContext, List.of(entity, key, dataType, mustBePresent, issuer));
-        assertFalse(result.isOk());
-        assertEquals(StdStatusCode.STATUS_CODE_MISSING_ATTRIBUTE, result.getStatus().getStatusCode());
+        assertThat(result.isOk()).isFalse();
+        assertThat(result.getStatus().getStatusCode()).isEqualTo(StdStatusCode.STATUS_CODE_MISSING_ATTRIBUTE);
 
         mustBePresent = new FunctionArgumentAttributeValue(DataTypeBoolean.AV_FALSE);
 
         // Five parameters signature, must NOT be present, mismatched issuer
         result = fd.evaluate(evaluationContext, List.of(entity, key, dataType, mustBePresent, issuer));
-        assertTrue(result.isOk());
-        assertTrue(result.isBag());
-        assertTrue(result.getBag().isEmpty());
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.isBag()).isTrue();
+        assertThat(result.getBag().isEmpty()).isTrue();
     }
 
     @Test
@@ -157,7 +175,7 @@ public class EntityFunctionsTest {
 
     private void testAttributeSelector(EvaluationContext evaluationContext, FunctionArgument entity) throws DataTypeException {
         FunctionDefinition fd = getFunctionDefinition("urn:oasis:names:tc:xacml:3.0:function:attribute-selector");
-        assertTrue(fd instanceof FunctionDefinitionAttributeSelector);
+        assertThat(fd instanceof FunctionDefinitionAttributeSelector).isTrue();
 
         Identifier xpathCategoryId = new IdentifierImpl("urn:ignored");
         AttributeValue<XPathExpressionWrapper> goodXPathExpression = DataTypes.DT_XPATHEXPRESSION.createAttributeValue("/ex:Root/ex:Nested", xpathCategoryId);
@@ -175,48 +193,48 @@ public class EntityFunctionsTest {
 
         // Three parameters signature: use root content node, must NOT be present
         ExpressionResult result = fd.evaluate(evaluationContext, List.of(entity, goodXPath, dataType));
-        assertTrue(result.isOk());
-        assertTrue(result.isBag());
-        assertEquals(1, result.getBag().size());
-        assertEquals(DataTypeBoolean.AV_TRUE, result.getValue());
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.isBag()).isTrue();
+        assertThat(result.getBag().size()).isEqualTo(1);
+        assertThat(result.getValue()).isEqualTo(DataTypeBoolean.AV_TRUE);
 
         result = fd.evaluate(evaluationContext, List.of(entity, badXPath, dataType));
-        assertTrue(result.isOk());
-        assertTrue(result.isBag());
-        assertEquals(0, result.getBag().size());
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.isBag()).isTrue();
+        assertThat(result.getBag().size()).isEqualTo(0);
 
         // Four parameters signature: use root content node, must be present
         result = fd.evaluate(evaluationContext, List.of(entity, badXPath, dataType, mustBePresent));
-        assertEquals(StdStatusCode.STATUS_CODE_MISSING_ATTRIBUTE, result.getStatus().getStatusCode());
+        assertThat(result.getStatus().getStatusCode()).isEqualTo(StdStatusCode.STATUS_CODE_MISSING_ATTRIBUTE);
 
         // Five parameters signature: bad content node selector, must be present
         result = fd.evaluate(evaluationContext, List.of(entity, goodXPath, dataType, mustBePresent, badXPathRef));
-        assertEquals(StdStatusCode.STATUS_CODE_SYNTAX_ERROR, result.getStatus().getStatusCode());
+        assertThat(result.getStatus().getStatusCode()).isEqualTo(StdStatusCode.STATUS_CODE_SYNTAX_ERROR);
 
         // Five parameters signature: good content node selector, good relative xpath, must be present
         result = fd.evaluate(evaluationContext, List.of(entity, textXPath, dataType, mustBePresent, goodXPathRef));
-        assertTrue(result.isOk());
-        assertTrue(result.isBag());
-        assertEquals(1, result.getBag().size());
-        assertEquals(DataTypeBoolean.AV_TRUE, result.getValue());
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.isBag()).isTrue();
+        assertThat(result.getBag().size()).isEqualTo(1);
+        assertThat(result.getValue()).isEqualTo(DataTypeBoolean.AV_TRUE);
 
         // Five parameters signature: good content node selector, bad relative xpath, must be present
         result = fd.evaluate(evaluationContext, List.of(entity, badXPath, dataType, mustBePresent, goodXPathRef));
-        assertEquals(StdStatusCode.STATUS_CODE_MISSING_ATTRIBUTE, result.getStatus().getStatusCode());
+        assertThat(result.getStatus().getStatusCode()).isEqualTo(StdStatusCode.STATUS_CODE_MISSING_ATTRIBUTE);
 
         mustBePresent = new FunctionArgumentAttributeValue(DataTypeBoolean.AV_FALSE);
 
         // Five parameters signature: good content node selector, bad relative xpath, must NOT be present
         result = fd.evaluate(evaluationContext, List.of(entity, badXPath, dataType, mustBePresent, goodXPathRef));
-        assertTrue(result.isOk());
-        assertTrue(result.isBag());
-        assertTrue(result.getBag().isEmpty());
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.isBag()).isTrue();
+        assertThat(result.getBag().isEmpty()).isTrue();
     }
 
     @Test
     public void testEntityOneAndOnly() throws DataTypeException {
         FunctionDefinition fd = getFunctionDefinition("urn:oasis:names:tc:xacml:3.0:function:entity-one-and-only");
-        assertTrue(fd instanceof FunctionDefinitionBagOneAndOnly);
+        assertThat(fd).isInstanceOf(FunctionDefinitionBagOneAndOnly.class);
 
         AttributeValue<RequestAttributes> value = DataTypes.DT_ENTITY.createAttributeValue(new StdRequestAttributes(null, Collections.emptyList(), null, null));
         Bag bag = new Bag();
@@ -224,52 +242,52 @@ public class EntityFunctionsTest {
         FunctionArgument functionArgument = new FunctionArgumentBag(bag);
 
         ExpressionResult result = fd.evaluate(null, Collections.singletonList(functionArgument));
-        assertFalse(result.isBag());
-        assertEquals(value, result.getValue());
+        assertThat(result.isBag()).isFalse();
+        assertThat(result.getValue()).isEqualTo(value);
     }
 
     @Test
     public void testEntityBagSize() throws DataTypeException {
         FunctionDefinition fd = getFunctionDefinition("urn:oasis:names:tc:xacml:3.0:function:entity-bag-size");
-        assertTrue(fd instanceof FunctionDefinitionBagSize);
+        assertThat(fd).isInstanceOf(FunctionDefinitionBagSize.class);
 
         // Create a function argument with an empty bag
         Bag bag = new Bag();
         FunctionArgument functionArgument = new FunctionArgumentBag(bag);
 
         ExpressionResult result = fd.evaluate(null, Collections.singletonList(functionArgument));
-        assertFalse(result.isBag());
-        assertEquals(XACML3.ID_DATATYPE_INTEGER, result.getValue().getDataTypeId());
-        assertEquals(BigInteger.valueOf(0), result.getValue().getValue());
+        assertThat(result.isBag()).isFalse();
+        assertThat(result.getValue().getDataTypeId()).isEqualTo(XACML3.ID_DATATYPE_INTEGER);
+        assertThat(result.getValue().getValue()).isEqualTo(BigInteger.valueOf(0));
 
         // Add an entity to the bag
         bag.add(DataTypes.DT_ENTITY.createAttributeValue(new StdRequestAttributes(null, Collections.emptyList(), null, null)));
 
         result = fd.evaluate(null, Collections.singletonList(functionArgument));
-        assertFalse(result.isBag());
-        assertEquals(XACML3.ID_DATATYPE_INTEGER, result.getValue().getDataTypeId());
-        assertEquals(BigInteger.valueOf(1), result.getValue().getValue());
+        assertThat(result.isBag()).isFalse();
+        assertThat(result.getValue().getDataTypeId()).isEqualTo(XACML3.ID_DATATYPE_INTEGER);
+        assertThat(result.getValue().getValue()).isEqualTo(BigInteger.valueOf(1));
     }
 
     @Test
     public void testEntityBag() throws DataTypeException {
         FunctionDefinition fd = getFunctionDefinition("urn:oasis:names:tc:xacml:3.0:function:entity-bag");
-        assertTrue(fd instanceof FunctionDefinitionBag);
+        assertThat(fd).isInstanceOf(FunctionDefinitionBag.class);
 
         // Create a function argument with an entity
         FunctionArgument functionArgument = new FunctionArgumentAttributeValue(
                 DataTypes.DT_ENTITY.createAttributeValue(new StdRequestAttributes(null, Collections.emptyList(), null, null)));
 
         ExpressionResult result = fd.evaluate(null, Collections.singletonList(functionArgument));
-        assertTrue(result.isBag());
-        assertEquals(1, result.getBag().size());
-        assertEquals(XACML3.ID_DATATYPE_ENTITY, result.getBag().getAttributeValues().next().getDataTypeId());
+        assertThat(result.isBag()).isTrue();
+        assertThat(result.getBag().size()).isEqualTo(1);
+        assertThat(result.getBag().getAttributeValues().next().getDataTypeId()).isEqualTo(XACML3.ID_DATATYPE_ENTITY);
     }
 
     private FunctionDefinition getFunctionDefinition(String uri) {
         FunctionDefinition fd = new StdFunctionDefinitionFactory().getFunctionDefinition(new IdentifierImpl(uri));
-        assertNotNull(fd);
-        assertEquals(uri, fd.getId().stringValue());
+        assertThat(fd).isNotNull();
+        assertThat(fd.getId().stringValue()).isEqualTo(uri);
         return fd;
     }
 

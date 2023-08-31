@@ -1,15 +1,16 @@
 /*
  *
- *          Copyright (c) 2018-2019 AT&T Knowledge Ventures
+ *          Copyright (c) 2018-2019, 2023 AT&T Knowledge Ventures
  *                     SPDX-License-Identifier: MIT
  */
 
 package com.att.research.xacml.std.datatypes;
 
-import static org.junit.Assert.*;
-import java.time.LocalDate;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import java.time.LocalDate;
 
 import com.att.research.xacml.api.DataTypeException;
 
@@ -21,13 +22,12 @@ public class DataTypeDateTest {
 		LocalDate local = LocalDate.now();
 		ISO8601Date iso8601 = ISO8601Date.fromLocalDate(local);
 
-		assertEquals(iso8601, dateType.convert(iso8601));
-		assertEquals(iso8601, dateType.convert(local));
-		assertEquals(2007, dateType.convert("2007-05-04").getYear());
+		assertThat(iso8601).isEqualTo(dateType.convert(iso8601));
+		assertThat(iso8601).isEqualTo(dateType.convert(local));
+		assertThat(2007).isEqualTo(dateType.convert("2007-05-04").getYear());
 	}
 
-	@Test(expected = DataTypeException.class)
-	public void testParse() throws DataTypeException {
-		DataTypeDate.newInstance().convert("888888");
+	public void testParse() {
+		assertThatExceptionOfType(DataTypeException.class).isThrownBy(() ->DataTypeDate.newInstance().convert("888888"));
 	}
 }

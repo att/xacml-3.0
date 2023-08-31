@@ -1,21 +1,32 @@
+/*
+ *
+ *          Copyright (c) 2023  AT&T Inc.
+ *                     SPDX-License-Identifier: MIT
+ */
 package com.att.research.xacmlatt.pdp.policy.expressions;
 
-import com.att.research.xacml.api.AttributeValue;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.api.XACML3;
-import com.att.research.xacml.std.*;
+import com.att.research.xacml.std.IdentifierImpl;
+import com.att.research.xacml.std.StdAttributeValue;
+import com.att.research.xacml.std.StdMutableAttribute;
+import com.att.research.xacml.std.StdMutableRequest;
+import com.att.research.xacml.std.StdMutableRequestAttributes;
+import com.att.research.xacml.std.StdStatus;
 import com.att.research.xacml.std.datatypes.DataTypeBoolean;
 import com.att.research.xacmlatt.pdp.policy.Bag;
 import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
 import com.att.research.xacmlatt.pdp.policy.FunctionArgumentExpression;
 import com.att.research.xacmlatt.pdp.std.StdEvaluationContext;
 import com.att.research.xacmlatt.pdp.std.StdFunctions;
-import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 public class AnyOfAnyTest {
     @Test
@@ -29,8 +40,8 @@ public class AnyOfAnyTest {
                 new FunctionArgumentExpression(new QuantifiedExpressionTest.MockExpression(
                         ExpressionResult.newBag(newBag("zero", "two", "four"))), evaluationContext, null)
         ));
-        assertEquals(StdStatus.STATUS_OK, result.getStatus());
-        assertEquals(DataTypeBoolean.AV_TRUE, result.getValue());
+        assertThat(StdStatus.STATUS_OK).isEqualTo(result.getStatus());
+        assertThat(DataTypeBoolean.AV_TRUE).isEqualTo(result.getValue());
     }
 
     @Test
@@ -64,8 +75,8 @@ public class AnyOfAnyTest {
                 new FunctionArgumentExpression(attributeDesignator1, evaluationContext, null),
                 new FunctionArgumentExpression(attributeDesignator2, evaluationContext, null)
         ));
-        assertEquals(StdStatus.STATUS_OK, result.getStatus());
-        assertEquals(DataTypeBoolean.AV_TRUE, result.getValue());
+        assertThat(StdStatus.STATUS_OK).isEqualTo(result.getStatus());
+        assertThat(DataTypeBoolean.AV_TRUE).isEqualTo(result.getValue());
     }
 
     @Test
@@ -79,8 +90,8 @@ public class AnyOfAnyTest {
                 new FunctionArgumentExpression(new QuantifiedExpressionTest.MockExpression(
                         ExpressionResult.newBag(newBag("zero", "two", "four"))), evaluationContext, null)
         ));
-        assertEquals(StdStatus.STATUS_OK, result.getStatus());
-        assertEquals(DataTypeBoolean.AV_TRUE, result.getValue());
+        assertThat(StdStatus.STATUS_OK).isEqualTo(result.getStatus());
+        assertThat(DataTypeBoolean.AV_TRUE).isEqualTo(result.getValue());
     }
 
     @Test
@@ -94,8 +105,8 @@ public class AnyOfAnyTest {
                 new FunctionArgumentExpression(new QuantifiedExpressionTest.MockExpression(
                         ExpressionResult.newBag(newBag("one", "two", "three"))), evaluationContext, null)
         ));
-        assertEquals(StdStatus.STATUS_OK, result.getStatus());
-        assertEquals(DataTypeBoolean.AV_TRUE, result.getValue());
+        assertThat(StdStatus.STATUS_OK).isEqualTo(result.getStatus());
+        assertThat(DataTypeBoolean.AV_TRUE).isEqualTo(result.getValue());
     }
 
     @Test
@@ -109,8 +120,8 @@ public class AnyOfAnyTest {
                 new FunctionArgumentExpression(new QuantifiedExpressionTest.MockExpression(
                         ExpressionResult.newBag(newBag("four", "five", "six"))), evaluationContext, null)
         ));
-        assertEquals(StdStatus.STATUS_OK, result.getStatus());
-        assertEquals(DataTypeBoolean.AV_FALSE, result.getValue());
+        assertThat(StdStatus.STATUS_OK).isEqualTo(result.getStatus());
+        assertThat(DataTypeBoolean.AV_FALSE).isEqualTo(result.getValue());
     }
     private Bag newBag(String... values) {
         Bag bag = new Bag();

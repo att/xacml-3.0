@@ -12,8 +12,10 @@ import java.time.LocalTime;
 import java.time.OffsetTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.datatypes.DataTypes;
@@ -26,7 +28,7 @@ public class FunctionDefinitionTimeInRangeTest {
   private static FunctionDefinitionTimeInRange<?> fd = (FunctionDefinitionTimeInRange<?>) StdFunctions.FD_TIME_IN_RANGE;
   private static List<FunctionArgument> arguments = new ArrayList<FunctionArgument>();
 
-  @Before
+  @BeforeEach
   public void beforeEachTest() {
     arguments.clear();
   }

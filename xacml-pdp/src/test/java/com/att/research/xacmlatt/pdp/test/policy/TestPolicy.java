@@ -26,20 +26,13 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.AttributeType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.AttributeValueType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.AttributesType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.ObjectFactory;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySetType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicyType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.RequestType;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.att.research.xacml.api.AttributeValue;
 import com.att.research.xacml.api.DataType;
 import com.att.research.xacml.api.DataTypeException;
@@ -47,12 +40,20 @@ import com.att.research.xacml.api.DataTypeFactory;
 import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.IdentifierImpl;
+import com.att.research.xacml.test.TestBase;
 import com.att.research.xacml.util.FactoryException;
 import com.att.research.xacml.util.XACMLObjectCopy;
 import com.att.research.xacml.util.XACMLPolicyAggregator;
 import com.att.research.xacml.util.XACMLPolicyScanner;
 import com.att.research.xacml.util.XACMLProperties;
-import com.att.research.xacml.test.TestBase;
+
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.AttributeType;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.AttributeValueType;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.AttributesType;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.ObjectFactory;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySetType;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicyType;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.RequestType;
 
 
 /**

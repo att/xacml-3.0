@@ -1,16 +1,19 @@
+/*
+ *
+ *          Copyright (c) 2013,2023  AT&T Knowledge Ventures
+ *                     SPDX-License-Identifier: MIT
+ */
 package com.att.research.xacmlatt.pdp.std.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import com.att.research.xacml.api.DataTypeException;
 import com.att.research.xacml.api.XACML3;
 import com.att.research.xacml.std.datatypes.DataTypes;
 import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
@@ -35,64 +38,52 @@ public class FunctionDefinitionNumberTypeConversionTest {
 	List<FunctionArgument> arguments = new ArrayList<FunctionArgument>();
 	
 	@Test
-	public void testDouble_to_integer() {
-		FunctionArgumentAttributeValue attr1 = null;
-		try {
-			attr1 = new FunctionArgumentAttributeValue(DataTypes.DT_DOUBLE.createAttributeValue(5.432));
-
-		} catch (Exception e) {
-			fail("creating attribute e="+ e);
-		}
+	public void testDouble_to_integer() throws DataTypeException {
+		FunctionArgumentAttributeValue attr1 = new FunctionArgumentAttributeValue(DataTypes.DT_DOUBLE.createAttributeValue(5.432));
 		
 		FunctionDefinitionNumberTypeConversion<?, ?> fd = (FunctionDefinitionNumberTypeConversion<?, ?>) StdFunctions.FD_DOUBLE_TO_INTEGER;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_DOUBLE_TO_INTEGER, fd.getId());
-		assertEquals(DataTypes.DT_DOUBLE.getId(), fd.getDataTypeArgs().getId());
-		assertEquals(DataTypes.DT_INTEGER.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_DOUBLE_TO_INTEGER);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_DOUBLE.getId());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_INTEGER.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(1), fd.getNumArgs());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat(fd.getNumArgs()).isEqualTo(Integer.valueOf(1));
 		
 		
 		// test normal add
 		arguments.add(attr1);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		BigInteger resValue = (BigInteger)res.getValue().getValue();
-		assertEquals(BigInteger.valueOf(5), resValue);
+		assertThat(resValue).isEqualTo(BigInteger.valueOf(5));
 	}
 
 	
 	@Test
-	public void testInteger_to_double() {
-		FunctionArgumentAttributeValue attr1 = null;
-		try {
-			attr1 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(5));
-
-		} catch (Exception e) {
-			fail("creating attribute e="+ e);
-		}
+	public void testInteger_to_double() throws DataTypeException {
+		FunctionArgumentAttributeValue attr1 = new FunctionArgumentAttributeValue(DataTypes.DT_INTEGER.createAttributeValue(5));
 		
 		FunctionDefinitionNumberTypeConversion<?, ?> fd = (FunctionDefinitionNumberTypeConversion<?, ?>) StdFunctions.FD_INTEGER_TO_DOUBLE;
 		
 		// check identity and type of the thing created
-		assertEquals(XACML3.ID_FUNCTION_INTEGER_TO_DOUBLE, fd.getId());
-		assertEquals(DataTypes.DT_INTEGER.getId(), fd.getDataTypeArgs().getId());
-		assertEquals(DataTypes.DT_DOUBLE.getId(), fd.getDataTypeId());
+		assertThat(fd.getId()).isEqualTo(XACML3.ID_FUNCTION_INTEGER_TO_DOUBLE);
+		assertThat(fd.getDataTypeArgs().getId()).isEqualTo(DataTypes.DT_INTEGER.getId());
+		assertThat(fd.getDataTypeId()).isEqualTo(DataTypes.DT_DOUBLE.getId());
 		
 		// just to be safe...  If tests take too long these can probably be eliminated
-		assertFalse(fd.returnsBag());
-		assertEquals(Integer.valueOf(1), fd.getNumArgs());
+		assertThat(fd.returnsBag()).isFalse();
+		assertThat(fd.getNumArgs()).isEqualTo(Integer.valueOf(1));
 		
 		
 		// test normal add
 		arguments.add(attr1);
 		ExpressionResult res = fd.evaluate(null, arguments);
-		assertTrue(res.isOk());
+		assertThat(res.isOk()).isTrue();
 		Double resValue = (Double)res.getValue().getValue();
-		assertEquals(Double.valueOf(5.0), resValue);
+		assertThat(resValue).isEqualTo(Double.valueOf(5.0));
 	}
 	
 	

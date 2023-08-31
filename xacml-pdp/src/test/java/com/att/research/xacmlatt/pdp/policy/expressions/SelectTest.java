@@ -1,19 +1,20 @@
 /*
  * Copyright (c) 2021, salesforce.com, inc.
+ * Modifications Copyright (c) 2023 AT&T Inc.
  * All rights reserved.
  * SPDX-License-Identifier: MIT
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 package com.att.research.xacmlatt.pdp.policy.expressions;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
+
 import com.att.research.xacmlatt.pdp.eval.EvaluationException;
 import com.att.research.xacmlatt.pdp.policy.ExpressionResult;
 import com.att.research.xacmlatt.pdp.policy.LexicalEnvironment;
 import com.att.research.xacmlatt.pdp.policy.Policy;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for Map quantified expression. See section 5.4 of the
@@ -34,9 +35,9 @@ public class SelectTest extends QuantifiedExpressionTest {
      */
     @Override
     protected void assertEmptyDomainResult(ExpressionResult result) {
-        assertTrue(result.isOk());
-        assertTrue(result.isBag());
-        assertEquals(0, result.getBag().size());
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.isBag()).isTrue();
+        assertThat(result.getBag().size()).isEqualTo(0);
     }
 
     /**
@@ -57,9 +58,10 @@ public class SelectTest extends QuantifiedExpressionTest {
 
         // Evaluate the quantified expression and make sure it returns the first domain value
         ExpressionResult result = evaluate(quantifiedExpression);
-        assertTrue(result.getStatus().getStatusMessage(), result.isOk());
-        assertTrue(result.isBag());
-        assertEquals(1, result.getBag().size());
-        assertEquals(Boolean.TRUE, result.getBag().getAttributeValues().next().getValue());
+        assertThat(result.getStatus().getStatusMessage()).isNull();;
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.isBag()).isTrue();
+        assertThat(result.getBag().size()).isEqualTo(1);
+        assertThat(Boolean.TRUE).isEqualTo(result.getBag().getAttributeValues().next().getValue());
     }
 }

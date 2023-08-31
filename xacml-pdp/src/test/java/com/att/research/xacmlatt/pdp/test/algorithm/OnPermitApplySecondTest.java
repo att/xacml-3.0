@@ -1,10 +1,22 @@
 /*
  * Copyright (c) 2021, salesforce.com, inc.
+ * Modifications Copyright (c) 2023, AT&T Inc.
  * All rights reserved.
  * SPDX-License-Identifier: MIT
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 package com.att.research.xacmlatt.pdp.test.algorithm;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Properties;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import com.att.research.xacml.api.Decision;
 import com.att.research.xacml.api.Response;
@@ -16,24 +28,9 @@ import com.att.research.xacml.std.annotations.XACMLRequest;
 import com.att.research.xacml.std.annotations.XACMLSubject;
 import com.att.research.xacmlatt.pdp.eval.EvaluationContext;
 import com.att.research.xacmlatt.pdp.eval.EvaluationResult;
-import com.att.research.xacmlatt.pdp.policy.CombinerParameter;
 import com.att.research.xacmlatt.pdp.policy.CombiningElement;
 import com.att.research.xacmlatt.pdp.policy.PolicySetChild;
 import com.att.research.xacmlatt.pdp.std.StdCombiningAlgorithms;
-import com.att.research.xacmlatt.pdp.std.StdEvaluationContext;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.List;
-import java.util.Properties;
-import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * These tests insure compliance to the on-permit-apply-second specification from the
@@ -43,11 +40,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author ygrignon
  */
 public class OnPermitApplySecondTest {
-    private static final Logger logger = LoggerFactory.getLogger(OnPermitApplySecondTest.class);
 
     private static PDPEngine pdp;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClassSetup() throws Exception {
         Properties properties = new Properties();
         try (InputStream inStream = new FileInputStream("src/test/resources/testsets/algorithms/onPermitApplySecond/xacml.properties")) {
