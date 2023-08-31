@@ -353,9 +353,12 @@ public class JsonResponseTranslatorTest {
 
     @Test
     public void testExceptions() {
-        assertThatExceptionOfType(JSONStructureException.class).isThrownBy(() -> {
-            JsonResponseTranslator.load(folder.resolve("/idontexist.json").toFile());
-        });
+    	File nonExistentFile = folder.resolve("/idontexist.json").toFile();
+    	if (nonExistentFile != null) {
+    		assertThatExceptionOfType(JSONStructureException.class).isThrownBy(() -> {
+    		    JsonResponseTranslator.load(folder.resolve("/idontexist.json").toFile());
+        	});
+    	}
         assertThatExceptionOfType(JSONStructureException.class).isThrownBy(() -> {
             JsonResponseTranslator.load("iamnot a json string at all");
         });

@@ -8,10 +8,10 @@ package com.att.research.xacml.std;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import org.junit.jupiter.api.Test;
 import java.net.URI;
 
-import com.att.research.xacml.api.DataTypeException;
+import org.junit.jupiter.api.Test;
+
 import com.att.research.xacml.api.Identifier;
 
 public class IdentifierImplTest {
@@ -22,15 +22,17 @@ public class IdentifierImplTest {
     assertThat(0).isNotEqualTo(id.hashCode());
   }
 
+  @Test
   public void testIdentifierImplURI() {
     URI uri = URI.create("com:test");
     Identifier id = new IdentifierImpl(uri);
     assertThat(id.getUri()).isEqualTo(uri);
   }
 
+  @Test
   public void testIdentifierImplURINull() {
     URI uri = null;
-    assertThatExceptionOfType(DataTypeException.class).isThrownBy(() -> new IdentifierImpl(uri));
+    assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> new IdentifierImpl(uri));
   }
 
   @Test
