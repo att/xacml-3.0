@@ -14,13 +14,14 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
+import org.w3c.dom.Node;
+
 import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.api.Request;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import org.w3c.dom.Node;
 
 /**
  * Translates JSON XACML Request that conforms to the following specification:

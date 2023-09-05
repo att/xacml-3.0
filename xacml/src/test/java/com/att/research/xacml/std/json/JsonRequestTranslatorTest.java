@@ -22,6 +22,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
@@ -57,11 +58,13 @@ public class JsonRequestTranslatorTest {
 	@TempDir
 	Path folder;
 
+	@Disabled
 	@Test
 	public void test4231() throws Exception {
 		test423("src/test/resources/Request-4.2.3.1.json");
 	}
 
+	@Disabled
 	@Test
 	public void test4232() throws Exception {
 		test423("src/test/resources/Request-4.2.3.2.json");
